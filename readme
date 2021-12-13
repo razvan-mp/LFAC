@@ -1,0 +1,17 @@
+am_plecat = exit
+integru = int
+plutitor = float
+litera = char
+fraza = string
+bul = bool
+tipu_meu = my type
+conservator = const
+
+daca = if
+altfel = else
+poate = elif
+functie = function
+intoarce = return
+vezi = eval
+rastimp = while
+pt = for
