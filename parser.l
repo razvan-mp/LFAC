@@ -45,10 +45,10 @@ void yyerror (char *error);
 "bul"                          	    {yylval.type_id = bul; return bul;}
 
 [a-zA-Z][a-zA-Z_0-9]*	            {strcpy(yylval.string, yytext); return AIDI;}
-[0]|[-]?[1-9][0-9]*     	        {yylval.num = atoi(yytext); return number;}
-[0]|[-]?[1-9][0-9]*\.[0-9]+         {yylval.num = atof(yytext); return number_r;}
-['].[']                 	        {yytext[2] = '\0'; strcpy(yylval.string, yytext + 1); return Valoare_Litera;}
-["][^\"]*["]                	    {strcpy(yylval.string, yytext + 1); yylval.string[strlen(yytext)] = '\0'; return Valoare_Fraza;}
+[0]|[-]?[1-9][0-9]*     	        {yylval.num = atoi(yytext); return numar;}
+[0]|[-]?[1-9][0-9]*\.[0-9]+         {yylval.num = atof(yytext); return numar_real;}
+['].[']                 	        {yytext[2] = '\0'; strcpy(yylval.string, yytext + 1); return valoare_litera;}
+["][^\"]*["]                	    {strcpy(yylval.string, yytext + 1); yylval.string[strlen(yytext)] = '\0'; return valoare_fraza;}
 [ \t]                  		        ;
 [\n]                    	        {yylineno++;}
 [-+=*/{};,\[\]]                     {return yytext[0];}
