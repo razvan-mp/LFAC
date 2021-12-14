@@ -1,62 +1,43 @@
 %{
-#include <string.h>
-#include <stdio.h>
-
-int yylex();
-void yyerror (char *error);
-
+    #include <stdio.h>
+    extern FILE* yyin;
+    extern char* yytext;
+    extern int yylineno;
 %}
 
-%option noyywrap
+%start s
+
+%union 
+{
+	int type; 
+	double value; 
+	char name[1000]; 
+}     
+
+%token OR LEQ AND GEQ EQEQ
+
+%token REAL_EQUAL PLUS MINUS PRODUCT DIVIDE LS GE
+
+%token PT DACA VEZI POATE ALTFEL FUNCTIE RASTIMP INTOARCE print 
+
+%token <type> conservator plutitor tipu_meu integru bul litera fraza
+%token <name> Valoare_Litera Valoare_Fraza
+
+%token am_plecat
+
+%token AIDI number number_r
+
+
+
 
 %%
-
-"||"                    	        {return OR;}
-"<="                            	{return LEQ;}
-"&&"                    	        {return AND;}
-">="                    	        {return GEQ;}
-"=="                    	        {return EQEQ;}
-
-"="                             	{return REAL_EQUAL;}
-"+"                             	{return PLUS;}
-"-"                             	{return MINUS;}
-"*"                             	{return PRODUCT;}
-"/"                             	{return DIVIDE;}
-"<"                             	{return LS;}
-">"                             	{return GE;}
-
-"pt"                                {return PT;}
-"daca"                            	{return DACA;}
-"vezi"                              {return VEZI;}
-"poate"                  	        {return POATE;}
-"altfel"                  	        {return ALTFEL;}
-"functie"                   	    {return FUNCTIE;}
-"rastimp"                           {return RASTIMP;}
-"intoarce"                	        {return INTOARCE;}
-
-"conservator"                       {return conservator;}
-"am_plecat"				   	        {return am_plecat;}
-"plutitor"                         	{yylval.type_id = plutitor; return plutitor;}
-"tipu_meu"                          {return tipu_meu;}
-"integru"              	        	{yylval.type_id = integru; return integru;}
-"litera"                          	{yylval.type_id = litera; return litera;}
-"fraza"                        	    {yylval.type_id = fraza; return fraza;}
-"print"				            	{return print;}
-"bul"                          	    {yylval.type_id = bul; return bul;}
-
-[a-zA-Z][a-zA-Z_0-9]*	            {strcpy(yylval.string, yytext); return AIDI;}
-[0]|[-]?[1-9][0-9]*     	        {yylval.num = atoi(yytext); return numar;}
-[0]|[-]?[1-9][0-9]*\.[0-9]+         {yylval.num = atof(yytext); return numar_real;}
-['].[']                 	        {yytext[2] = '\0'; strcpy(yylval.string, yytext + 1); return valoare_litera;}
-["][^\"]*["]                	    {strcpy(yylval.string, yytext + 1); yylval.string[strlen(yytext)] = '\0'; return valoare_fraza;}
-[ \t]                  		        ;
-[\n]                    	        {yylineno++;}
-[-+=*/{};,\[\]]                     {return yytext[0];}
-.                       	        {ECHO; yyerror ("caracter dubios"); printf("%s\n", yytext);}
-
-"/*" {BEGIN comment;}
-<comment>.|\n ;
-<comment>"*/" {BEGIN 0;}
-
+s : ;
 %%
-int yywrap (void) {return 1;}
+void yyerror(char *s){
+    printf("error: %s\n", s);
+}
+int main(int argc, char** argv)
+{
+    yyin = fopen(argv[1],"r");
+    yyparse();
+} 
