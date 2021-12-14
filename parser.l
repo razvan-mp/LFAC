@@ -1,6 +1,4 @@
 %{
-#include "y.tab.h"
-
 #include <string.h>
 #include <stdio.h>
 
@@ -9,7 +7,6 @@ void yyerror (char *error);
 
 %}
 
-%x comment
 %option noyywrap
 
 %%
