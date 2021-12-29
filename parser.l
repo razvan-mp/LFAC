@@ -1,5 +1,5 @@
 %{
-#include "ya_starting.tab.h"
+#include "semantics.tab.h"
 
 #include <string.h>
 #include <stdio.h>
