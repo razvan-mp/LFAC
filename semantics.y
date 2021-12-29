@@ -142,6 +142,40 @@ void createEmptyVariable(int type, char* identifier)
         new_variable->array[0] = 0;
     }
 
+    ++number_of_variables;
+}
+
+void createVariable(int type, char* identifier, struct var* expression)
+{
+    if(getIndex(identifier) == -1)
+    {
+        printf("Variabila a mai fost declarata!\n");
+        exit(0);
+    }
+
+    struct variable_structure *new_variable = variables + number_of_variables;
+
+    sprintf(new_variable->identifier, "%s", identifier);
+    new_variable->type = type;
+    new_variable->initialized[0] = true;
+
+    if(type == fraza)
+    {
+        sprintf(new_variable->array_string[0], "%s", expression->array_string[0]);
+    }
+    else
+    if(type == bul)
+    {
+        new_variable->array[0] = (expression->array[0] == 1);
+    }
+    else
+    {
+        new_variable->array[0] = expression->array[0];
+    }
+
+    if(strlen(new_variable->identifier) == 0)
+        free(expression);
+    ++number_of_variables;
 }
 
 void yyerror(char *s){
