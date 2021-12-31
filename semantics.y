@@ -192,6 +192,7 @@ void createVariable(int type, char* identifier, struct variable_structure* expre
     ++number_of_variables;
 }
 
+
 void print_val(struct variable_structure* nod)
 {
     int type = nod->variable_type;
