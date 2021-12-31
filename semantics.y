@@ -1,5 +1,8 @@
 %{
     #include <stdio.h>
+    #include <string.h>
+    #include <stdbool.h>
+    #include <stdlib.h>
 
     #define NMAX 1000
 
@@ -7,6 +10,8 @@
     extern char* yytext;
     extern int yylineno;
 
+    void yyerror(char *s);
+    int yylex();
 
     struct variable_structure
     {
@@ -26,7 +31,7 @@
     }variables[NMAX];
 
     void createEmptyVariable(int, char*);
-    void createVariable(char*, int, struct variable_structure*);
+    void createVariable(int, char*, struct variable_structure*);
     void createConstantVariable(char*, int, struct variable_structure*);
 
     int number_of_variables = 0;
@@ -37,6 +42,7 @@
 
 %union 
 {
+    char string[1000];
 	int type; 
 	double value; 
 	char name[1000];
@@ -54,7 +60,8 @@
 
 %token am_plecat
 
-%token AIDI number number_r
+%token number number_r
+%token<string> AIDI
 
 
 /* New */
@@ -70,8 +77,15 @@
 s : ;
 /* Prob trebe pe aici line: line etc*/
 
-line : am_plecat ';' {exit(EXIT_SUCCESS);}
-     | assignment ';' {;}
+program : lines { print_symtable(variable_structure, number_of_variables); printf("Program corect sintactic\n"); }
+
+lines : line                    {;}
+        | lines line            {;}
+        ;
+
+line : am_plecat ';'                    {exit(EXIT_SUCCESS);}
+     | assignment ';'                   {;}
+     | print expression ';'             {print_val($2);}
      ;
 
 TYPE : plutitor {$$ = $1;}
@@ -118,7 +132,7 @@ int getIndex(char* identifier)
             return i;
     }
     return -1;
-} 
+}
 
 void createEmptyVariable(int type, char* identifier)
 {
@@ -131,11 +145,11 @@ void createEmptyVariable(int type, char* identifier)
     struct variable_structure *new_variable = variables + number_of_variables;
 
     sprintf(new_variable->identifier, "%s", identifier);
-    new_variable->type = type;
+    new_variable->variable_type = type;
 
     if(type == fraza)
     {
-        new_variable->array_string[0] = "";
+        sprintf(new_variable->array_string[0], "%s", "");
     }
     else
     {
@@ -145,7 +159,7 @@ void createEmptyVariable(int type, char* identifier)
     ++number_of_variables;
 }
 
-void createVariable(int type, char* identifier, struct var* expression)
+void createVariable(int type, char* identifier, struct variable_structure* expression)
 {
     if(getIndex(identifier) == -1)
     {
@@ -156,7 +170,7 @@ void createVariable(int type, char* identifier, struct var* expression)
     struct variable_structure *new_variable = variables + number_of_variables;
 
     sprintf(new_variable->identifier, "%s", identifier);
-    new_variable->type = type;
+    new_variable->variable_type = type;
     new_variable->initialized[0] = true;
 
     if(type == fraza)
@@ -176,6 +190,30 @@ void createVariable(int type, char* identifier, struct var* expression)
     if(strlen(new_variable->identifier) == 0)
         free(expression);
     ++number_of_variables;
+}
+
+void print_val(struct variable_structure* nod)
+{
+    int type = nod->variable_type;
+    int n;
+
+    switch(type)
+    {
+        case integru:
+            if (nod->variable_type == 2)
+            {
+                n = nod->size_array;
+                printf("{");
+
+                for (int i = 0 ; i < n - 1 ; i++)
+                    printf("%d, ", (int)nod->array[i]);
+                printf("%d}\n", (int)nod->array[n - 1]);
+                break;
+            }
+            if (nod->variable_type == 1)
+                printf("%d\n", (int)nod->array[0]);
+            break;
+    }
 }
 
 void yyerror(char *s){
