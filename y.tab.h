@@ -59,7 +59,7 @@ extern int yydebug;
     plutitor = 260,                /* plutitor  */
     litera = 261,                  /* litera  */
     bul = 262,                     /* bul  */
-    String = 263,                  /* String  */
+    fraza = 263,                   /* fraza  */
     conservator = 264,             /* conservator  */
     GEQ = 265,                     /* GEQ  */
     LEQ = 266,                     /* LEQ  */
@@ -73,12 +73,21 @@ extern int yydebug;
     PROD = 274,                    /* PROD  */
     DIV = 275,                     /* DIV  */
     EQUAL = 276,                   /* EQUAL  */
-    String_Value = 277,            /* String_Value  */
-    Character_Value = 278,         /* Character_Value  */
-    exit_command = 279,            /* exit_command  */
-    number = 280,                  /* number  */
-    number_r = 281,                /* number_r  */
-    IDENTIFIER = 282               /* IDENTIFIER  */
+    IF = 277,                      /* IF  */
+    WHILE = 278,                   /* WHILE  */
+    pt = 279,                      /* pt  */
+    ELSE = 280,                    /* ELSE  */
+    ELIF = 281,                    /* ELIF  */
+    FUN = 282,                     /* FUN  */
+    RETURN = 283,                  /* RETURN  */
+    DEFINE_TYPE = 284,             /* DEFINE_TYPE  */
+    String_Value = 285,            /* String_Value  */
+    Character_Value = 286,         /* Character_Value  */
+    EVAL = 287,                    /* EVAL  */
+    exit_command = 288,            /* exit_command  */
+    number = 289,                  /* number  */
+    number_r = 290,                /* number_r  */
+    IDENTIFIER = 291               /* IDENTIFIER  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -92,7 +101,7 @@ extern int yydebug;
 #define plutitor 260
 #define litera 261
 #define bul 262
-#define String 263
+#define fraza 263
 #define conservator 264
 #define GEQ 265
 #define LEQ 266
@@ -106,12 +115,21 @@ extern int yydebug;
 #define PROD 274
 #define DIV 275
 #define EQUAL 276
-#define String_Value 277
-#define Character_Value 278
-#define exit_command 279
-#define number 280
-#define number_r 281
-#define IDENTIFIER 282
+#define IF 277
+#define WHILE 278
+#define pt 279
+#define ELSE 280
+#define ELIF 281
+#define FUN 282
+#define RETURN 283
+#define DEFINE_TYPE 284
+#define String_Value 285
+#define Character_Value 286
+#define EVAL 287
+#define exit_command 288
+#define number 289
+#define number_r 290
+#define IDENTIFIER 291
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -125,7 +143,7 @@ union YYSTYPE
 	struct var* strct;
 	struct parameter* funParam;
 
-#line 129 "y.tab.h"
+#line 147 "y.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

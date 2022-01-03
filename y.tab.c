@@ -190,7 +190,7 @@ extern int yydebug;
     plutitor = 260,                /* plutitor  */
     litera = 261,                  /* litera  */
     bul = 262,                     /* bul  */
-    String = 263,                  /* String  */
+    fraza = 263,                   /* fraza  */
     conservator = 264,             /* conservator  */
     GEQ = 265,                     /* GEQ  */
     LEQ = 266,                     /* LEQ  */
@@ -204,12 +204,21 @@ extern int yydebug;
     PROD = 274,                    /* PROD  */
     DIV = 275,                     /* DIV  */
     EQUAL = 276,                   /* EQUAL  */
-    String_Value = 277,            /* String_Value  */
-    Character_Value = 278,         /* Character_Value  */
-    exit_command = 279,            /* exit_command  */
-    number = 280,                  /* number  */
-    number_r = 281,                /* number_r  */
-    IDENTIFIER = 282               /* IDENTIFIER  */
+    IF = 277,                      /* IF  */
+    WHILE = 278,                   /* WHILE  */
+    pt = 279,                      /* pt  */
+    ELSE = 280,                    /* ELSE  */
+    ELIF = 281,                    /* ELIF  */
+    FUN = 282,                     /* FUN  */
+    RETURN = 283,                  /* RETURN  */
+    DEFINE_TYPE = 284,             /* DEFINE_TYPE  */
+    String_Value = 285,            /* String_Value  */
+    Character_Value = 286,         /* Character_Value  */
+    EVAL = 287,                    /* EVAL  */
+    exit_command = 288,            /* exit_command  */
+    number = 289,                  /* number  */
+    number_r = 290,                /* number_r  */
+    IDENTIFIER = 291               /* IDENTIFIER  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -223,7 +232,7 @@ extern int yydebug;
 #define plutitor 260
 #define litera 261
 #define bul 262
-#define String 263
+#define fraza 263
 #define conservator 264
 #define GEQ 265
 #define LEQ 266
@@ -237,12 +246,21 @@ extern int yydebug;
 #define PROD 274
 #define DIV 275
 #define EQUAL 276
-#define String_Value 277
-#define Character_Value 278
-#define exit_command 279
-#define number 280
-#define number_r 281
-#define IDENTIFIER 282
+#define IF 277
+#define WHILE 278
+#define pt 279
+#define ELSE 280
+#define ELIF 281
+#define FUN 282
+#define RETURN 283
+#define DEFINE_TYPE 284
+#define String_Value 285
+#define Character_Value 286
+#define EVAL 287
+#define exit_command 288
+#define number 289
+#define number_r 290
+#define IDENTIFIER 291
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -256,7 +274,7 @@ union YYSTYPE
 	struct var* strct;
 	struct parameter* funParam;
 
-#line 260 "y.tab.c"
+#line 278 "y.tab.c"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -282,7 +300,7 @@ enum yysymbol_kind_t
   YYSYMBOL_plutitor = 5,                   /* plutitor  */
   YYSYMBOL_litera = 6,                     /* litera  */
   YYSYMBOL_bul = 7,                        /* bul  */
-  YYSYMBOL_String = 8,                     /* String  */
+  YYSYMBOL_fraza = 8,                      /* fraza  */
   YYSYMBOL_conservator = 9,                /* conservator  */
   YYSYMBOL_GEQ = 10,                       /* GEQ  */
   YYSYMBOL_LEQ = 11,                       /* LEQ  */
@@ -296,25 +314,52 @@ enum yysymbol_kind_t
   YYSYMBOL_PROD = 19,                      /* PROD  */
   YYSYMBOL_DIV = 20,                       /* DIV  */
   YYSYMBOL_EQUAL = 21,                     /* EQUAL  */
-  YYSYMBOL_String_Value = 22,              /* String_Value  */
-  YYSYMBOL_Character_Value = 23,           /* Character_Value  */
-  YYSYMBOL_exit_command = 24,              /* exit_command  */
-  YYSYMBOL_number = 25,                    /* number  */
-  YYSYMBOL_number_r = 26,                  /* number_r  */
-  YYSYMBOL_IDENTIFIER = 27,                /* IDENTIFIER  */
-  YYSYMBOL_28_ = 28,                       /* ';'  */
-  YYSYMBOL_29_ = 29,                       /* '['  */
-  YYSYMBOL_30_ = 30,                       /* ']'  */
-  YYSYMBOL_31_ = 31,                       /* '('  */
-  YYSYMBOL_32_ = 32,                       /* ')'  */
-  YYSYMBOL_YYACCEPT = 33,                  /* $accept  */
-  YYSYMBOL_program = 34,                   /* program  */
-  YYSYMBOL_lines = 35,                     /* lines  */
-  YYSYMBOL_line = 36,                      /* line  */
-  YYSYMBOL_DATA_TYPE = 37,                 /* DATA_TYPE  */
-  YYSYMBOL_assignment = 38,                /* assignment  */
-  YYSYMBOL_exp = 39,                       /* exp  */
-  YYSYMBOL_term = 40                       /* term  */
+  YYSYMBOL_IF = 22,                        /* IF  */
+  YYSYMBOL_WHILE = 23,                     /* WHILE  */
+  YYSYMBOL_pt = 24,                        /* pt  */
+  YYSYMBOL_ELSE = 25,                      /* ELSE  */
+  YYSYMBOL_ELIF = 26,                      /* ELIF  */
+  YYSYMBOL_FUN = 27,                       /* FUN  */
+  YYSYMBOL_RETURN = 28,                    /* RETURN  */
+  YYSYMBOL_DEFINE_TYPE = 29,               /* DEFINE_TYPE  */
+  YYSYMBOL_String_Value = 30,              /* String_Value  */
+  YYSYMBOL_Character_Value = 31,           /* Character_Value  */
+  YYSYMBOL_EVAL = 32,                      /* EVAL  */
+  YYSYMBOL_exit_command = 33,              /* exit_command  */
+  YYSYMBOL_number = 34,                    /* number  */
+  YYSYMBOL_number_r = 35,                  /* number_r  */
+  YYSYMBOL_IDENTIFIER = 36,                /* IDENTIFIER  */
+  YYSYMBOL_37_ = 37,                       /* ';'  */
+  YYSYMBOL_38_ = 38,                       /* '('  */
+  YYSYMBOL_39_ = 39,                       /* ')'  */
+  YYSYMBOL_40_ = 40,                       /* '{'  */
+  YYSYMBOL_41_ = 41,                       /* '}'  */
+  YYSYMBOL_42_ = 42,                       /* '['  */
+  YYSYMBOL_43_ = 43,                       /* ']'  */
+  YYSYMBOL_44_ = 44,                       /* ','  */
+  YYSYMBOL_YYACCEPT = 45,                  /* $accept  */
+  YYSYMBOL_program = 46,                   /* program  */
+  YYSYMBOL_declarations = 47,              /* declarations  */
+  YYSYMBOL_line = 48,                      /* line  */
+  YYSYMBOL_ELEMENTS = 49,                  /* ELEMENTS  */
+  YYSYMBOL_DATA_TYPE = 50,                 /* DATA_TYPE  */
+  YYSYMBOL_assignment = 51,                /* assignment  */
+  YYSYMBOL_exp = 52,                       /* exp  */
+  YYSYMBOL_term = 53,                      /* term  */
+  YYSYMBOL_fun_call_list = 54,             /* fun_call_list  */
+  YYSYMBOL_more_call_param = 55,           /* more_call_param  */
+  YYSYMBOL_stat = 56,                      /* stat  */
+  YYSYMBOL_ELSE_ = 57,                     /* ELSE_  */
+  YYSYMBOL_ELIF_S = 58,                    /* ELIF_S  */
+  YYSYMBOL_ELIF_ = 59,                     /* ELIF_  */
+  YYSYMBOL_smtm = 60,                      /* smtm  */
+  YYSYMBOL_smtm_types = 61,                /* smtm_types  */
+  YYSYMBOL_smtm_type = 62,                 /* smtm_type  */
+  YYSYMBOL_FUNCTION = 63,                  /* FUNCTION  */
+  YYSYMBOL_lista_param = 64,               /* lista_param  */
+  YYSYMBOL_more_params = 65,               /* more_params  */
+  YYSYMBOL_paramentru = 66,                /* paramentru  */
+  YYSYMBOL_smtm_fun = 67                   /* smtm_fun  */
 };
 typedef enum yysymbol_kind_t yysymbol_kind_t;
 
@@ -431,7 +476,7 @@ typedef int yytype_uint16;
 
 
 /* Stored state numbers (used for stacks). */
-typedef yytype_int8 yy_state_t;
+typedef yytype_uint8 yy_state_t;
 
 /* State numbers in computations.  */
 typedef int yy_state_fast_t;
@@ -634,21 +679,21 @@ union yyalloc
 #endif /* !YYCOPY_NEEDED */
 
 /* YYFINAL -- State number of the termination state.  */
-#define YYFINAL  27
+#define YYFINAL  39
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   168
+#define YYLAST   575
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  33
+#define YYNTOKENS  45
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  8
+#define YYNNTS  23
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  36
+#define YYNRULES  74
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  70
+#define YYNSTATES  172
 
 /* YYMAXUTOK -- Last valid token kind.  */
-#define YYMAXUTOK   282
+#define YYMAXUTOK   291
 
 
 /* YYTRANSLATE(TOKEN-NUM) -- Symbol number corresponding to TOKEN-NUM
@@ -666,15 +711,15 @@ static const yytype_int8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-      31,    32,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,    28,
+      38,    39,     2,     2,    44,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,    37,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,    29,     2,    30,     2,     2,     2,     2,     2,     2,
+       2,    42,     2,    43,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,    40,     2,    41,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -690,17 +735,22 @@ static const yytype_int8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
        5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
       15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
-      25,    26,    27
+      25,    26,    27,    28,    29,    30,    31,    32,    33,    34,
+      35,    36
 };
 
 #if YYDEBUG
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
-static const yytype_uint8 yyrline[] =
+static const yytype_int16 yyrline[] =
 {
-       0,   122,   122,   125,   126,   129,   130,   131,   134,   135,
-     136,   137,   138,   141,   142,   143,   144,   145,   149,   150,
-     151,   152,   153,   154,   156,   157,   158,   159,   160,   161,
-     162,   166,   167,   168,   169,   170,   171
+       0,   135,   135,   138,   139,   142,   143,   144,   145,   146,
+     147,   148,   151,   152,   155,   156,   157,   158,   159,   162,
+     163,   165,   167,   169,   170,   174,   175,   176,   177,   178,
+     179,   181,   182,   183,   184,   185,   186,   187,   191,   192,
+     193,   194,   195,   196,   197,   200,   201,   204,   205,   208,
+     209,   210,   211,   212,   213,   216,   219,   220,   223,   226,
+     227,   230,   231,   234,   235,   236,   237,   242,   245,   246,
+     249,   250,   253,   257,   258
 };
 #endif
 
@@ -717,11 +767,16 @@ static const char *yysymbol_name (yysymbol_kind_t yysymbol) YY_ATTRIBUTE_UNUSED;
 static const char *const yytname[] =
 {
   "\"end of file\"", "error", "\"invalid token\"", "print", "integru",
-  "plutitor", "litera", "bul", "String", "conservator", "GEQ", "LEQ",
-  "AND", "OR", "EQEQ", "LS", "GE", "PLUS", "MINUS", "PROD", "DIV", "EQUAL",
-  "String_Value", "Character_Value", "exit_command", "number", "number_r",
-  "IDENTIFIER", "';'", "'['", "']'", "'('", "')'", "$accept", "program",
-  "lines", "line", "DATA_TYPE", "assignment", "exp", "term", YY_NULLPTR
+  "plutitor", "litera", "bul", "fraza", "conservator", "GEQ", "LEQ", "AND",
+  "OR", "EQEQ", "LS", "GE", "PLUS", "MINUS", "PROD", "DIV", "EQUAL", "IF",
+  "WHILE", "pt", "ELSE", "ELIF", "FUN", "RETURN", "DEFINE_TYPE",
+  "String_Value", "Character_Value", "EVAL", "exit_command", "number",
+  "number_r", "IDENTIFIER", "';'", "'('", "')'", "'{'", "'}'", "'['",
+  "']'", "','", "$accept", "program", "declarations", "line", "ELEMENTS",
+  "DATA_TYPE", "assignment", "exp", "term", "fun_call_list",
+  "more_call_param", "stat", "ELSE_", "ELIF_S", "ELIF_", "smtm",
+  "smtm_types", "smtm_type", "FUNCTION", "lista_param", "more_params",
+  "paramentru", "smtm_fun", YY_NULLPTR
 };
 
 static const char *
@@ -738,12 +793,13 @@ static const yytype_int16 yytoknum[] =
 {
        0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
      265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
-     275,   276,   277,   278,   279,   280,   281,   282,    59,    91,
-      93,    40,    41
+     275,   276,   277,   278,   279,   280,   281,   282,   283,   284,
+     285,   286,   287,   288,   289,   290,   291,    59,    40,    41,
+     123,   125,    91,    93,    44
 };
 #endif
 
-#define YYPACT_NINF (-28)
+#define YYPACT_NINF (-122)
 
 #define yypact_value_is_default(Yyn) \
   ((Yyn) == YYPACT_NINF)
@@ -757,13 +813,24 @@ static const yytype_int16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int16 yypact[] =
 {
-      26,    14,   -28,   -28,   -28,   -28,   -28,    73,   -27,   -17,
-      27,    26,   -28,    -1,    10,   -28,   -28,   -28,   -28,    15,
-      14,   118,   -28,    16,   -28,    14,    14,   -28,   -28,    17,
-     -28,    14,    44,    14,    14,    14,    14,    14,    14,    14,
-      14,    14,    14,    14,   -28,    28,   137,    55,    14,    76,
-     -28,   -10,   -10,   -28,    36,   148,   -10,   -10,    85,    85,
-      12,    12,    14,    30,    97,   -28,   137,    14,   -28,   137
+     252,   100,  -122,  -122,  -122,  -122,  -122,     9,   -29,   -26,
+       7,     2,    32,    34,   -15,    23,   252,  -122,   -17,    36,
+    -122,  -122,  -122,  -122,  -122,  -122,   -13,   100,   421,  -122,
+      45,   100,   100,    46,     9,   100,  -122,   100,   100,  -122,
+    -122,    51,   -14,  -122,   100,   100,   298,   100,   100,   100,
+     100,   100,   100,   100,   100,   100,   100,   100,  -122,    67,
+     309,   339,    75,    56,    64,   350,   181,    47,    65,   100,
+     100,   181,    74,    60,   108,  -122,   274,   274,  -122,    98,
+     217,   274,   274,    72,    72,    20,    20,   100,    76,    76,
+     100,    78,    80,    95,   112,     9,   181,   253,  -122,   100,
+    -122,   181,    71,    15,  -122,   432,   102,     9,  -122,   100,
+     105,   103,   109,  -122,  -122,   181,   100,   -20,  -122,   116,
+     118,   460,  -122,   141,  -122,    76,   119,  -122,    15,  -122,
+     100,  -122,  -122,   181,  -122,   121,     9,   471,   100,  -122,
+    -122,  -122,  -122,  -122,   100,  -122,  -122,   499,   180,  -122,
+    -122,  -122,   287,   380,   120,   100,   216,   112,    76,   137,
+     510,   100,  -122,   100,   125,   538,   391,  -122,   126,    76,
+    -122,  -122
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -771,101 +838,217 @@ static const yytype_int16 yypact[] =
      means the default is an error.  */
 static const yytype_int8 yydefact[] =
 {
-       0,     0,     8,     9,    10,    11,    12,     0,     0,     0,
-       0,     2,     3,     0,     0,    36,    35,    33,    34,    31,
-       0,     0,    18,     0,     6,     0,     0,     1,     4,    13,
-       5,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     7,     0,    16,     0,     0,     0,
-      19,    29,    28,    24,    25,    30,    26,    27,    20,    21,
-      22,    23,     0,     0,     0,    32,    14,     0,    15,    17
+       0,     0,    14,    15,    16,    17,    18,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     2,     3,     0,     0,
+       8,     9,    44,    43,    41,    42,    38,     0,     0,    25,
+       0,     0,     0,     0,    13,     0,     6,     0,     0,     1,
+       4,     0,    19,     5,    46,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     7,     0,
+       0,     0,     0,     0,     0,     0,    23,     0,     0,     0,
+       0,    47,     0,    45,     0,    26,    36,    35,    31,    32,
+      37,    33,    34,    27,    28,    29,    30,     0,     0,     0,
+       0,     0,     0,     0,     0,    69,    20,     0,    40,     0,
+      39,    21,     0,    49,    53,     0,     0,    13,    10,     0,
+       0,     0,    68,    70,    22,    48,     0,    38,    60,     0,
+       0,     0,    66,     0,    61,     0,     0,    51,    52,    56,
+       0,    11,    12,    24,    72,     0,     0,     0,     0,    63,
+      64,    59,    62,    55,     0,    50,    57,     0,     0,    67,
+      71,    65,     0,     0,     0,     0,     0,    39,     0,     0,
+       0,     0,    58,     0,     0,     0,     0,    74,     0,     0,
+      73,    54
 };
 
   /* YYPGOTO[NTERM-NUM].  */
-static const yytype_int8 yypgoto[] =
+static const yytype_int16 yypgoto[] =
 {
-     -28,   -28,   -28,    41,    75,   -28,   -20,   -28
+    -122,  -122,  -122,   143,    61,     4,     5,    -1,  -122,  -122,
+    -122,     8,    41,  -122,    42,   -86,    25,  -121,  -122,  -122,
+    -122,    38,  -122
 };
 
   /* YYDEFGOTO[NTERM-NUM].  */
-static const yytype_int8 yydefgoto[] =
+static const yytype_uint8 yydefgoto[] =
 {
-       0,    10,    11,    12,    13,    14,    21,    22
+       0,    15,    16,    17,    63,   119,   120,   121,    29,    72,
+      73,   122,   127,   128,   129,   103,   123,   124,    21,   111,
+     112,   113,   149
 };
 
   /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
      positive, shift that token.  If negative, reduce the rule whose
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
-static const yytype_int8 yytable[] =
+static const yytype_uint8 yytable[] =
 {
-      32,    24,    35,    36,    25,    46,    47,    40,    41,    42,
-      43,    49,    26,    51,    52,    53,    54,    55,    56,    57,
-      58,    59,    60,    61,    35,    36,    29,    27,    64,     1,
-       2,     3,     4,     5,     6,     7,    15,    16,    30,    17,
-      18,    19,    66,    45,    31,    20,    48,    69,    35,    62,
-       8,    67,    28,     9,    33,    34,    35,    36,    37,    38,
-      39,    40,    41,    42,    43,    33,    34,    35,    36,    37,
-      38,    39,    40,    41,    42,    43,    50,     2,     3,     4,
-       5,     6,    23,     0,     0,    63,    33,    34,    35,    36,
-      37,    38,    39,    40,    41,    42,    43,    35,    36,     0,
-       0,     0,     0,     0,    42,    43,    65,    33,    34,    35,
-      36,    37,    38,    39,    40,    41,    42,    43,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,    68,    33,    34,
-      35,    36,    37,    38,    39,    40,    41,    42,    43,     0,
-       0,     0,     0,     0,     0,     0,    44,    33,    34,    35,
-      36,    37,    38,    39,    40,    41,    42,    43,    33,    34,
-      35,    36,     0,    38,    39,    40,    41,    42,    43
+      28,    37,   142,   104,    18,    19,    37,    69,    20,    31,
+      41,    30,    32,     2,     3,     4,     5,     6,    44,    42,
+      18,    19,   138,    39,    20,    44,    46,    38,    70,    45,
+      60,    61,    49,    50,    65,   142,    66,    67,    64,   143,
+     125,   126,    34,    71,    74,    33,    76,    77,    78,    79,
+      80,    81,    82,    83,    84,    85,    86,    47,    48,    49,
+      50,    51,    52,    53,    54,    55,    56,    57,    96,    97,
+      35,    36,   162,    43,   116,     2,     3,     4,     5,     6,
+       7,    59,    62,   171,    49,    50,   101,    68,    87,   105,
+      94,    56,    57,     8,     9,    10,    90,    91,   115,   110,
+      92,    22,    23,    95,    99,    24,    25,   117,   133,    27,
+      49,    64,   118,    98,   106,   137,   102,   107,    47,    48,
+      49,    50,    51,    52,    53,    54,    55,    56,    57,   147,
+      22,    23,   108,   109,    24,    25,    26,   152,    27,   131,
+     110,   134,   135,   153,   116,     2,     3,     4,     5,     6,
+       7,   100,    42,   136,   160,   139,   159,   144,   163,    40,
+     165,   148,   166,     8,     9,    10,   167,   170,   132,   145,
+     146,    22,    23,   156,   150,    24,    25,   117,     0,    27,
+       0,     0,   141,   116,     2,     3,     4,     5,     6,     7,
+       0,    47,    48,    49,    50,    51,    52,    53,    54,    55,
+      56,    57,     8,     9,    10,     0,     0,     0,   155,     0,
+      22,    23,     0,     0,    24,    25,   117,     0,    27,   116,
+       2,     3,     4,     5,     6,     7,     0,    47,    48,    49,
+      50,     0,    52,    53,    54,    55,    56,    57,     8,     9,
+      10,     0,     0,     0,   161,     0,    22,    23,     0,     0,
+      24,    25,   117,     0,    27,     1,     2,     3,     4,     5,
+       6,     7,     0,    47,    48,    49,    50,    51,    52,    53,
+      54,    55,    56,    57,     8,     9,    10,     0,     0,     0,
+       0,    11,     0,     0,    12,    13,    49,    50,    14,     0,
+       0,    54,    55,    56,    57,     0,   114,    47,    48,    49,
+      50,    51,    52,    53,    54,    55,    56,    57,    47,    48,
+      49,    50,    51,    52,    53,    54,    55,    56,    57,    47,
+      48,    49,    50,    51,    52,    53,    54,    55,    56,    57,
+     157,     0,     0,     0,     0,     0,     0,    75,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,    88,    47,
+      48,    49,    50,    51,    52,    53,    54,    55,    56,    57,
+      47,    48,    49,    50,    51,    52,    53,    54,    55,    56,
+      57,     0,     0,     0,     0,     0,     0,     0,    89,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,    93,
+      47,    48,    49,    50,    51,    52,    53,    54,    55,    56,
+      57,    47,    48,    49,    50,    51,    52,    53,    54,    55,
+      56,    57,     0,     0,     0,     0,     0,     0,     0,   158,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+     169,    47,    48,    49,    50,    51,    52,    53,    54,    55,
+      56,    57,    47,    48,    49,    50,    51,    52,    53,    54,
+      55,    56,    57,     0,     0,     0,     0,     0,    58,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,   130,
+      47,    48,    49,    50,    51,    52,    53,    54,    55,    56,
+      57,    47,    48,    49,    50,    51,    52,    53,    54,    55,
+      56,    57,     0,     0,     0,     0,     0,   140,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,   151,    47,
+      48,    49,    50,    51,    52,    53,    54,    55,    56,    57,
+      47,    48,    49,    50,    51,    52,    53,    54,    55,    56,
+      57,     0,     0,     0,     0,     0,   154,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,   164,    47,    48,
+      49,    50,    51,    52,    53,    54,    55,    56,    57,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,   168
 };
 
-static const yytype_int8 yycheck[] =
+static const yytype_int16 yycheck[] =
 {
-      20,    28,    12,    13,    21,    25,    26,    17,    18,    19,
-      20,    31,    29,    33,    34,    35,    36,    37,    38,    39,
-      40,    41,    42,    43,    12,    13,    27,     0,    48,     3,
-       4,     5,     6,     7,     8,     9,    22,    23,    28,    25,
-      26,    27,    62,    27,    29,    31,    29,    67,    12,    21,
-      24,    21,    11,    27,    10,    11,    12,    13,    14,    15,
-      16,    17,    18,    19,    20,    10,    11,    12,    13,    14,
-      15,    16,    17,    18,    19,    20,    32,     4,     5,     6,
-       7,     8,     7,    -1,    -1,    30,    10,    11,    12,    13,
-      14,    15,    16,    17,    18,    19,    20,    12,    13,    -1,
-      -1,    -1,    -1,    -1,    19,    20,    30,    10,    11,    12,
-      13,    14,    15,    16,    17,    18,    19,    20,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    30,    10,    11,
-      12,    13,    14,    15,    16,    17,    18,    19,    20,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    28,    10,    11,    12,
+       1,    21,   123,    89,     0,     0,    21,    21,     0,    38,
+      27,     7,    38,     4,     5,     6,     7,     8,    38,    36,
+      16,    16,    42,     0,    16,    38,    27,    42,    42,    42,
+      31,    32,    12,    13,    35,   156,    37,    38,    34,   125,
+      25,    26,    40,    44,    45,    38,    47,    48,    49,    50,
+      51,    52,    53,    54,    55,    56,    57,    10,    11,    12,
+      13,    14,    15,    16,    17,    18,    19,    20,    69,    70,
+      38,    37,   158,    37,     3,     4,     5,     6,     7,     8,
+       9,    36,    36,   169,    12,    13,    87,    36,    21,    90,
+      43,    19,    20,    22,    23,    24,    21,    41,    99,    95,
+      36,    30,    31,    38,    44,    34,    35,    36,   109,    38,
+      12,   107,    41,    39,    36,   116,    40,    37,    10,    11,
+      12,    13,    14,    15,    16,    17,    18,    19,    20,   130,
+      30,    31,    37,    21,    34,    35,    36,   138,    38,    37,
+     136,    36,    39,   144,     3,     4,     5,     6,     7,     8,
+       9,    43,    36,    44,   155,    37,    36,    38,    21,    16,
+     161,    40,   163,    22,    23,    24,    41,    41,   107,   128,
+     128,    30,    31,   148,   136,    34,    35,    36,    -1,    38,
+      -1,    -1,    41,     3,     4,     5,     6,     7,     8,     9,
+      -1,    10,    11,    12,    13,    14,    15,    16,    17,    18,
+      19,    20,    22,    23,    24,    -1,    -1,    -1,    28,    -1,
+      30,    31,    -1,    -1,    34,    35,    36,    -1,    38,     3,
+       4,     5,     6,     7,     8,     9,    -1,    10,    11,    12,
+      13,    -1,    15,    16,    17,    18,    19,    20,    22,    23,
+      24,    -1,    -1,    -1,    28,    -1,    30,    31,    -1,    -1,
+      34,    35,    36,    -1,    38,     3,     4,     5,     6,     7,
+       8,     9,    -1,    10,    11,    12,    13,    14,    15,    16,
+      17,    18,    19,    20,    22,    23,    24,    -1,    -1,    -1,
+      -1,    29,    -1,    -1,    32,    33,    12,    13,    36,    -1,
+      -1,    17,    18,    19,    20,    -1,    43,    10,    11,    12,
       13,    14,    15,    16,    17,    18,    19,    20,    10,    11,
-      12,    13,    -1,    15,    16,    17,    18,    19,    20
+      12,    13,    14,    15,    16,    17,    18,    19,    20,    10,
+      11,    12,    13,    14,    15,    16,    17,    18,    19,    20,
+      43,    -1,    -1,    -1,    -1,    -1,    -1,    39,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    39,    10,
+      11,    12,    13,    14,    15,    16,    17,    18,    19,    20,
+      10,    11,    12,    13,    14,    15,    16,    17,    18,    19,
+      20,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    39,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    39,
+      10,    11,    12,    13,    14,    15,    16,    17,    18,    19,
+      20,    10,    11,    12,    13,    14,    15,    16,    17,    18,
+      19,    20,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    39,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      39,    10,    11,    12,    13,    14,    15,    16,    17,    18,
+      19,    20,    10,    11,    12,    13,    14,    15,    16,    17,
+      18,    19,    20,    -1,    -1,    -1,    -1,    -1,    37,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    37,
+      10,    11,    12,    13,    14,    15,    16,    17,    18,    19,
+      20,    10,    11,    12,    13,    14,    15,    16,    17,    18,
+      19,    20,    -1,    -1,    -1,    -1,    -1,    37,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    37,    10,
+      11,    12,    13,    14,    15,    16,    17,    18,    19,    20,
+      10,    11,    12,    13,    14,    15,    16,    17,    18,    19,
+      20,    -1,    -1,    -1,    -1,    -1,    37,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    37,    10,    11,
+      12,    13,    14,    15,    16,    17,    18,    19,    20,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    37
 };
 
   /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
      symbol of state STATE-NUM.  */
 static const yytype_int8 yystos[] =
 {
-       0,     3,     4,     5,     6,     7,     8,     9,    24,    27,
-      34,    35,    36,    37,    38,    22,    23,    25,    26,    27,
-      31,    39,    40,    37,    28,    21,    29,     0,    36,    27,
-      28,    29,    39,    10,    11,    12,    13,    14,    15,    16,
-      17,    18,    19,    20,    28,    27,    39,    39,    29,    39,
-      32,    39,    39,    39,    39,    39,    39,    39,    39,    39,
-      39,    39,    21,    30,    39,    30,    39,    21,    30,    39
+       0,     3,     4,     5,     6,     7,     8,     9,    22,    23,
+      24,    29,    32,    33,    36,    46,    47,    48,    50,    51,
+      56,    63,    30,    31,    34,    35,    36,    38,    52,    53,
+      50,    38,    38,    38,    40,    38,    37,    21,    42,     0,
+      48,    27,    36,    37,    38,    42,    52,    10,    11,    12,
+      13,    14,    15,    16,    17,    18,    19,    20,    37,    36,
+      52,    52,    36,    49,    50,    52,    52,    52,    36,    21,
+      42,    52,    54,    55,    52,    39,    52,    52,    52,    52,
+      52,    52,    52,    52,    52,    52,    52,    21,    39,    39,
+      21,    41,    36,    39,    43,    38,    52,    52,    39,    44,
+      43,    52,    40,    60,    60,    52,    36,    37,    37,    21,
+      50,    64,    65,    66,    43,    52,     3,    36,    41,    50,
+      51,    52,    56,    61,    62,    25,    26,    57,    58,    59,
+      37,    37,    49,    52,    36,    39,    44,    52,    42,    37,
+      37,    41,    62,    60,    38,    57,    59,    52,    40,    67,
+      66,    37,    52,    52,    37,    28,    61,    43,    39,    36,
+      52,    28,    60,    21,    37,    52,    52,    41,    37,    39,
+      41,    60
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_int8 yyr1[] =
 {
-       0,    33,    34,    35,    35,    36,    36,    36,    37,    37,
-      37,    37,    37,    38,    38,    38,    38,    38,    39,    39,
-      39,    39,    39,    39,    39,    39,    39,    39,    39,    39,
-      39,    40,    40,    40,    40,    40,    40
+       0,    45,    46,    47,    47,    48,    48,    48,    48,    48,
+      48,    48,    49,    49,    50,    50,    50,    50,    50,    51,
+      51,    51,    51,    51,    51,    52,    52,    52,    52,    52,
+      52,    52,    52,    52,    52,    52,    52,    52,    53,    53,
+      53,    53,    53,    53,    53,    54,    54,    55,    55,    56,
+      56,    56,    56,    56,    56,    57,    58,    58,    59,    60,
+      60,    61,    61,    62,    62,    62,    62,    63,    64,    64,
+      65,    65,    66,    67,    67
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
 static const yytype_int8 yyr2[] =
 {
        0,     2,     1,     1,     2,     2,     2,     3,     1,     1,
-       1,     1,     1,     2,     5,     5,     3,     6,     1,     3,
-       3,     3,     3,     3,     3,     3,     3,     3,     3,     3,
-       3,     1,     4,     1,     1,     1,     1
+       5,     6,     4,     0,     1,     1,     1,     1,     1,     2,
+       4,     5,     5,     3,     6,     1,     3,     3,     3,     3,
+       3,     3,     3,     3,     3,     3,     3,     3,     1,     4,
+       4,     1,     1,     1,     1,     1,     0,     1,     3,     5,
+       7,     6,     6,     5,    13,     2,     1,     2,     5,     3,
+       2,     1,     2,     2,     2,     3,     1,     7,     1,     0,
+       1,     3,     2,     6,     5
 };
 
 
@@ -1332,218 +1515,428 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
-  case 2: /* program: lines  */
-#line 122 "semantics.y"
-                { print_simbol_table(variables,totalVar);printf("Program corect sintactic\n\n"); }
-#line 1339 "y.tab.c"
+  case 2: /* program: declarations  */
+#line 135 "semantics.y"
+                       { print_simbol_table(variables,totalVar);printf( "Program corect sintactic\n" ); }
+#line 1522 "y.tab.c"
     break;
 
-  case 3: /* lines: line  */
-#line 125 "semantics.y"
-                                                        {;}
-#line 1345 "y.tab.c"
+  case 3: /* declarations: line  */
+#line 138 "semantics.y"
+                                                                {;}
+#line 1528 "y.tab.c"
     break;
 
-  case 4: /* lines: lines line  */
-#line 126 "semantics.y"
-                                                        {;}
-#line 1351 "y.tab.c"
+  case 4: /* declarations: declarations line  */
+#line 139 "semantics.y"
+                                                                                {;}
+#line 1534 "y.tab.c"
     break;
 
   case 5: /* line: assignment ';'  */
-#line 129 "semantics.y"
+#line 142 "semantics.y"
                                                                                         {;}
-#line 1357 "y.tab.c"
+#line 1540 "y.tab.c"
     break;
 
   case 6: /* line: exit_command ';'  */
-#line 130 "semantics.y"
+#line 143 "semantics.y"
                                                                                                 {exit(EXIT_SUCCESS);}
-#line 1363 "y.tab.c"
+#line 1546 "y.tab.c"
     break;
 
   case 7: /* line: print exp ';'  */
-#line 131 "semantics.y"
-                                                                                                {printValue((yyvsp[-1].strct));}
-#line 1369 "y.tab.c"
-    break;
-
-  case 8: /* DATA_TYPE: integru  */
-#line 134 "semantics.y"
-                                 {(yyval.type_id) = (yyvsp[0].type_id);}
-#line 1375 "y.tab.c"
-    break;
-
-  case 9: /* DATA_TYPE: plutitor  */
-#line 135 "semantics.y"
-                                                         {(yyval.type_id) = (yyvsp[0].type_id);}
-#line 1381 "y.tab.c"
-    break;
-
-  case 10: /* DATA_TYPE: litera  */
-#line 136 "semantics.y"
-                                         {(yyval.type_id) = (yyvsp[0].type_id);}
-#line 1387 "y.tab.c"
-    break;
-
-  case 11: /* DATA_TYPE: bul  */
-#line 137 "semantics.y"
-                                                 {(yyval.type_id) = (yyvsp[0].type_id);}
-#line 1393 "y.tab.c"
-    break;
-
-  case 12: /* DATA_TYPE: String  */
-#line 138 "semantics.y"
-                                                 {(yyval.type_id) = (yyvsp[0].type_id);}
-#line 1399 "y.tab.c"
-    break;
-
-  case 13: /* assignment: DATA_TYPE IDENTIFIER  */
-#line 141 "semantics.y"
-                                                                                {pushEmptyVariable((yyvsp[0].string), (yyvsp[-1].type_id));}
-#line 1405 "y.tab.c"
-    break;
-
-  case 14: /* assignment: conservator DATA_TYPE IDENTIFIER EQUAL exp  */
-#line 142 "semantics.y"
-                                                                        {pushVariableConst((yyvsp[-2].string), (yyvsp[-3].type_id), (yyvsp[0].strct));}
-#line 1411 "y.tab.c"
-    break;
-
-  case 15: /* assignment: DATA_TYPE IDENTIFIER '[' exp ']'  */
-#line 143 "semantics.y"
-                                                                                {pushArray((yyvsp[-3].string), (yyvsp[-4].type_id), (yyvsp[-1].strct));}
-#line 1417 "y.tab.c"
-    break;
-
-  case 16: /* assignment: IDENTIFIER EQUAL exp  */
 #line 144 "semantics.y"
-                                                                                        {updateValue((yyvsp[-2].string), (yyvsp[0].strct));}
-#line 1423 "y.tab.c"
+                                                                                                {printValue((yyvsp[-1].strct));}
+#line 1552 "y.tab.c"
     break;
 
-  case 17: /* assignment: IDENTIFIER '[' exp ']' EQUAL exp  */
+  case 8: /* line: stat  */
 #line 145 "semantics.y"
-                                                                                {updateArrValue((yyvsp[-5].string), (yyvsp[-3].strct), (yyvsp[0].strct));}
-#line 1429 "y.tab.c"
+                                                                                                        {;}
+#line 1558 "y.tab.c"
     break;
 
-  case 18: /* exp: term  */
-#line 149 "semantics.y"
-                                        {(yyval.strct) = (yyvsp[0].strct);}
-#line 1435 "y.tab.c"
+  case 9: /* line: FUNCTION  */
+#line 146 "semantics.y"
+                                                                                                        {;}
+#line 1564 "y.tab.c"
     break;
 
-  case 19: /* exp: '(' exp ')'  */
-#line 150 "semantics.y"
-                                                {(yyval.strct) = (yyvsp[-1].strct);}
-#line 1441 "y.tab.c"
+  case 10: /* line: EVAL '(' exp ')' ';'  */
+#line 147 "semantics.y"
+                                                                                {Eval_function((yyvsp[-2].strct));}
+#line 1570 "y.tab.c"
     break;
 
-  case 20: /* exp: exp PLUS exp  */
+  case 11: /* line: DEFINE_TYPE '{' ELEMENTS '}' IDENTIFIER ';'  */
+#line 148 "semantics.y"
+                                                                {pushStructVariable((yyvsp[-1].string));}
+#line 1576 "y.tab.c"
+    break;
+
+  case 12: /* ELEMENTS: DATA_TYPE IDENTIFIER ';' ELEMENTS  */
 #line 151 "semantics.y"
-                                    {(yyval.strct) = comp((yyvsp[-2].strct), (yyvsp[0].strct), PLUS);}
-#line 1447 "y.tab.c"
+                                                {;}
+#line 1582 "y.tab.c"
     break;
 
-  case 21: /* exp: exp MINUS exp  */
+  case 13: /* ELEMENTS: %empty  */
 #line 152 "semantics.y"
-                                    {(yyval.strct) = comp((yyvsp[-2].strct), (yyvsp[0].strct), MINUS);}
-#line 1453 "y.tab.c"
+                                                                                                {;}
+#line 1588 "y.tab.c"
     break;
 
-  case 22: /* exp: exp PROD exp  */
-#line 153 "semantics.y"
-                                    {(yyval.strct) = comp((yyvsp[-2].strct), (yyvsp[0].strct), PROD);}
-#line 1459 "y.tab.c"
+  case 14: /* DATA_TYPE: integru  */
+#line 155 "semantics.y"
+                                 {(yyval.type_id) = (yyvsp[0].type_id);}
+#line 1594 "y.tab.c"
     break;
 
-  case 23: /* exp: exp DIV exp  */
-#line 154 "semantics.y"
-                                        {(yyval.strct) = comp((yyvsp[-2].strct), (yyvsp[0].strct), DIV);}
-#line 1465 "y.tab.c"
-    break;
-
-  case 24: /* exp: exp AND exp  */
+  case 15: /* DATA_TYPE: plutitor  */
 #line 156 "semantics.y"
-                                                {(yyval.strct) = comp((yyvsp[-2].strct), (yyvsp[0].strct), AND);}
-#line 1471 "y.tab.c"
+                                                         {(yyval.type_id) = (yyvsp[0].type_id);}
+#line 1600 "y.tab.c"
     break;
 
-  case 25: /* exp: exp OR exp  */
+  case 16: /* DATA_TYPE: litera  */
 #line 157 "semantics.y"
-                                                {(yyval.strct) = comp((yyvsp[-2].strct), (yyvsp[0].strct), OR);}
-#line 1477 "y.tab.c"
+                                         {(yyval.type_id) = (yyvsp[0].type_id);}
+#line 1606 "y.tab.c"
     break;
 
-  case 26: /* exp: exp LS exp  */
+  case 17: /* DATA_TYPE: bul  */
 #line 158 "semantics.y"
-                                                        {(yyval.strct) = comp((yyvsp[-2].strct), (yyvsp[0].strct), LS) ;}
-#line 1483 "y.tab.c"
+                                                 {(yyval.type_id) = (yyvsp[0].type_id);}
+#line 1612 "y.tab.c"
     break;
 
-  case 27: /* exp: exp GE exp  */
+  case 18: /* DATA_TYPE: fraza  */
 #line 159 "semantics.y"
-                                                        {(yyval.strct) = comp((yyvsp[-2].strct), (yyvsp[0].strct), GE);}
-#line 1489 "y.tab.c"
+                                         {(yyval.type_id) = (yyvsp[0].type_id);}
+#line 1618 "y.tab.c"
     break;
 
-  case 28: /* exp: exp LEQ exp  */
-#line 160 "semantics.y"
-                                                        {(yyval.strct) = comp((yyvsp[-2].strct), (yyvsp[0].strct), LEQ);}
-#line 1495 "y.tab.c"
-    break;
-
-  case 29: /* exp: exp GEQ exp  */
-#line 161 "semantics.y"
-                                                        {(yyval.strct) = comp((yyvsp[-2].strct), (yyvsp[0].strct), GEQ);}
-#line 1501 "y.tab.c"
-    break;
-
-  case 30: /* exp: exp EQEQ exp  */
+  case 19: /* assignment: DATA_TYPE IDENTIFIER  */
 #line 162 "semantics.y"
-                                                        {(yyval.strct) = comp((yyvsp[-2].strct), (yyvsp[0].strct), EQEQ);}
-#line 1507 "y.tab.c"
+                                                                                {pushEmptyVariable((yyvsp[0].string), (yyvsp[-1].type_id));}
+#line 1624 "y.tab.c"
     break;
 
-  case 31: /* term: IDENTIFIER  */
-#line 166 "semantics.y"
-                                                                {(yyval.strct) = temporaryPointVar((yyvsp[0].string));}
-#line 1513 "y.tab.c"
+  case 20: /* assignment: DATA_TYPE IDENTIFIER EQUAL exp  */
+#line 163 "semantics.y"
+                                                                                {pushVariable((yyvsp[-2].string), (yyvsp[-3].type_id), (yyvsp[0].strct));}
+#line 1630 "y.tab.c"
     break;
 
-  case 32: /* term: IDENTIFIER '[' exp ']'  */
+  case 21: /* assignment: conservator DATA_TYPE IDENTIFIER EQUAL exp  */
+#line 165 "semantics.y"
+                                                                        {pushVariableConst((yyvsp[-2].string), (yyvsp[-3].type_id), (yyvsp[0].strct));}
+#line 1636 "y.tab.c"
+    break;
+
+  case 22: /* assignment: DATA_TYPE IDENTIFIER '[' exp ']'  */
 #line 167 "semantics.y"
-                                                                {(yyval.strct) = temporaryPointArr((yyvsp[-3].string), (yyvsp[-1].strct));}
-#line 1519 "y.tab.c"
+                                                                                {pushArray((yyvsp[-3].string), (yyvsp[-4].type_id), (yyvsp[-1].strct));}
+#line 1642 "y.tab.c"
     break;
 
-  case 33: /* term: number  */
-#line 168 "semantics.y"
-                                                                {(yyval.strct) = temporaryPointNum((yyvsp[0].num), integru);}
-#line 1525 "y.tab.c"
-    break;
-
-  case 34: /* term: number_r  */
+  case 23: /* assignment: IDENTIFIER EQUAL exp  */
 #line 169 "semantics.y"
-                                                                                {(yyval.strct) = temporaryPointNum((yyvsp[0].num), plutitor);}
-#line 1531 "y.tab.c"
+                                                                                        {updateValue((yyvsp[-2].string), (yyvsp[0].strct));}
+#line 1648 "y.tab.c"
     break;
 
-  case 35: /* term: Character_Value  */
+  case 24: /* assignment: IDENTIFIER '[' exp ']' EQUAL exp  */
 #line 170 "semantics.y"
+                                                                                {updateArrValue((yyvsp[-5].string), (yyvsp[-3].strct), (yyvsp[0].strct));}
+#line 1654 "y.tab.c"
+    break;
+
+  case 25: /* exp: term  */
+#line 174 "semantics.y"
+                                        {(yyval.strct) = (yyvsp[0].strct);}
+#line 1660 "y.tab.c"
+    break;
+
+  case 26: /* exp: '(' exp ')'  */
+#line 175 "semantics.y"
+                                                {(yyval.strct) = (yyvsp[-1].strct);}
+#line 1666 "y.tab.c"
+    break;
+
+  case 27: /* exp: exp PLUS exp  */
+#line 176 "semantics.y"
+                                    {(yyval.strct) = comp((yyvsp[-2].strct), (yyvsp[0].strct), PLUS);}
+#line 1672 "y.tab.c"
+    break;
+
+  case 28: /* exp: exp MINUS exp  */
+#line 177 "semantics.y"
+                                    {(yyval.strct) = comp((yyvsp[-2].strct), (yyvsp[0].strct), MINUS);}
+#line 1678 "y.tab.c"
+    break;
+
+  case 29: /* exp: exp PROD exp  */
+#line 178 "semantics.y"
+                                    {(yyval.strct) = comp((yyvsp[-2].strct), (yyvsp[0].strct), PROD);}
+#line 1684 "y.tab.c"
+    break;
+
+  case 30: /* exp: exp DIV exp  */
+#line 179 "semantics.y"
+                                        {(yyval.strct) = comp((yyvsp[-2].strct), (yyvsp[0].strct), DIV);}
+#line 1690 "y.tab.c"
+    break;
+
+  case 31: /* exp: exp AND exp  */
+#line 181 "semantics.y"
+                                                {(yyval.strct) = comp((yyvsp[-2].strct), (yyvsp[0].strct), AND);}
+#line 1696 "y.tab.c"
+    break;
+
+  case 32: /* exp: exp OR exp  */
+#line 182 "semantics.y"
+                                                {(yyval.strct) = comp((yyvsp[-2].strct), (yyvsp[0].strct), OR);}
+#line 1702 "y.tab.c"
+    break;
+
+  case 33: /* exp: exp LS exp  */
+#line 183 "semantics.y"
+                                                        {(yyval.strct) = comp((yyvsp[-2].strct), (yyvsp[0].strct), LS) ;}
+#line 1708 "y.tab.c"
+    break;
+
+  case 34: /* exp: exp GE exp  */
+#line 184 "semantics.y"
+                                                        {(yyval.strct) = comp((yyvsp[-2].strct), (yyvsp[0].strct), GE);}
+#line 1714 "y.tab.c"
+    break;
+
+  case 35: /* exp: exp LEQ exp  */
+#line 185 "semantics.y"
+                                                        {(yyval.strct) = comp((yyvsp[-2].strct), (yyvsp[0].strct), LEQ);}
+#line 1720 "y.tab.c"
+    break;
+
+  case 36: /* exp: exp GEQ exp  */
+#line 186 "semantics.y"
+                                                        {(yyval.strct) = comp((yyvsp[-2].strct), (yyvsp[0].strct), GEQ);}
+#line 1726 "y.tab.c"
+    break;
+
+  case 37: /* exp: exp EQEQ exp  */
+#line 187 "semantics.y"
+                                                        {(yyval.strct) = comp((yyvsp[-2].strct), (yyvsp[0].strct), EQEQ);}
+#line 1732 "y.tab.c"
+    break;
+
+  case 38: /* term: IDENTIFIER  */
+#line 191 "semantics.y"
+                                                                {(yyval.strct) = temporaryPointVar((yyvsp[0].string));}
+#line 1738 "y.tab.c"
+    break;
+
+  case 39: /* term: IDENTIFIER '[' exp ']'  */
+#line 192 "semantics.y"
+                                                                {(yyval.strct) = temporaryPointArr((yyvsp[-3].string), (yyvsp[-1].strct));}
+#line 1744 "y.tab.c"
+    break;
+
+  case 40: /* term: IDENTIFIER '(' fun_call_list ')'  */
+#line 193 "semantics.y"
+                                                        {(yyval.strct) = temporaryPointFun((yyvsp[-3].string), (yyvsp[-1].funParam));}
+#line 1750 "y.tab.c"
+    break;
+
+  case 41: /* term: number  */
+#line 194 "semantics.y"
+                                                                {(yyval.strct) = temporaryPointNum((yyvsp[0].num), integru);}
+#line 1756 "y.tab.c"
+    break;
+
+  case 42: /* term: number_r  */
+#line 195 "semantics.y"
+                                                                                {(yyval.strct) = temporaryPointNum((yyvsp[0].num), plutitor);}
+#line 1762 "y.tab.c"
+    break;
+
+  case 43: /* term: Character_Value  */
+#line 196 "semantics.y"
                                                                         {(yyval.strct) = temporaryPointStr((yyvsp[0].string), litera);}
-#line 1537 "y.tab.c"
+#line 1768 "y.tab.c"
     break;
 
-  case 36: /* term: String_Value  */
-#line 171 "semantics.y"
-                                                                        {(yyval.strct) = temporaryPointStr((yyvsp[0].string), String);}
-#line 1543 "y.tab.c"
+  case 44: /* term: String_Value  */
+#line 197 "semantics.y"
+                                                                        {(yyval.strct) = temporaryPointStr((yyvsp[0].string), fraza);}
+#line 1774 "y.tab.c"
+    break;
+
+  case 45: /* fun_call_list: more_call_param  */
+#line 200 "semantics.y"
+                                                        {(yyval.funParam) = (yyvsp[0].funParam);}
+#line 1780 "y.tab.c"
+    break;
+
+  case 46: /* fun_call_list: %empty  */
+#line 201 "semantics.y"
+                                                                                        {(yyval.funParam) = initializeParam(0);}
+#line 1786 "y.tab.c"
+    break;
+
+  case 47: /* more_call_param: exp  */
+#line 204 "semantics.y"
+                                                                {(yyval.funParam) = initializeParam((yyvsp[0].strct)->type);}
+#line 1792 "y.tab.c"
+    break;
+
+  case 48: /* more_call_param: more_call_param ',' exp  */
+#line 205 "semantics.y"
+                                                                {pushParam((yyval.funParam), (yyvsp[0].strct)->type);}
+#line 1798 "y.tab.c"
+    break;
+
+  case 49: /* stat: IF '(' exp ')' smtm  */
+#line 208 "semantics.y"
+                                                        {;}
+#line 1804 "y.tab.c"
+    break;
+
+  case 50: /* stat: IF '(' exp ')' smtm ELIF_S ELSE_  */
+#line 209 "semantics.y"
+                                                        {;}
+#line 1810 "y.tab.c"
+    break;
+
+  case 51: /* stat: IF '(' exp ')' smtm ELSE_  */
+#line 210 "semantics.y"
+                                                        {;}
+#line 1816 "y.tab.c"
+    break;
+
+  case 52: /* stat: IF '(' exp ')' smtm ELIF_S  */
+#line 211 "semantics.y"
+                                                        {;}
+#line 1822 "y.tab.c"
+    break;
+
+  case 53: /* stat: WHILE '(' exp ')' smtm  */
+#line 212 "semantics.y"
+                                                                {;}
+#line 1828 "y.tab.c"
+    break;
+
+  case 54: /* stat: pt '(' IDENTIFIER EQUAL exp ';' exp ';' IDENTIFIER EQUAL exp ')' smtm  */
+#line 213 "semantics.y"
+                                                                                                                        {;}
+#line 1834 "y.tab.c"
+    break;
+
+  case 55: /* ELSE_: ELSE smtm  */
+#line 216 "semantics.y"
+                                                                {;}
+#line 1840 "y.tab.c"
+    break;
+
+  case 58: /* ELIF_: ELIF '(' exp ')' smtm  */
+#line 223 "semantics.y"
+                                                        {;}
+#line 1846 "y.tab.c"
+    break;
+
+  case 59: /* smtm: '{' smtm_types '}'  */
+#line 226 "semantics.y"
+                                                        {;}
+#line 1852 "y.tab.c"
+    break;
+
+  case 60: /* smtm: '{' '}'  */
+#line 227 "semantics.y"
+                                                                                {;}
+#line 1858 "y.tab.c"
+    break;
+
+  case 61: /* smtm_types: smtm_type  */
+#line 230 "semantics.y"
+                                                                {;}
+#line 1864 "y.tab.c"
+    break;
+
+  case 63: /* smtm_type: assignment ';'  */
+#line 234 "semantics.y"
+                                                        {;}
+#line 1870 "y.tab.c"
+    break;
+
+  case 64: /* smtm_type: exp ';'  */
+#line 235 "semantics.y"
+                                                                {;}
+#line 1876 "y.tab.c"
+    break;
+
+  case 65: /* smtm_type: print exp ';'  */
+#line 236 "semantics.y"
+                                                                {printValue((yyvsp[-1].strct));}
+#line 1882 "y.tab.c"
+    break;
+
+  case 66: /* smtm_type: stat  */
+#line 237 "semantics.y"
+                                                                        {;}
+#line 1888 "y.tab.c"
+    break;
+
+  case 67: /* FUNCTION: DATA_TYPE FUN IDENTIFIER '(' lista_param ')' smtm_fun  */
+#line 242 "semantics.y"
+                                                                                        {pushFunction((yyvsp[-4].string), (yyvsp[-6].type_id), (yyvsp[-2].funParam));}
+#line 1894 "y.tab.c"
+    break;
+
+  case 68: /* lista_param: more_params  */
+#line 245 "semantics.y"
+                                                                                                                                {(yyval.funParam) = (yyvsp[0].funParam);}
+#line 1900 "y.tab.c"
+    break;
+
+  case 69: /* lista_param: %empty  */
+#line 246 "semantics.y"
+                                                                                                                                                        {(yyval.funParam) = initializeParam(0);}
+#line 1906 "y.tab.c"
+    break;
+
+  case 70: /* more_params: paramentru  */
+#line 249 "semantics.y"
+                                                                                                                                {(yyval.funParam) = initializeParam((yyvsp[0].type_id));}
+#line 1912 "y.tab.c"
+    break;
+
+  case 71: /* more_params: more_params ',' paramentru  */
+#line 250 "semantics.y"
+                                                                                                                        {pushParam((yyval.funParam), (yyvsp[0].type_id));}
+#line 1918 "y.tab.c"
+    break;
+
+  case 72: /* paramentru: DATA_TYPE IDENTIFIER  */
+#line 253 "semantics.y"
+                                                                                                                        {(yyval.type_id) = (yyvsp[-1].type_id);}
+#line 1924 "y.tab.c"
+    break;
+
+  case 73: /* smtm_fun: '{' smtm_types RETURN exp ';' '}'  */
+#line 257 "semantics.y"
+                                                                {;}
+#line 1930 "y.tab.c"
+    break;
+
+  case 74: /* smtm_fun: '{' RETURN exp ';' '}'  */
+#line 258 "semantics.y"
+                                                                                {;}
+#line 1936 "y.tab.c"
     break;
 
 
-#line 1547 "y.tab.c"
+#line 1940 "y.tab.c"
 
       default: break;
     }
@@ -1737,14 +2130,14 @@ yyreturn:
   return yyresult;
 }
 
-#line 174 "semantics.y"
+#line 261 "semantics.y"
 
 void pushStructVariable(char*id)
 {
 	int i = getVariableIndex(id);
 
 	if (i != -1) {
-		printf("The variable %s was already declared here\n", id);
+		printf( "The variable %s was already declared here\n", id);
 		exit(0);
 	}
 
@@ -1760,7 +2153,7 @@ void pushFunction(char* id, int retType, struct parameter* p) {
 	int i = getVariableIndex(id);
 
 	if (i != -1) {
-		printf("Name for function %s was already taken.\n", id);
+		printf( "Name for function %s was already taken.\n" , id);
 		exit(0);
 	}
 
@@ -1834,8 +2227,8 @@ void print_simbol_table(struct var* v,int n)
 			case plutitor:
 				fprintf(fd, "tip = plutitor valoare = %f ", (float)v[i].array[0]);
 				break;
-			case String:
-				fprintf(fd, "tip = String valoare = \"%s\" ", (char*)v[i].arrayStr[0]);
+			case fraza:
+				fprintf(fd, "tip = fraza valoare = \"%s\" ", (char*)v[i].arrayStr[0]);
 				break;
 			case bul:
 				fprintf(fd, "tip = bul valoare = %d ", (int)v[i].array[0]);
@@ -1877,8 +2270,8 @@ void print_simbol_table(struct var* v,int n)
 				 	fprintf(fd,"%s[%d] = %f  ", v[i].id, j, (float)v[i].array[j]);
 				}
 				break;
-			case String:
-				fprintf(fd, "tip = String Array");
+			case fraza:
+				fprintf(fd, "tip = fraza Array");
 				for(int j=0;j<v[i].arraySize;j++)
 				{
 					fprintf(fd," %s[%d] = \"%s\" ", v[i].id, j, (char*)v[i].arrayStr[j]);
@@ -1941,7 +2334,7 @@ struct var* temporaryPointStr(void* val, int type) {
 
 	v->type = type;
 
-	if (type == String) {
+	if (type == fraza) {
 		sprintf(v->arrayStr[0], "%s", (char*)val);
 	} else {
 		v->array[0] = ((char*)val)[0];
@@ -2026,7 +2419,7 @@ struct var* temporaryPointArr(char* id, struct var* node) {
 		exit(0);
 	}
 
-	if (node->type == String) {
+	if (node->type == fraza) {
 		printf("This array type cannot be accessed with a string expression.\n" );
 		exit(0);
 	}
@@ -2051,7 +2444,7 @@ struct var* temporaryPointArr(char* id, struct var* node) {
 		printf( "%s[%d] was not initialzied. The default value will be used. Line %d.\n" , id, n, yylineno);
 	}
 
-	if (v->type == String) {
+	if (v->type == fraza) {
 		sprintf(exp->arrayStr[0], "%s", v->arrayStr[n]);
 	} else if (v->type == bul) {
 		exp->array[0] = v->array[n] != 0;
@@ -2103,7 +2496,7 @@ void updateValue(char* id, struct var* exp) {
 		exit(0);
 	}
 	
-	if (vr->type == String && exp->type != String || vr->type != String && exp->type == String) {
+	if (vr->type == fraza && exp->type != fraza || vr->type != fraza && exp->type == fraza) {
 		printf( "Data types should match.\n" );
 		exit(0);
 	}
@@ -2120,7 +2513,7 @@ void updateValue(char* id, struct var* exp) {
 		int m = exp->arraySize;
 
 		for (int i = 0; i < n && i < m; i++) {
-			if (vr->type == String) {
+			if (vr->type == fraza) {
 				sprintf(vr->arrayStr[i], "%s", exp->arrayStr[i]);
 			} else if (vr->type == bul) {
 				vr->array[i] = exp->array[i] != 0;
@@ -2133,7 +2526,7 @@ void updateValue(char* id, struct var* exp) {
 	}
 
 	vr->isInitilalized[0] = 1;
-	if (vr->type == String) {
+	if (vr->type == fraza) {
 		sprintf(vr->arrayStr[0], "%s", exp->arrayStr[0]);
 	} else if (vr->type == bul) {
 		vr->array[0] = exp->array[0] != 0;
@@ -2158,7 +2551,7 @@ void updateArrValue(char* id, struct var* exp_1, struct var* exp_2) {
 		exit(0);
 	}
 
-	if (exp_1->type == String) {
+	if (exp_1->type == fraza) {
 		printf( "This array type cannot be accessed with a string expression.\n" );
 		exit(0);
 	}
@@ -2175,14 +2568,14 @@ void updateArrValue(char* id, struct var* exp_1, struct var* exp_2) {
 		exit(0);
 	}
 
-	if (v->type == String && exp_2->type != String || v->type != String && exp_2->type == String) {
+	if (v->type == fraza && exp_2->type != fraza || v->type != fraza && exp_2->type == fraza) {
 		printf( "Data type should match for variable %s[%d]"  ".\n" , id, n);
 		exit(0);
 	}
 
 	v->isInitilalized[n] = 1;
 
-	if (v->type == String) {
+	if (v->type == fraza) {
 		sprintf(v->arrayStr[n], "%s", exp_2->arrayStr[0]);
 	} else if (v->type == bul) {
 		v->array[n] = exp_2->array[0] != 0;
@@ -2204,7 +2597,7 @@ void pushEmptyVariable(char* id, int type) {
 	sprintf(v->id, "%s", id);
 	v->type = type;
 
-	if (type == String) {
+	if (type == fraza) {
 		sprintf(v->arrayStr[0], "%s", "");
 	} else {
 		v->array[0] = 0;
@@ -2226,7 +2619,7 @@ void pushVariable(char* id, int type, struct var* exp) {
 	sprintf(v->id, "%s", id);
 	v->type = type;
 	v->isInitilalized[0] = 1;
-	if (type == String) {
+	if (type == fraza) {
 		sprintf(v->arrayStr[0], "%s", exp->arrayStr[0]);
 	} else if (type == bul) {
 		v->array[0] = exp->array[0] != 0;
@@ -2246,7 +2639,7 @@ void pushArray(char* id, int type, struct var* exp) {
 		exit(0);
 	}
 
-	if (exp->type == String) {
+	if (exp->type == fraza) {
 		printf( "Array types cannot be declared with string expressions.\n" );
 		exit(0);
 	}
@@ -2260,7 +2653,7 @@ void pushArray(char* id, int type, struct var* exp) {
 
 	struct var *v = variables + totalVar;
 
-	if (v->type == String && exp->type != String || v->type != String && exp->type == String) {
+	if (v->type == fraza && exp->type != fraza || v->type != fraza && exp->type == fraza) {
 		printf( "Data types should match.\n" );
 		exit(0);
 	}
@@ -2286,7 +2679,7 @@ void pushVariableConst(char* id, int type, struct var* exp) {
 	sprintf(v->id, "%s", id);
 	v->type = type;
 
-	if (type == String) {
+	if (type == fraza) {
 		sprintf(v->arrayStr[0], "%s", exp->arrayStr[0]);
 	} else if (type == bul) {
 		v->array[0] = exp->array[0] != 0;
@@ -2308,24 +2701,24 @@ struct var* comp(struct var* a, struct var* b, int op_type) {
 
 	switch (op_type) {
 	case PLUS:;
-		if (a->type == String && b->type == String) {
-			v->type = String;
+		if (a->type == fraza && b->type == fraza) {
+			v->type = fraza;
 			strcpy(v->arrayStr[0], "");
 			strcat(v->arrayStr[0], a->arrayStr[0]);
 			strcat(v->arrayStr[0], b->arrayStr[0]);
 			break;
 		}
 
-		if (a->type != String && b->type == String) {
-			v->type = String;
+		if (a->type != fraza && b->type == fraza) {
+			v->type = fraza;
 			strcpy(v->arrayStr[0], "");
 			sprintf(v->arrayStr[0], "%f", (float)a->array[0]);
 			strcat(v->arrayStr[0], b->arrayStr[0]);
 			break;
 		}
 
-		if (a->type == String && b->type != String) {
-			v->type = String;
+		if (a->type == fraza && b->type != fraza) {
+			v->type = fraza;
 			strcpy(v->arrayStr[0], "");
 
 			strcat(v->arrayStr[0], a->arrayStr[0]);
@@ -2402,7 +2795,7 @@ struct var* comp(struct var* a, struct var* b, int op_type) {
 		}
 		break;
 	case LS:;
-		if (a->type == String && b->type == String) {
+		if (a->type == fraza && b->type == fraza) {
 			n = strcmp(a->arrayStr[0], b->arrayStr[0]);
 			v->array[0] = n == -1;
 		} else {
@@ -2411,7 +2804,7 @@ struct var* comp(struct var* a, struct var* b, int op_type) {
 		v->type = integru;
 		break;
 	case LEQ:;
-		if (a->type == String && b->type == String) {
+		if (a->type == fraza && b->type == fraza) {
 			n = strcmp(a->arrayStr[0], b->arrayStr[0]);
 			v->array[0] = n == -1 || n == 0;
 		} else {
@@ -2420,7 +2813,7 @@ struct var* comp(struct var* a, struct var* b, int op_type) {
 		v->type = integru;
 		break;
 	case GE:;
-		if (a->type == String && b->type == String) {
+		if (a->type == fraza && b->type == fraza) {
 			n = strcmp(a->arrayStr[0], b->arrayStr[0]);
 			v->array[0] = n == 1;
 		} else {
@@ -2429,7 +2822,7 @@ struct var* comp(struct var* a, struct var* b, int op_type) {
 		v->type = integru;
 		break;
 	case GEQ:;
-		if (a->type == String && b->type == String) {
+		if (a->type == fraza && b->type == fraza) {
 			n = strcmp(a->arrayStr[0], b->arrayStr[0]);
 			v->array[0] = n == 1 || n == 0;
 		} else {
@@ -2438,7 +2831,7 @@ struct var* comp(struct var* a, struct var* b, int op_type) {
 		v->type = integru;
 		break;
 	case EQEQ:;
-		if (a->type == String && b->type == String) {
+		if (a->type == fraza && b->type == fraza) {
 			n = strcmp(a->arrayStr[0], b->arrayStr[0]);
 			v->array[0] = n == 0;
 		} else {
@@ -2501,7 +2894,7 @@ void printValue(struct var* node) {
 		if (node->var_type == TYPE_NORMAL)
 			printf("%f\n", (float)node->array[0]);
 		break;
-	case String:
+	case fraza:
 		if (node->var_type == TYPE_ARRAY) {
 			n = node->arraySize;
 			printf("{");
@@ -2576,8 +2969,8 @@ char* defToDataType(int n) {
 	case plutitor:
 		return "plutitor";
 		break;
-	case String:
-		return "String";
+	case fraza:
+		return "fraza";
 		break;
 	}
 	return "";

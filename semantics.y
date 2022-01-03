@@ -85,22 +85,38 @@ char* defToDataType(int);
 %token print
 
 %type <type_id> DATA_TYPE
-%token <type_id> integru plutitor litera bul String
+%token <type_id> integru plutitor litera bul fraza
 %token conservator
 
 %token GEQ LEQ AND OR EQEQ LS GE
 %token PLUS MINUS PROD DIV EQUAL
 
+%type<num> stat
+%token IF WHILE pt
+%type<num> smtm smtm_type smtm_types smtm_fun ELSE_ ELIF_ ELIF_S 
+%token ELSE
+%token ELIF
+
+%token FUN RETURN DEFINE_TYPE
+%type<num> FUNCTION
+
 %token <string> String_Value Character_Value
+
+%type <type_id> paramentru
+%type<funParam> lista_param more_params fun_call_list more_call_param
+
+%token EVAL
 
 %token exit_command
 %token <num> number number_r
 %token <string> IDENTIFIER
-%type <num> line lines
+%type <num> line declarations
 
 %type <strct> exp term 
 
-%type <num> assignment // TODO verify
+%type <num> assignment
+
+%nonassoc IF ELSE ELIF
 
 %right EQUAL
 
@@ -116,31 +132,40 @@ char* defToDataType(int);
 
 %%
 
-/* descriptions of expected inputs     corresponding actions (in C) */
+program : declarations { print_simbol_table(variables,totalVar);printf( "Program corect sintactic\n" ); }
+		; 
 
-
-program : lines { print_simbol_table(variables,totalVar);printf("Program corect sintactic\n\n"); }
-		;
-
-lines   : line			 			{;}
-		| lines line				{;}
-		;
+declarations   	: line			 			{;}
+				| declarations line				{;}
+				;
 
 line 	: assignment ';'								{;}
 		| exit_command ';'								{exit(EXIT_SUCCESS);}
 		| print exp ';'									{printValue($2);}
+		| stat 											{;}
+		| FUNCTION 				   						{;}
+		| EVAL '(' exp ')' ';'          				{Eval_function($3);}
+		| DEFINE_TYPE '{' ELEMENTS '}' IDENTIFIER ';'   {pushStructVariable($5);}
 		;
+
+ELEMENTS : DATA_TYPE IDENTIFIER ';' ELEMENTS	{;}
+		 |										{;}
+		 ;
 
 DATA_TYPE   : integru   	 {$$ = $1;}
 			| plutitor			 {$$ = $1;}
 			| litera 	 {$$ = $1;}
 			| bul 	 		 {$$ = $1;}
-			| String		 {$$ = $1;}
+			| fraza		 {$$ = $1;}
 			;
 
 assignment  : DATA_TYPE IDENTIFIER	 					{pushEmptyVariable($2, $1);}
+			| DATA_TYPE IDENTIFIER EQUAL exp  			{pushVariable($2, $1, $4);}
+		
 			| conservator DATA_TYPE IDENTIFIER EQUAL exp  	{pushVariableConst($3, $2, $5);}
+
 			| DATA_TYPE IDENTIFIER '[' exp ']'			{pushArray($2, $1, $4);}
+
 			| IDENTIFIER EQUAL exp   					{updateValue($1, $3);}
 			| IDENTIFIER '[' exp ']' EQUAL exp			{updateArrValue($1, $3, $6);}
 			;
@@ -165,11 +190,73 @@ exp    	: term                     	{$$ = $1;}
 
 term	: IDENTIFIER						{$$ = temporaryPointVar($1);} 
 		| IDENTIFIER '[' exp ']'			{$$ = temporaryPointArr($1, $3);}
+		| IDENTIFIER '(' fun_call_list ')' 	{$$ = temporaryPointFun($1, $3);}
    		| number                			{$$ = temporaryPointNum($1, integru);}
 		| number_r							{$$ = temporaryPointNum($1, plutitor);}
 		| Character_Value					{$$ = temporaryPointStr($1, litera);}
-		| String_Value						{$$ = temporaryPointStr($1, String);}
+		| String_Value						{$$ = temporaryPointStr($1, fraza);}
         ;
+
+fun_call_list	: more_call_param			{$$ = $1;}
+				|							{$$ = initializeParam(0);}
+				;
+
+more_call_param : exp						{$$ = initializeParam($1->type);}
+				| more_call_param ',' exp	{pushParam($$, $3->type);}
+				;
+
+stat	: IF '(' exp ')' smtm				{;}
+		| IF '(' exp ')' smtm ELIF_S ELSE_ 	{;}
+		| IF '(' exp ')' smtm ELSE_ 		{;}
+		| IF '(' exp ')' smtm ELIF_S	 	{;}
+		| WHILE '(' exp ')' smtm			{;}
+		| pt '(' IDENTIFIER EQUAL exp ';' exp ';' IDENTIFIER EQUAL exp ')' smtm					{;}
+		;
+
+ELSE_   : ELSE smtm 						{;}
+		;
+
+ELIF_S  : ELIF_
+		| ELIF_S ELIF_
+		;
+
+ELIF_   : ELIF '(' exp ')' smtm				{;}
+		;
+
+smtm 	: '{' smtm_types '}'				{;}
+		| '{' '}'							{;}
+		;
+
+smtm_types  : smtm_type 					{;}
+			| smtm_types smtm_type
+			;
+
+smtm_type 	: assignment ';'			{;}
+			| exp        ';'			{;}
+			| print exp ';'				{printValue($2);}
+			| stat 						{;}
+			;
+
+
+
+FUNCTION 	: DATA_TYPE FUN IDENTIFIER '(' lista_param ')' smtm_fun 		{pushFunction($3, $1, $5);}
+			;
+
+lista_param : more_params													{$$ = $1;}
+			| 																{$$ = initializeParam(0);}
+			;
+
+more_params : paramentru													{$$ = initializeParam($1);}
+			| more_params ',' paramentru									{pushParam($$, $3);}
+			;
+
+paramentru  : DATA_TYPE IDENTIFIER											{$$ = $1;}
+			;
+
+
+smtm_fun	: '{' smtm_types RETURN exp ';' '}' 		{;}
+			| '{' RETURN exp ';' '}'				{;}
+			;
 
 %%
 void pushStructVariable(char*id)
@@ -177,7 +264,7 @@ void pushStructVariable(char*id)
 	int i = getVariableIndex(id);
 
 	if (i != -1) {
-		printf("The variable %s was already declared here\n", id);
+		printf( "The variable %s was already declared here\n", id);
 		exit(0);
 	}
 
@@ -193,7 +280,7 @@ void pushFunction(char* id, int retType, struct parameter* p) {
 	int i = getVariableIndex(id);
 
 	if (i != -1) {
-		printf("Name for function %s was already taken.\n", id);
+		printf( "Name for function %s was already taken.\n" , id);
 		exit(0);
 	}
 
@@ -267,8 +354,8 @@ void print_simbol_table(struct var* v,int n)
 			case plutitor:
 				fprintf(fd, "tip = plutitor valoare = %f ", (float)v[i].array[0]);
 				break;
-			case String:
-				fprintf(fd, "tip = String valoare = \"%s\" ", (char*)v[i].arrayStr[0]);
+			case fraza:
+				fprintf(fd, "tip = fraza valoare = \"%s\" ", (char*)v[i].arrayStr[0]);
 				break;
 			case bul:
 				fprintf(fd, "tip = bul valoare = %d ", (int)v[i].array[0]);
@@ -310,8 +397,8 @@ void print_simbol_table(struct var* v,int n)
 				 	fprintf(fd,"%s[%d] = %f  ", v[i].id, j, (float)v[i].array[j]);
 				}
 				break;
-			case String:
-				fprintf(fd, "tip = String Array");
+			case fraza:
+				fprintf(fd, "tip = fraza Array");
 				for(int j=0;j<v[i].arraySize;j++)
 				{
 					fprintf(fd," %s[%d] = \"%s\" ", v[i].id, j, (char*)v[i].arrayStr[j]);
@@ -374,7 +461,7 @@ struct var* temporaryPointStr(void* val, int type) {
 
 	v->type = type;
 
-	if (type == String) {
+	if (type == fraza) {
 		sprintf(v->arrayStr[0], "%s", (char*)val);
 	} else {
 		v->array[0] = ((char*)val)[0];
@@ -459,7 +546,7 @@ struct var* temporaryPointArr(char* id, struct var* node) {
 		exit(0);
 	}
 
-	if (node->type == String) {
+	if (node->type == fraza) {
 		printf("This array type cannot be accessed with a string expression.\n" );
 		exit(0);
 	}
@@ -484,7 +571,7 @@ struct var* temporaryPointArr(char* id, struct var* node) {
 		printf( "%s[%d] was not initialzied. The default value will be used. Line %d.\n" , id, n, yylineno);
 	}
 
-	if (v->type == String) {
+	if (v->type == fraza) {
 		sprintf(exp->arrayStr[0], "%s", v->arrayStr[n]);
 	} else if (v->type == bul) {
 		exp->array[0] = v->array[n] != 0;
@@ -536,7 +623,7 @@ void updateValue(char* id, struct var* exp) {
 		exit(0);
 	}
 	
-	if (vr->type == String && exp->type != String || vr->type != String && exp->type == String) {
+	if (vr->type == fraza && exp->type != fraza || vr->type != fraza && exp->type == fraza) {
 		printf( "Data types should match.\n" );
 		exit(0);
 	}
@@ -553,7 +640,7 @@ void updateValue(char* id, struct var* exp) {
 		int m = exp->arraySize;
 
 		for (int i = 0; i < n && i < m; i++) {
-			if (vr->type == String) {
+			if (vr->type == fraza) {
 				sprintf(vr->arrayStr[i], "%s", exp->arrayStr[i]);
 			} else if (vr->type == bul) {
 				vr->array[i] = exp->array[i] != 0;
@@ -566,7 +653,7 @@ void updateValue(char* id, struct var* exp) {
 	}
 
 	vr->isInitilalized[0] = 1;
-	if (vr->type == String) {
+	if (vr->type == fraza) {
 		sprintf(vr->arrayStr[0], "%s", exp->arrayStr[0]);
 	} else if (vr->type == bul) {
 		vr->array[0] = exp->array[0] != 0;
@@ -591,7 +678,7 @@ void updateArrValue(char* id, struct var* exp_1, struct var* exp_2) {
 		exit(0);
 	}
 
-	if (exp_1->type == String) {
+	if (exp_1->type == fraza) {
 		printf( "This array type cannot be accessed with a string expression.\n" );
 		exit(0);
 	}
@@ -608,14 +695,14 @@ void updateArrValue(char* id, struct var* exp_1, struct var* exp_2) {
 		exit(0);
 	}
 
-	if (v->type == String && exp_2->type != String || v->type != String && exp_2->type == String) {
+	if (v->type == fraza && exp_2->type != fraza || v->type != fraza && exp_2->type == fraza) {
 		printf( "Data type should match for variable %s[%d]"  ".\n" , id, n);
 		exit(0);
 	}
 
 	v->isInitilalized[n] = 1;
 
-	if (v->type == String) {
+	if (v->type == fraza) {
 		sprintf(v->arrayStr[n], "%s", exp_2->arrayStr[0]);
 	} else if (v->type == bul) {
 		v->array[n] = exp_2->array[0] != 0;
@@ -637,7 +724,7 @@ void pushEmptyVariable(char* id, int type) {
 	sprintf(v->id, "%s", id);
 	v->type = type;
 
-	if (type == String) {
+	if (type == fraza) {
 		sprintf(v->arrayStr[0], "%s", "");
 	} else {
 		v->array[0] = 0;
@@ -659,7 +746,7 @@ void pushVariable(char* id, int type, struct var* exp) {
 	sprintf(v->id, "%s", id);
 	v->type = type;
 	v->isInitilalized[0] = 1;
-	if (type == String) {
+	if (type == fraza) {
 		sprintf(v->arrayStr[0], "%s", exp->arrayStr[0]);
 	} else if (type == bul) {
 		v->array[0] = exp->array[0] != 0;
@@ -679,7 +766,7 @@ void pushArray(char* id, int type, struct var* exp) {
 		exit(0);
 	}
 
-	if (exp->type == String) {
+	if (exp->type == fraza) {
 		printf( "Array types cannot be declared with string expressions.\n" );
 		exit(0);
 	}
@@ -693,7 +780,7 @@ void pushArray(char* id, int type, struct var* exp) {
 
 	struct var *v = variables + totalVar;
 
-	if (v->type == String && exp->type != String || v->type != String && exp->type == String) {
+	if (v->type == fraza && exp->type != fraza || v->type != fraza && exp->type == fraza) {
 		printf( "Data types should match.\n" );
 		exit(0);
 	}
@@ -719,7 +806,7 @@ void pushVariableConst(char* id, int type, struct var* exp) {
 	sprintf(v->id, "%s", id);
 	v->type = type;
 
-	if (type == String) {
+	if (type == fraza) {
 		sprintf(v->arrayStr[0], "%s", exp->arrayStr[0]);
 	} else if (type == bul) {
 		v->array[0] = exp->array[0] != 0;
@@ -741,24 +828,24 @@ struct var* comp(struct var* a, struct var* b, int op_type) {
 
 	switch (op_type) {
 	case PLUS:;
-		if (a->type == String && b->type == String) {
-			v->type = String;
+		if (a->type == fraza && b->type == fraza) {
+			v->type = fraza;
 			strcpy(v->arrayStr[0], "");
 			strcat(v->arrayStr[0], a->arrayStr[0]);
 			strcat(v->arrayStr[0], b->arrayStr[0]);
 			break;
 		}
 
-		if (a->type != String && b->type == String) {
-			v->type = String;
+		if (a->type != fraza && b->type == fraza) {
+			v->type = fraza;
 			strcpy(v->arrayStr[0], "");
 			sprintf(v->arrayStr[0], "%f", (float)a->array[0]);
 			strcat(v->arrayStr[0], b->arrayStr[0]);
 			break;
 		}
 
-		if (a->type == String && b->type != String) {
-			v->type = String;
+		if (a->type == fraza && b->type != fraza) {
+			v->type = fraza;
 			strcpy(v->arrayStr[0], "");
 
 			strcat(v->arrayStr[0], a->arrayStr[0]);
@@ -835,7 +922,7 @@ struct var* comp(struct var* a, struct var* b, int op_type) {
 		}
 		break;
 	case LS:;
-		if (a->type == String && b->type == String) {
+		if (a->type == fraza && b->type == fraza) {
 			n = strcmp(a->arrayStr[0], b->arrayStr[0]);
 			v->array[0] = n == -1;
 		} else {
@@ -844,7 +931,7 @@ struct var* comp(struct var* a, struct var* b, int op_type) {
 		v->type = integru;
 		break;
 	case LEQ:;
-		if (a->type == String && b->type == String) {
+		if (a->type == fraza && b->type == fraza) {
 			n = strcmp(a->arrayStr[0], b->arrayStr[0]);
 			v->array[0] = n == -1 || n == 0;
 		} else {
@@ -853,7 +940,7 @@ struct var* comp(struct var* a, struct var* b, int op_type) {
 		v->type = integru;
 		break;
 	case GE:;
-		if (a->type == String && b->type == String) {
+		if (a->type == fraza && b->type == fraza) {
 			n = strcmp(a->arrayStr[0], b->arrayStr[0]);
 			v->array[0] = n == 1;
 		} else {
@@ -862,7 +949,7 @@ struct var* comp(struct var* a, struct var* b, int op_type) {
 		v->type = integru;
 		break;
 	case GEQ:;
-		if (a->type == String && b->type == String) {
+		if (a->type == fraza && b->type == fraza) {
 			n = strcmp(a->arrayStr[0], b->arrayStr[0]);
 			v->array[0] = n == 1 || n == 0;
 		} else {
@@ -871,7 +958,7 @@ struct var* comp(struct var* a, struct var* b, int op_type) {
 		v->type = integru;
 		break;
 	case EQEQ:;
-		if (a->type == String && b->type == String) {
+		if (a->type == fraza && b->type == fraza) {
 			n = strcmp(a->arrayStr[0], b->arrayStr[0]);
 			v->array[0] = n == 0;
 		} else {
@@ -934,7 +1021,7 @@ void printValue(struct var* node) {
 		if (node->var_type == TYPE_NORMAL)
 			printf("%f\n", (float)node->array[0]);
 		break;
-	case String:
+	case fraza:
 		if (node->var_type == TYPE_ARRAY) {
 			n = node->arraySize;
 			printf("{");
@@ -1009,8 +1096,8 @@ char* defToDataType(int n) {
 	case plutitor:
 		return "plutitor";
 		break;
-	case String:
-		return "String";
+	case fraza:
+		return "fraza";
 		break;
 	}
 	return "";

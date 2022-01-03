@@ -15,7 +15,7 @@ int yylex();
 "integru"              	        	{yylval.type_id = integru; return integru;}
 "plutitor"                         	{yylval.type_id = plutitor; return plutitor;}
 "litera"                          	{yylval.type_id = litera; return litera;}
-"String"                        	{yylval.type_id = String; return String;}
+"fraza"                        	    {yylval.type_id = fraza; return fraza;}
 "bul"                          	    {yylval.type_id = bul; return bul;}
 "conservator"                       {return conservator;}
 
@@ -32,6 +32,8 @@ int yylex();
 "/"                             	{return DIV;}
 "<"                             	{return LS;}
 ">"                             	{return GE;}
+
+"pt"                                {return pt;}
 
 [#].*[#]                            {;}
 [()<>]                  	        {return yytext[0];}

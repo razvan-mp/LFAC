@@ -1,7 +1,6 @@
-integru a;
-String ss[2];
-
-ss[0] = "Lorem ipsum";
-print ss[0] + ss[1];
-
-print a;
+integru a = 1;
+conservator integru b = 8;
+pt(a = 0 ; a < b ; a = a + 2)
+{
+    print a;
+}

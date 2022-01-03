@@ -4,4 +4,4 @@ all:
 
 	gcc -g lex.yy.c y.tab.c -o test
 
-	./test
+	./test input.txt
