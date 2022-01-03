@@ -1,0 +1,3 @@
+nume : a  tip = integru valoare = 0  not constant 
+nume : ss  tip = String Array ss[0] = "Lorem ipsum"  ss[1] = " varlanca gay" 
+

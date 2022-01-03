@@ -1,63 +1,49 @@
 %{
-#include "semantics.tab.h"
-#include <string.h>
 #include <stdio.h>
+#include <string.h>
 
+#include "y.tab.h"
+
+void yyerror (char *s);
 int yylex();
-void yyerror (char *error);
 
 %}
-
-%x comment
-%option noyywrap
-
 %%
 
-"||"                    	        {return OR;}
+"print"				            	{return print;}
+"exit"				   	        	{return exit_command;}
+"integru"              	        	{yylval.type_id = integru; return integru;}
+"plutitor"                         	{yylval.type_id = plutitor; return plutitor;}
+"litera"                          	{yylval.type_id = litera; return litera;}
+"String"                        	{yylval.type_id = String; return String;}
+"bul"                          	    {yylval.type_id = bul; return bul;}
+"conservator"                       {return conservator;}
+
 "<="                            	{return LEQ;}
-"&&"                    	        {return AND;}
 ">="                    	        {return GEQ;}
+"&&"                    	        {return AND;}
+"||"                    	        {return OR;}
 "=="                    	        {return EQEQ;}
 
-"="                             	{return REAL_EQUAL;}
+"="                             	{return EQUAL;}
 "+"                             	{return PLUS;}
 "-"                             	{return MINUS;}
-"*"                             	{return PRODUCT;}
-"/"                             	{return DIVIDE;}
+"*"                             	{return PROD;}
+"/"                             	{return DIV;}
 "<"                             	{return LS;}
 ">"                             	{return GE;}
 
-"pt"                                {return PT;}
-"daca"                            	{return DACA;}
-"vezi"                              {return VEZI;}
-"poate"                  	        {return POATE;}
-"altfel"                  	        {return ALTFEL;}
-"functie"                   	    {return FUNCTIE;}
-"rastimp"                           {return RASTIMP;}
-"intoarce"                	        {return INTOARCE;}
-
-"conservator"                       {return conservator;}
-"am_plecat"				   	        {return am_plecat;}
-"plutitor"                         	{yylval.type = plutitor; return plutitor;}
-"tipu_meu"                          {return tipu_meu;}
-"integru"              	        	{yylval.type = integru; return integru;}
-"litera"                          	{yylval.type = litera; return litera;}
-"fraza"                        	    {yylval.type = fraza; return fraza;}
-"print"				            	{return print;}
-"bul"                          	    {yylval.type = bul; return bul;}
-
-[a-zA-Z][a-zA-Z_0-9]*	            {strcpy(yylval.name, yytext); return AIDI;}
-[0]|[-]?[1-9][0-9]*     	        {yylval.value = atoi(yytext); return number;}
-[0]|[-]?[1-9][0-9]*\.[0-9]+         {yylval.value = atof(yytext); return number_r;}
-['].[']                 	        {yytext[2] = '\0'; strcpy(yylval.name, yytext + 1); return Valoare_Litera;}
-["][^\"]*["]                	    {strcpy(yylval.name, yytext + 1); yylval.name[strlen(yytext)] = '\0'; return Valoare_Fraza;}
+[#].*[#]                            {;}
+[()<>]                  	        {return yytext[0];}
+[a-zA-Z]+([a-zA-Z]*[_]*[0-9]*)*	    {strcpy(yylval.string, yytext); return IDENTIFIER;}
+["][^\"]*["]                	    {strcpy(yylval.string, yytext + 1); yylval.string[strlen(yytext + 1) - 1] = '\0'; return String_Value;}
+['].[']                 	        {yytext[2] = '\0'; strcpy(yylval.string, yytext + 1); return Character_Value;}
+[0]|[-]?[1-9][0-9]*     	        {yylval.num = atoi(yytext); return number;}
+[0]|[-]?[1-9][0-9]*\.[0-9]+         {yylval.num = atof(yytext); return number_r;}
 [ \t]                  		        ;
 [\n]                    	        {yylineno++;}
 [-+=*/{};,\[\]]                     {return yytext[0];}
-.                       	        {ECHO; yyerror ("caracter dubios"); printf("%s\n", yytext);}
-
-"/*" {BEGIN comment;}
-<comment>.|\n ;
-<comment>"*/" {BEGIN 0;}
+.                       	        {ECHO; yyerror ("unexpected character"); printf("%s\n", yytext);}
 
 %%
+int yywrap (void) {return 1;}

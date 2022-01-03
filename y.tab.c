@@ -69,45 +69,89 @@
 /* First part of user prologue.  */
 #line 1 "semantics.y"
 
-    #include <stdio.h>
-    #include <string.h>
-    #include <stdbool.h>
-    #include <stdlib.h>
+void yyerror (char *s);
+int yylex();
+#include <stdio.h>     /* C declarations used in actions */
+#include <string.h>
+#include <stdlib.h>
+#include <ctype.h>
 
-    #define NMAX 1000
+extern char* yytext;
+extern FILE* yyin;
+extern int yylineno;
+int lineError = 0;
 
-    extern FILE* yyin;
-    extern char* yytext;
-    extern int yylineno;
+#define TYPE_NORMAL 1
+#define TYPE_ARRAY 2
+#define TYPE_FUNCTION 3
 
-    void yyerror(char *s);
-    int yylex();
+struct var {
+	char id[100];
+	int var_type;
 
-    struct variable_structure
-    {
-        char identifier[NMAX];
-        int variable_type;
+	// normal type
+	int type;
+	int cnst;
 
-        int simple_type;
-        int simple_constant;
+	// array
+	int arraySize;
+	double array[100];
+	char arrayStr[100][1000];
+	int isInitilalized[100];
+	
+	// function
+	int parameterTypes[10];
+	int parameterNum;
+};
 
-        int size_array;
-        float array[NMAX];
-        char array_string[NMAX][NMAX];
-        bool initialized[NMAX];
+struct parameter {
+	int paramNum;
+	int parameterTypes[10];
+};
 
-        int number_of_parameters;
-        int types_of_parameters[10];
-    }variables[NMAX];
+struct var* initializeVar();
 
-    void createEmptyVariable(int, char*);
-    void createVariable(int, char*, struct variable_structure*);
-    void createConstantVariable(char*, int, struct variable_structure*);
+#define BBLK "\e[1;30m"
+#define BRED "\e[1;31m"
+#define BGRN "\e[1;32m"
+#define BYEL "\e[1;33m"
+#define BBLU "\e[1;34m"
+#define BMAG "\e[1;35m"
+#define BCYN "\e[1;36m"
+#define BWHT "\e[1;37m"
+#define RESET "\e[0m"
 
-    int number_of_variables = 0;
+int totalVar = 0;
+struct var variables[100];
 
+struct var* temporaryPointNum(double, int);
+struct var* temporaryPointStr(void*, int);
+struct var* temporaryPointVar(char*);
+struct var* temporaryPointArr(char*, struct var*);
+struct var* temporaryPointFun(char*, struct parameter*);
 
-#line 111 "y.tab.c"
+void freeVar(struct var* v);
+int getVariableIndex(char*);
+void updateValue(char*, struct var*);
+void FloatingPointException(int);
+void pushVariable(char*, int, struct var*);
+void pushVariableConst(char*, int, struct var*);
+void pushEmptyVariable(char*, int);
+void pushStructVariable(char*);
+struct var* comp(struct var*, struct var*, int);
+void printValue(struct var*);
+void print_simbol_table(struct var*,int);
+
+void pushArray(char*, int, struct var*);
+void updateArrValue(char*, struct var*, struct var*);
+void Eval_function(struct var*);
+
+void pushParam(struct parameter*, int);
+struct parameter* initializeParam(int);
+void pushFunction(char*, int, struct parameter*);
+char* defToDataType(int);
+
+#line 155 "y.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -151,40 +195,31 @@ extern int yydebug;
     YYEOF = 0,                     /* "end of file"  */
     YYerror = 256,                 /* error  */
     YYUNDEF = 257,                 /* "invalid token"  */
-    OR = 258,                      /* OR  */
-    LEQ = 259,                     /* LEQ  */
-    AND = 260,                     /* AND  */
-    GEQ = 261,                     /* GEQ  */
-    EQEQ = 262,                    /* EQEQ  */
-    REAL_EQUAL = 263,              /* REAL_EQUAL  */
-    PLUS = 264,                    /* PLUS  */
-    MINUS = 265,                   /* MINUS  */
-    PRODUCT = 266,                 /* PRODUCT  */
-    DIVIDE = 267,                  /* DIVIDE  */
-    LS = 268,                      /* LS  */
-    GE = 269,                      /* GE  */
-    PT = 270,                      /* PT  */
-    DACA = 271,                    /* DACA  */
-    VEZI = 272,                    /* VEZI  */
-    POATE = 273,                   /* POATE  */
-    ALTFEL = 274,                  /* ALTFEL  */
-    FUNCTIE = 275,                 /* FUNCTIE  */
-    RASTIMP = 276,                 /* RASTIMP  */
-    INTOARCE = 277,                /* INTOARCE  */
-    print = 278,                   /* print  */
-    conservator = 279,             /* conservator  */
-    plutitor = 280,                /* plutitor  */
-    tipu_meu = 281,                /* tipu_meu  */
-    integru = 282,                 /* integru  */
-    bul = 283,                     /* bul  */
-    litera = 284,                  /* litera  */
-    fraza = 285,                   /* fraza  */
-    Valoare_Litera = 286,          /* Valoare_Litera  */
-    Valoare_Fraza = 287,           /* Valoare_Fraza  */
-    am_plecat = 288,               /* am_plecat  */
-    number = 289,                  /* number  */
-    number_r = 290,                /* number_r  */
-    AIDI = 291                     /* AIDI  */
+    print = 258,                   /* print  */
+    integru = 259,                 /* integru  */
+    plutitor = 260,                /* plutitor  */
+    litera = 261,                  /* litera  */
+    bul = 262,                     /* bul  */
+    String = 263,                  /* String  */
+    conservator = 264,             /* conservator  */
+    GEQ = 265,                     /* GEQ  */
+    LEQ = 266,                     /* LEQ  */
+    AND = 267,                     /* AND  */
+    OR = 268,                      /* OR  */
+    EQEQ = 269,                    /* EQEQ  */
+    LS = 270,                      /* LS  */
+    GE = 271,                      /* GE  */
+    PLUS = 272,                    /* PLUS  */
+    MINUS = 273,                   /* MINUS  */
+    PROD = 274,                    /* PROD  */
+    DIV = 275,                     /* DIV  */
+    EQUAL = 276,                   /* EQUAL  */
+    String_Value = 277,            /* String_Value  */
+    Character_Value = 278,         /* Character_Value  */
+    exit_command = 279,            /* exit_command  */
+    number = 280,                  /* number  */
+    number_r = 281,                /* number_r  */
+    IDENTIFIER = 282               /* IDENTIFIER  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -193,54 +228,45 @@ extern int yydebug;
 #define YYEOF 0
 #define YYerror 256
 #define YYUNDEF 257
-#define OR 258
-#define LEQ 259
-#define AND 260
-#define GEQ 261
-#define EQEQ 262
-#define REAL_EQUAL 263
-#define PLUS 264
-#define MINUS 265
-#define PRODUCT 266
-#define DIVIDE 267
-#define LS 268
-#define GE 269
-#define PT 270
-#define DACA 271
-#define VEZI 272
-#define POATE 273
-#define ALTFEL 274
-#define FUNCTIE 275
-#define RASTIMP 276
-#define INTOARCE 277
-#define print 278
-#define conservator 279
-#define plutitor 280
-#define tipu_meu 281
-#define integru 282
-#define bul 283
-#define litera 284
-#define fraza 285
-#define Valoare_Litera 286
-#define Valoare_Fraza 287
-#define am_plecat 288
-#define number 289
-#define number_r 290
-#define AIDI 291
+#define print 258
+#define integru 259
+#define plutitor 260
+#define litera 261
+#define bul 262
+#define String 263
+#define conservator 264
+#define GEQ 265
+#define LEQ 266
+#define AND 267
+#define OR 268
+#define EQEQ 269
+#define LS 270
+#define GE 271
+#define PLUS 272
+#define MINUS 273
+#define PROD 274
+#define DIV 275
+#define EQUAL 276
+#define String_Value 277
+#define Character_Value 278
+#define exit_command 279
+#define number 280
+#define number_r 281
+#define IDENTIFIER 282
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 44 "semantics.y"
+#line 85 "semantics.y"
 
-    char string[1000];
-	int type; 
-	double value; 
-	char name[1000];
-    struct variable_structure* data_structure; 
+	double num; 
+	char string[1000]; 
+	int type_id; 
+	struct var* strct;
+	struct parameter* funParam;
 
-#line 244 "y.tab.c"
+#line 270 "y.tab.c"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -261,47 +287,44 @@ enum yysymbol_kind_t
   YYSYMBOL_YYEOF = 0,                      /* "end of file"  */
   YYSYMBOL_YYerror = 1,                    /* error  */
   YYSYMBOL_YYUNDEF = 2,                    /* "invalid token"  */
-  YYSYMBOL_OR = 3,                         /* OR  */
-  YYSYMBOL_LEQ = 4,                        /* LEQ  */
-  YYSYMBOL_AND = 5,                        /* AND  */
-  YYSYMBOL_GEQ = 6,                        /* GEQ  */
-  YYSYMBOL_EQEQ = 7,                       /* EQEQ  */
-  YYSYMBOL_REAL_EQUAL = 8,                 /* REAL_EQUAL  */
-  YYSYMBOL_PLUS = 9,                       /* PLUS  */
-  YYSYMBOL_MINUS = 10,                     /* MINUS  */
-  YYSYMBOL_PRODUCT = 11,                   /* PRODUCT  */
-  YYSYMBOL_DIVIDE = 12,                    /* DIVIDE  */
-  YYSYMBOL_LS = 13,                        /* LS  */
-  YYSYMBOL_GE = 14,                        /* GE  */
-  YYSYMBOL_PT = 15,                        /* PT  */
-  YYSYMBOL_DACA = 16,                      /* DACA  */
-  YYSYMBOL_VEZI = 17,                      /* VEZI  */
-  YYSYMBOL_POATE = 18,                     /* POATE  */
-  YYSYMBOL_ALTFEL = 19,                    /* ALTFEL  */
-  YYSYMBOL_FUNCTIE = 20,                   /* FUNCTIE  */
-  YYSYMBOL_RASTIMP = 21,                   /* RASTIMP  */
-  YYSYMBOL_INTOARCE = 22,                  /* INTOARCE  */
-  YYSYMBOL_print = 23,                     /* print  */
-  YYSYMBOL_conservator = 24,               /* conservator  */
-  YYSYMBOL_plutitor = 25,                  /* plutitor  */
-  YYSYMBOL_tipu_meu = 26,                  /* tipu_meu  */
-  YYSYMBOL_integru = 27,                   /* integru  */
-  YYSYMBOL_bul = 28,                       /* bul  */
-  YYSYMBOL_litera = 29,                    /* litera  */
-  YYSYMBOL_fraza = 30,                     /* fraza  */
-  YYSYMBOL_Valoare_Litera = 31,            /* Valoare_Litera  */
-  YYSYMBOL_Valoare_Fraza = 32,             /* Valoare_Fraza  */
-  YYSYMBOL_am_plecat = 33,                 /* am_plecat  */
-  YYSYMBOL_number = 34,                    /* number  */
-  YYSYMBOL_number_r = 35,                  /* number_r  */
-  YYSYMBOL_AIDI = 36,                      /* AIDI  */
-  YYSYMBOL_37_ = 37,                       /* ';'  */
-  YYSYMBOL_38_ = 38,                       /* '['  */
-  YYSYMBOL_39_ = 39,                       /* ']'  */
-  YYSYMBOL_40_ = 40,                       /* '('  */
-  YYSYMBOL_41_ = 41,                       /* ')'  */
-  YYSYMBOL_YYACCEPT = 42,                  /* $accept  */
-  YYSYMBOL_s = 43                          /* s  */
+  YYSYMBOL_print = 3,                      /* print  */
+  YYSYMBOL_integru = 4,                    /* integru  */
+  YYSYMBOL_plutitor = 5,                   /* plutitor  */
+  YYSYMBOL_litera = 6,                     /* litera  */
+  YYSYMBOL_bul = 7,                        /* bul  */
+  YYSYMBOL_String = 8,                     /* String  */
+  YYSYMBOL_conservator = 9,                /* conservator  */
+  YYSYMBOL_GEQ = 10,                       /* GEQ  */
+  YYSYMBOL_LEQ = 11,                       /* LEQ  */
+  YYSYMBOL_AND = 12,                       /* AND  */
+  YYSYMBOL_OR = 13,                        /* OR  */
+  YYSYMBOL_EQEQ = 14,                      /* EQEQ  */
+  YYSYMBOL_LS = 15,                        /* LS  */
+  YYSYMBOL_GE = 16,                        /* GE  */
+  YYSYMBOL_PLUS = 17,                      /* PLUS  */
+  YYSYMBOL_MINUS = 18,                     /* MINUS  */
+  YYSYMBOL_PROD = 19,                      /* PROD  */
+  YYSYMBOL_DIV = 20,                       /* DIV  */
+  YYSYMBOL_EQUAL = 21,                     /* EQUAL  */
+  YYSYMBOL_String_Value = 22,              /* String_Value  */
+  YYSYMBOL_Character_Value = 23,           /* Character_Value  */
+  YYSYMBOL_exit_command = 24,              /* exit_command  */
+  YYSYMBOL_number = 25,                    /* number  */
+  YYSYMBOL_number_r = 26,                  /* number_r  */
+  YYSYMBOL_IDENTIFIER = 27,                /* IDENTIFIER  */
+  YYSYMBOL_28_ = 28,                       /* ';'  */
+  YYSYMBOL_29_ = 29,                       /* '['  */
+  YYSYMBOL_30_ = 30,                       /* ']'  */
+  YYSYMBOL_31_ = 31,                       /* '('  */
+  YYSYMBOL_32_ = 32,                       /* ')'  */
+  YYSYMBOL_YYACCEPT = 33,                  /* $accept  */
+  YYSYMBOL_program = 34,                   /* program  */
+  YYSYMBOL_lines = 35,                     /* lines  */
+  YYSYMBOL_line = 36,                      /* line  */
+  YYSYMBOL_DATA_TYPE = 37,                 /* DATA_TYPE  */
+  YYSYMBOL_assignment = 38,                /* assignment  */
+  YYSYMBOL_exp = 39,                       /* exp  */
+  YYSYMBOL_term = 40                       /* term  */
 };
 typedef enum yysymbol_kind_t yysymbol_kind_t;
 
@@ -621,21 +644,21 @@ union yyalloc
 #endif /* !YYCOPY_NEEDED */
 
 /* YYFINAL -- State number of the termination state.  */
-#define YYFINAL  2
+#define YYFINAL  27
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   0
+#define YYLAST   168
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  42
+#define YYNTOKENS  33
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  2
+#define YYNNTS  8
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  2
+#define YYNRULES  36
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  3
+#define YYNSTATES  70
 
 /* YYMAXUTOK -- Last valid token kind.  */
-#define YYMAXUTOK   291
+#define YYMAXUTOK   282
 
 
 /* YYTRANSLATE(TOKEN-NUM) -- Symbol number corresponding to TOKEN-NUM
@@ -653,12 +676,12 @@ static const yytype_int8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-      40,    41,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,    37,
+      31,    32,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,    28,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,    38,     2,    39,     2,     2,     2,     2,     2,     2,
+       2,    29,     2,    30,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -677,15 +700,17 @@ static const yytype_int8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
        5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
       15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
-      25,    26,    27,    28,    29,    30,    31,    32,    33,    34,
-      35,    36
+      25,    26,    27
 };
 
 #if YYDEBUG
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
-static const yytype_int8 yyrline[] =
+static const yytype_uint8 yyrline[] =
 {
-       0,    77,    77
+       0,   132,   132,   135,   136,   139,   140,   141,   144,   145,
+     146,   147,   148,   151,   152,   153,   154,   155,   159,   160,
+     161,   162,   163,   164,   166,   167,   168,   169,   170,   171,
+     172,   176,   177,   178,   179,   180,   181
 };
 #endif
 
@@ -701,13 +726,12 @@ static const char *yysymbol_name (yysymbol_kind_t yysymbol) YY_ATTRIBUTE_UNUSED;
    First, the terminals, then, starting at YYNTOKENS, nonterminals.  */
 static const char *const yytname[] =
 {
-  "\"end of file\"", "error", "\"invalid token\"", "OR", "LEQ", "AND",
-  "GEQ", "EQEQ", "REAL_EQUAL", "PLUS", "MINUS", "PRODUCT", "DIVIDE", "LS",
-  "GE", "PT", "DACA", "VEZI", "POATE", "ALTFEL", "FUNCTIE", "RASTIMP",
-  "INTOARCE", "print", "conservator", "plutitor", "tipu_meu", "integru",
-  "bul", "litera", "fraza", "Valoare_Litera", "Valoare_Fraza", "am_plecat",
-  "number", "number_r", "AIDI", "';'", "'['", "']'", "'('", "')'",
-  "$accept", "s", YY_NULLPTR
+  "\"end of file\"", "error", "\"invalid token\"", "print", "integru",
+  "plutitor", "litera", "bul", "String", "conservator", "GEQ", "LEQ",
+  "AND", "OR", "EQEQ", "LS", "GE", "PLUS", "MINUS", "PROD", "DIV", "EQUAL",
+  "String_Value", "Character_Value", "exit_command", "number", "number_r",
+  "IDENTIFIER", "';'", "'['", "']'", "'('", "')'", "$accept", "program",
+  "lines", "line", "DATA_TYPE", "assignment", "exp", "term", YY_NULLPTR
 };
 
 static const char *
@@ -724,13 +748,12 @@ static const yytype_int16 yytoknum[] =
 {
        0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
      265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
-     275,   276,   277,   278,   279,   280,   281,   282,   283,   284,
-     285,   286,   287,   288,   289,   290,   291,    59,    91,    93,
-      40,    41
+     275,   276,   277,   278,   279,   280,   281,   282,    59,    91,
+      93,    40,    41
 };
 #endif
 
-#define YYPACT_NINF (-1)
+#define YYPACT_NINF (-28)
 
 #define yypact_value_is_default(Yyn) \
   ((Yyn) == YYPACT_NINF)
@@ -742,9 +765,15 @@ static const yytype_int16 yytoknum[] =
 
   /* YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
      STATE-NUM.  */
-static const yytype_int8 yypact[] =
+static const yytype_int16 yypact[] =
 {
-      -1,     0,    -1
+      26,    14,   -28,   -28,   -28,   -28,   -28,    73,   -27,   -17,
+      27,    26,   -28,    -1,    10,   -28,   -28,   -28,   -28,    15,
+      14,   118,   -28,    16,   -28,    14,    14,   -28,   -28,    17,
+     -28,    14,    44,    14,    14,    14,    14,    14,    14,    14,
+      14,    14,    14,    14,   -28,    28,   137,    55,    14,    76,
+     -28,   -10,   -10,   -28,    36,   148,   -10,   -10,    85,    85,
+      12,    12,    14,    30,    97,   -28,   137,    14,   -28,   137
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -752,19 +781,25 @@ static const yytype_int8 yypact[] =
      means the default is an error.  */
 static const yytype_int8 yydefact[] =
 {
-       2,     0,     1
+       0,     0,     8,     9,    10,    11,    12,     0,     0,     0,
+       0,     2,     3,     0,     0,    36,    35,    33,    34,    31,
+       0,     0,    18,     0,     6,     0,     0,     1,     4,    13,
+       5,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     7,     0,    16,     0,     0,     0,
+      19,    29,    28,    24,    25,    30,    26,    27,    20,    21,
+      22,    23,     0,     0,     0,    32,    14,     0,    15,    17
 };
 
   /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-      -1,    -1
+     -28,   -28,   -28,    41,    75,   -28,   -20,   -28
 };
 
   /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-       0,     1
+       0,    10,    11,    12,    13,    14,    21,    22
 };
 
   /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -772,31 +807,75 @@ static const yytype_int8 yydefgoto[] =
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_int8 yytable[] =
 {
-       2
+      32,    24,    35,    36,    25,    46,    47,    40,    41,    42,
+      43,    49,    26,    51,    52,    53,    54,    55,    56,    57,
+      58,    59,    60,    61,    35,    36,    29,    27,    64,     1,
+       2,     3,     4,     5,     6,     7,    15,    16,    30,    17,
+      18,    19,    66,    45,    31,    20,    48,    69,    35,    62,
+       8,    67,    28,     9,    33,    34,    35,    36,    37,    38,
+      39,    40,    41,    42,    43,    33,    34,    35,    36,    37,
+      38,    39,    40,    41,    42,    43,    50,     2,     3,     4,
+       5,     6,    23,     0,     0,    63,    33,    34,    35,    36,
+      37,    38,    39,    40,    41,    42,    43,    35,    36,     0,
+       0,     0,     0,     0,    42,    43,    65,    33,    34,    35,
+      36,    37,    38,    39,    40,    41,    42,    43,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,    68,    33,    34,
+      35,    36,    37,    38,    39,    40,    41,    42,    43,     0,
+       0,     0,     0,     0,     0,     0,    44,    33,    34,    35,
+      36,    37,    38,    39,    40,    41,    42,    43,    33,    34,
+      35,    36,     0,    38,    39,    40,    41,    42,    43
 };
 
 static const yytype_int8 yycheck[] =
 {
-       0
+      20,    28,    12,    13,    21,    25,    26,    17,    18,    19,
+      20,    31,    29,    33,    34,    35,    36,    37,    38,    39,
+      40,    41,    42,    43,    12,    13,    27,     0,    48,     3,
+       4,     5,     6,     7,     8,     9,    22,    23,    28,    25,
+      26,    27,    62,    27,    29,    31,    29,    67,    12,    21,
+      24,    21,    11,    27,    10,    11,    12,    13,    14,    15,
+      16,    17,    18,    19,    20,    10,    11,    12,    13,    14,
+      15,    16,    17,    18,    19,    20,    32,     4,     5,     6,
+       7,     8,     7,    -1,    -1,    30,    10,    11,    12,    13,
+      14,    15,    16,    17,    18,    19,    20,    12,    13,    -1,
+      -1,    -1,    -1,    -1,    19,    20,    30,    10,    11,    12,
+      13,    14,    15,    16,    17,    18,    19,    20,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    30,    10,    11,
+      12,    13,    14,    15,    16,    17,    18,    19,    20,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    28,    10,    11,    12,
+      13,    14,    15,    16,    17,    18,    19,    20,    10,    11,
+      12,    13,    -1,    15,    16,    17,    18,    19,    20
 };
 
   /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
      symbol of state STATE-NUM.  */
 static const yytype_int8 yystos[] =
 {
-       0,    43,     0
+       0,     3,     4,     5,     6,     7,     8,     9,    24,    27,
+      34,    35,    36,    37,    38,    22,    23,    25,    26,    27,
+      31,    39,    40,    37,    28,    21,    29,     0,    36,    27,
+      28,    29,    39,    10,    11,    12,    13,    14,    15,    16,
+      17,    18,    19,    20,    28,    27,    39,    39,    29,    39,
+      32,    39,    39,    39,    39,    39,    39,    39,    39,    39,
+      39,    39,    21,    30,    39,    30,    39,    21,    30,    39
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_int8 yyr1[] =
 {
-       0,    42,    43
+       0,    33,    34,    35,    35,    36,    36,    36,    37,    37,
+      37,    37,    37,    38,    38,    38,    38,    38,    39,    39,
+      39,    39,    39,    39,    39,    39,    39,    39,    39,    39,
+      39,    40,    40,    40,    40,    40,    40
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
 static const yytype_int8 yyr2[] =
 {
-       0,     2,     0
+       0,     2,     1,     1,     2,     2,     2,     3,     1,     1,
+       1,     1,     1,     2,     5,     5,     3,     6,     1,     3,
+       3,     3,     3,     3,     3,     3,     3,     3,     3,     3,
+       3,     1,     4,     1,     1,     1,     1
 };
 
 
@@ -1263,8 +1342,218 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
+  case 2: /* program: lines  */
+#line 132 "semantics.y"
+                { print_simbol_table(variables,totalVar);printf(BGRN "Program corect sintactic\n\n" RESET); }
+#line 1349 "y.tab.c"
+    break;
 
-#line 1268 "y.tab.c"
+  case 3: /* lines: line  */
+#line 135 "semantics.y"
+                                                        {;}
+#line 1355 "y.tab.c"
+    break;
+
+  case 4: /* lines: lines line  */
+#line 136 "semantics.y"
+                                                        {;}
+#line 1361 "y.tab.c"
+    break;
+
+  case 5: /* line: assignment ';'  */
+#line 139 "semantics.y"
+                                                                                        {;}
+#line 1367 "y.tab.c"
+    break;
+
+  case 6: /* line: exit_command ';'  */
+#line 140 "semantics.y"
+                                                                                                {exit(EXIT_SUCCESS);}
+#line 1373 "y.tab.c"
+    break;
+
+  case 7: /* line: print exp ';'  */
+#line 141 "semantics.y"
+                                                                                                {printValue((yyvsp[-1].strct));}
+#line 1379 "y.tab.c"
+    break;
+
+  case 8: /* DATA_TYPE: integru  */
+#line 144 "semantics.y"
+                                 {(yyval.type_id) = (yyvsp[0].type_id);}
+#line 1385 "y.tab.c"
+    break;
+
+  case 9: /* DATA_TYPE: plutitor  */
+#line 145 "semantics.y"
+                                                         {(yyval.type_id) = (yyvsp[0].type_id);}
+#line 1391 "y.tab.c"
+    break;
+
+  case 10: /* DATA_TYPE: litera  */
+#line 146 "semantics.y"
+                                         {(yyval.type_id) = (yyvsp[0].type_id);}
+#line 1397 "y.tab.c"
+    break;
+
+  case 11: /* DATA_TYPE: bul  */
+#line 147 "semantics.y"
+                                                 {(yyval.type_id) = (yyvsp[0].type_id);}
+#line 1403 "y.tab.c"
+    break;
+
+  case 12: /* DATA_TYPE: String  */
+#line 148 "semantics.y"
+                                                 {(yyval.type_id) = (yyvsp[0].type_id);}
+#line 1409 "y.tab.c"
+    break;
+
+  case 13: /* assignment: DATA_TYPE IDENTIFIER  */
+#line 151 "semantics.y"
+                                                                                {pushEmptyVariable((yyvsp[0].string), (yyvsp[-1].type_id));}
+#line 1415 "y.tab.c"
+    break;
+
+  case 14: /* assignment: conservator DATA_TYPE IDENTIFIER EQUAL exp  */
+#line 152 "semantics.y"
+                                                                        {pushVariableConst((yyvsp[-2].string), (yyvsp[-3].type_id), (yyvsp[0].strct));}
+#line 1421 "y.tab.c"
+    break;
+
+  case 15: /* assignment: DATA_TYPE IDENTIFIER '[' exp ']'  */
+#line 153 "semantics.y"
+                                                                                {pushArray((yyvsp[-3].string), (yyvsp[-4].type_id), (yyvsp[-1].strct));}
+#line 1427 "y.tab.c"
+    break;
+
+  case 16: /* assignment: IDENTIFIER EQUAL exp  */
+#line 154 "semantics.y"
+                                                                                        {updateValue((yyvsp[-2].string), (yyvsp[0].strct));}
+#line 1433 "y.tab.c"
+    break;
+
+  case 17: /* assignment: IDENTIFIER '[' exp ']' EQUAL exp  */
+#line 155 "semantics.y"
+                                                                                {updateArrValue((yyvsp[-5].string), (yyvsp[-3].strct), (yyvsp[0].strct));}
+#line 1439 "y.tab.c"
+    break;
+
+  case 18: /* exp: term  */
+#line 159 "semantics.y"
+                                        {(yyval.strct) = (yyvsp[0].strct);}
+#line 1445 "y.tab.c"
+    break;
+
+  case 19: /* exp: '(' exp ')'  */
+#line 160 "semantics.y"
+                                                {(yyval.strct) = (yyvsp[-1].strct);}
+#line 1451 "y.tab.c"
+    break;
+
+  case 20: /* exp: exp PLUS exp  */
+#line 161 "semantics.y"
+                                    {(yyval.strct) = comp((yyvsp[-2].strct), (yyvsp[0].strct), PLUS);}
+#line 1457 "y.tab.c"
+    break;
+
+  case 21: /* exp: exp MINUS exp  */
+#line 162 "semantics.y"
+                                    {(yyval.strct) = comp((yyvsp[-2].strct), (yyvsp[0].strct), MINUS);}
+#line 1463 "y.tab.c"
+    break;
+
+  case 22: /* exp: exp PROD exp  */
+#line 163 "semantics.y"
+                                    {(yyval.strct) = comp((yyvsp[-2].strct), (yyvsp[0].strct), PROD);}
+#line 1469 "y.tab.c"
+    break;
+
+  case 23: /* exp: exp DIV exp  */
+#line 164 "semantics.y"
+                                        {(yyval.strct) = comp((yyvsp[-2].strct), (yyvsp[0].strct), DIV);}
+#line 1475 "y.tab.c"
+    break;
+
+  case 24: /* exp: exp AND exp  */
+#line 166 "semantics.y"
+                                                {(yyval.strct) = comp((yyvsp[-2].strct), (yyvsp[0].strct), AND);}
+#line 1481 "y.tab.c"
+    break;
+
+  case 25: /* exp: exp OR exp  */
+#line 167 "semantics.y"
+                                                {(yyval.strct) = comp((yyvsp[-2].strct), (yyvsp[0].strct), OR);}
+#line 1487 "y.tab.c"
+    break;
+
+  case 26: /* exp: exp LS exp  */
+#line 168 "semantics.y"
+                                                        {(yyval.strct) = comp((yyvsp[-2].strct), (yyvsp[0].strct), LS) ;}
+#line 1493 "y.tab.c"
+    break;
+
+  case 27: /* exp: exp GE exp  */
+#line 169 "semantics.y"
+                                                        {(yyval.strct) = comp((yyvsp[-2].strct), (yyvsp[0].strct), GE);}
+#line 1499 "y.tab.c"
+    break;
+
+  case 28: /* exp: exp LEQ exp  */
+#line 170 "semantics.y"
+                                                        {(yyval.strct) = comp((yyvsp[-2].strct), (yyvsp[0].strct), LEQ);}
+#line 1505 "y.tab.c"
+    break;
+
+  case 29: /* exp: exp GEQ exp  */
+#line 171 "semantics.y"
+                                                        {(yyval.strct) = comp((yyvsp[-2].strct), (yyvsp[0].strct), GEQ);}
+#line 1511 "y.tab.c"
+    break;
+
+  case 30: /* exp: exp EQEQ exp  */
+#line 172 "semantics.y"
+                                                        {(yyval.strct) = comp((yyvsp[-2].strct), (yyvsp[0].strct), EQEQ);}
+#line 1517 "y.tab.c"
+    break;
+
+  case 31: /* term: IDENTIFIER  */
+#line 176 "semantics.y"
+                                                                {(yyval.strct) = temporaryPointVar((yyvsp[0].string));}
+#line 1523 "y.tab.c"
+    break;
+
+  case 32: /* term: IDENTIFIER '[' exp ']'  */
+#line 177 "semantics.y"
+                                                                {(yyval.strct) = temporaryPointArr((yyvsp[-3].string), (yyvsp[-1].strct));}
+#line 1529 "y.tab.c"
+    break;
+
+  case 33: /* term: number  */
+#line 178 "semantics.y"
+                                                                {(yyval.strct) = temporaryPointNum((yyvsp[0].num), integru);}
+#line 1535 "y.tab.c"
+    break;
+
+  case 34: /* term: number_r  */
+#line 179 "semantics.y"
+                                                                                {(yyval.strct) = temporaryPointNum((yyvsp[0].num), plutitor);}
+#line 1541 "y.tab.c"
+    break;
+
+  case 35: /* term: Character_Value  */
+#line 180 "semantics.y"
+                                                                        {(yyval.strct) = temporaryPointStr((yyvsp[0].string), litera);}
+#line 1547 "y.tab.c"
+    break;
+
+  case 36: /* term: String_Value  */
+#line 181 "semantics.y"
+                                                                        {(yyval.strct) = temporaryPointStr((yyvsp[0].string), String);}
+#line 1553 "y.tab.c"
+    break;
+
+
+#line 1557 "y.tab.c"
 
       default: break;
     }
@@ -1458,106 +1747,864 @@ yyreturn:
   return yyresult;
 }
 
-#line 125 "semantics.y"
+#line 184 "semantics.y"
 
-
-int getIndex(char* identifier)
+void pushStructVariable(char*id)
 {
-    for(int i = 0 ; i < number_of_variables ; ++i)
-    {
-        if(!strcmp(identifier, variables[i].identifier))
-            return i;
-    }
-    return -1;
+	int i = getVariableIndex(id);
+
+	if (i != -1) {
+		printf(BRED "The variable " BBLU "%s" BRED " was already declared here\n", id);
+		exit(0);
+	}
+
+	struct var *v = variables + totalVar;
+	
+	sprintf(v->id, "%s", id);
+	v->type = 0;
+
+	totalVar++;
 }
 
-void createEmptyVariable(int type, char* identifier)
-{
-    if(getIndex(identifier) == -1)
-    {
-        printf("Variabila a mai fost declarata!\n");
-        exit(0);
-    }
+void pushFunction(char* id, int retType, struct parameter* p) {
+	int i = getVariableIndex(id);
 
-    struct variable_structure *new_variable = variables + number_of_variables;
+	if (i != -1) {
+		printf(BRED "Name for function " BBLK "%s" BRED " was already taken.\n" RESET, id);
+		exit(0);
+	}
 
-    sprintf(new_variable->identifier, "%s", identifier);
-    new_variable->variable_type = type;
+	struct var *v = variables + totalVar;
+	
+	sprintf(v->id, "%s", id);
+	v->var_type = TYPE_FUNCTION;
+	v->type = retType;
+	v->parameterNum = p->paramNum;
+	for (int i = 0; i < p->paramNum; i++) {
+		v->parameterTypes[i] = p->parameterTypes[i];
+	}
 
-    if(type == fraza)
-    {
-        sprintf(new_variable->array_string[0], "%s", "");
-    }
-    else
-    {
-        new_variable->array[0] = 0;
-    }
-
-    ++number_of_variables;
+	free(p);
+	totalVar++;
 }
 
-void createVariable(int type, char* identifier, struct variable_structure* expression)
-{
-    if(getIndex(identifier) == -1)
-    {
-        printf("Variabila a mai fost declarata!\n");
-        exit(0);
-    }
-
-    struct variable_structure *new_variable = variables + number_of_variables;
-
-    sprintf(new_variable->identifier, "%s", identifier);
-    new_variable->variable_type = type;
-    new_variable->initialized[0] = true;
-
-    if(type == fraza)
-    {
-        sprintf(new_variable->array_string[0], "%s", expression->array_string[0]);
-    }
-    else
-    if(type == bul)
-    {
-        new_variable->array[0] = (expression->array[0] == 1);
-    }
-    else
-    {
-        new_variable->array[0] = expression->array[0];
-    }
-
-    if(strlen(new_variable->identifier) == 0)
-        free(expression);
-    ++number_of_variables;
+void pushParam(struct parameter* p, int type) {
+	p->parameterTypes[p->paramNum++] = type;	
 }
 
-void print_val(struct variable_structure* nod)
-{
-    int type = nod->variable_type;
-    int n;
+struct parameter* initializeParam(int type) {
+	struct parameter *p = (struct parameter*)malloc(sizeof(struct parameter));
+	if (type == 0) {
+		p->paramNum = 0;
+		return p;
+	}
 
-    switch(type)
-    {
-        case integru:
-            if (nod->variable_type == 2)
-            {
-                n = nod->size_array;
-                printf("{");
+	p->paramNum = 1;
+	p->parameterTypes[0] = type;
 
-                for (int i = 0 ; i < n - 1 ; i++)
-                    printf("%d, ", (int)nod->array[i]);
-                printf("%d}\n", (int)nod->array[n - 1]);
-                break;
-            }
-            if (nod->variable_type == 1)
-                printf("%d\n", (int)nod->array[0]);
-            break;
-    }
+	return p;
 }
 
-void yyerror(char *s){
-    printf("error: %s\n", s);
-}
-int main(int argc, char** argv)
+void Eval_function(struct var* x)
 {
-    yyin = fopen(argv[1],"r");
-    yyparse();
+  if(x->type == integru)
+  		printf(BGRN "%d\n" RESET,(int)x->array[0]);
+  else
+  {
+	  	printf(BYEL "Eval function must have an integer type parameter.\n" RESET);
+		exit(0);
+  }
+   
+}
+
+void print_simbol_table(struct var* v,int n)
+{
+	FILE *fd;
+	fd = fopen("symbol_table.txt", "w");
+	if(fd == NULL)
+	{
+		char buffer[100];
+		sprintf(buffer, "Nu pot deschide fisierul symbol_table.txt.");
+		yyerror(buffer);
+		exit(0);
+	}
+ 	
+ 	for(int i=0;i<n;i++)
+	{
+	    if(v[i].var_type != TYPE_ARRAY && v[i].var_type != TYPE_FUNCTION)
+		{
+			fprintf(fd,"nume : %s  ",v[i].id);
+			switch (v[i].type) {
+			case integru:
+				fprintf(fd, "tip = integru valoare = %d  ", (int)v[i].array[0]);
+				break;
+			case litera:
+				fprintf(fd, "tip = litera valoare = '%c' ", (char)v[i].array[0]);
+				break;
+			case plutitor:
+				fprintf(fd, "tip = plutitor valoare = %f ", (float)v[i].array[0]);
+				break;
+			case String:
+				fprintf(fd, "tip = String valoare = \"%s\" ", (char*)v[i].arrayStr[0]);
+				break;
+			case bul:
+				fprintf(fd, "tip = bul valoare = %d ", (int)v[i].array[0]);
+				break;
+			case 0:
+				fprintf(fd, "tip = User Defined Type\n");
+				break;
+			default:
+				break;
+			}
+			if(v[i].type!=0)
+				if(v[i].cnst)
+					fprintf(fd, "constant \n");
+				else
+					fprintf(fd, "not constant \n");
+		}
+		else if(v[i].var_type != TYPE_FUNCTION)
+		{
+			fprintf(fd,"nume : %s  ",v[i].id);
+			switch (v[i].type) {
+			case integru:
+				fprintf(fd, "tip = integru Array ");
+				for(int j=0;j<v[i].arraySize;j++)
+				{
+				 	fprintf(fd,"%s[%d] = %d  ", v[i].id, j, (int)v[i].array[j]);
+				}
+				break;
+			case litera:
+				fprintf(fd, "tip = Chraracter Array ");
+				for(int j=0;j<v[i].arraySize;j++)
+				{
+				 	fprintf(fd,"%s[%d] = %c  ", v[i].id, j, (char)v[i].array[j]);
+				}
+				break;
+			case plutitor:
+				fprintf(fd, "tip = plutitor Array ");
+				for(int j=0;j<v[i].arraySize;j++)
+				{
+				 	fprintf(fd,"%s[%d] = %f  ", v[i].id, j, (float)v[i].array[j]);
+				}
+				break;
+			case String:
+				fprintf(fd, "tip = String Array");
+				for(int j=0;j<v[i].arraySize;j++)
+				{
+					fprintf(fd," %s[%d] = \"%s\" ", v[i].id, j, (char*)v[i].arrayStr[j]);
+				}
+				break;
+			case bul:
+				fprintf(fd, "tip = bul Array ");
+				for(int j=0;j<v[i].arraySize;j++)
+				{
+				 	fprintf(fd,"%s[%d] = %d  ", v[i].id, j, (int)v[i].array[j]);
+				}
+				break;
+			default:
+				break;
+			}
+			fprintf(fd,"\n");
+		}
+
+	}
+	fprintf(fd,"\n");
+    for(int i=0;i<n;i++)
+	{
+		if(v[i].var_type == TYPE_FUNCTION)
+		{
+            fprintf(fd, "Function : ");
+			fprintf(fd, "%s %s", defToDataType(v[i].type), v[i].id);
+			int nr = v[i].parameterNum;
+			if (nr != 0) 
+			{   
+				fprintf(fd,  " (");
+				for (int j = 0; j < nr-1 ; j++)
+				{
+					fprintf(fd, "%s, ", defToDataType(v[i].parameterTypes[j]));
+				}
+				fprintf(fd, "%s", defToDataType(v[i].parameterTypes[nr-1]));
+				fprintf(fd,  ") ");
+			}
+			else
+			{
+			 fprintf(fd, "();");
+			}
+
+			fprintf(fd, "\n");
+			
+		}
+	}
+}
+
+struct var* temporaryPointNum(double val, int type) {
+	struct var *v = initializeVar();
+
+	v->array[0] = val;
+	v->type = type;
+
+	return v;
+}
+
+struct var* temporaryPointStr(void* val, int type) {
+	struct var *v = initializeVar();
+
+	v->type = type;
+
+	if (type == String) {
+		sprintf(v->arrayStr[0], "%s", (char*)val);
+	} else {
+		v->array[0] = ((char*)val)[0];
+	}
+
+	return v;
+}
+
+struct var* temporaryPointFun(char* id, struct parameter* pr) {
+	int i = getVariableIndex(id);
+
+	if (i == -1) {
+		printf(BRED "Function " BYEL "%s" BRED " was not declared in this scope.\n", id);
+		exit(0);
+	}
+
+	struct var* v = variables + i;
+
+	if (v->var_type != TYPE_FUNCTION) {
+		printf(BBLU "%s" BRED " should be a function, not a variable.\n" RESET, v->id);
+		exit(0);
+	}
+
+	if (v->parameterNum != pr->paramNum) {
+		printf(BRED "The number of variables should match for function " BBLU "%s" BRED ".\n" RESET, v->id);
+		exit(0);
+	}
+
+	int n = v->parameterNum;
+
+	int *funParams = v->parameterTypes;
+	int *callParams = pr->parameterTypes;
+
+	for (int i = 0; i < n; i++) {
+		if (funParams[i] != callParams[i]) {
+			printf(BBLU "%s" BRED " parameters should match function definition.\n" RESET, v->id);
+			printf(BRED "Parameter " BMAG "%d" BRED " is " BBLU "%s" BBLU " but in definition is " BBLU "%s" BRED ".\n" RESET, i + 1, defToDataType(callParams[i]), defToDataType(funParams[i]));
+			exit(0);
+		}
+	}
+
+	v = initializeVar();
+	v->type = integru;
+	v->array[0] = 0;
+
+	return v;
+}
+
+struct var* temporaryPointVar(char* id) {
+	int i = getVariableIndex(id);
+
+	if (i == -1) {
+		printf(BYEL "%s" BRED " was not declared in this scope.\n", id);
+		exit(0);
+	}
+	
+	struct var* v = variables + i;
+	
+	if (v->var_type == TYPE_NORMAL && v->isInitilalized[0] == 0) {
+		printf(BYEL "%s was not initialzied. The default value will be used. Line %d.\n" RESET, id, yylineno);
+	}
+
+	if (v->var_type == TYPE_FUNCTION) {
+		v->array[0] = 0;
+	}
+
+	return v;
+}
+
+struct var* temporaryPointArr(char* id, struct var* node) {
+	int i = getVariableIndex(id);
+
+	if (i == -1) {
+		printf(BYEL "%s" BRED " was not declared in this scope.\n", id);
+		exit(0);
+	}
+
+	struct var *v = variables + i;
+
+	if (v->var_type != TYPE_ARRAY) {
+		printf(BRED "Varialbe " BBLU "%s" BRED " is not an array type.\n" RESET, v->id);
+		exit(0);
+	}
+
+	if (node->type == String) {
+		printf(BRED"This array type cannot be accessed with a string expression.\n" RESET);
+		exit(0);
+	}
+
+	int n = (int)node->array[0];
+
+	if (n < 0) {
+		printf(BRED "Array index should be more than 0 but it's " BMAG "%d" BRED ".\n" RESET, n);
+		exit(0);
+	}
+
+	if (n >= v->arraySize) {
+		printf(BRED "Array size exceded for variable " BBLU "%s" BRED " from expression: " BMAG "%d" BRED ", where maximum index is " BMAG "%d" BRED ".\n" RESET, id, n, v->arraySize - 1);
+		exit(0);
+	}
+
+	struct var *exp = initializeVar();
+
+	exp->type = v->type;
+
+	if (v->var_type == TYPE_ARRAY && v->isInitilalized[n] == 0) {
+		printf(BYEL "%s[%d] was not initialzied. The default value will be used. Line %d.\n" RESET, id, n, yylineno);
+	}
+
+	if (v->type == String) {
+		sprintf(exp->arrayStr[0], "%s", v->arrayStr[n]);
+	} else if (v->type == bul) {
+		exp->array[0] = v->array[n] != 0;
+	} else {
+		exp->array[0] = v->array[n];
+	}
+
+	return exp;
+}
+
+void freeVar(struct var* v) {
+	if (strlen(v->id) == 0) {
+		free(v);
+	}
+}
+
+int getVariableIndex(char* varName) {
+	for (int i = 0; i < totalVar; i++) {
+		if (strcmp(varName, variables[i].id) == 0) {
+			return i;
+		}
+	}
+
+	return -1;
 } 
+
+void updateValue(char* id, struct var* exp) {
+	int i = getVariableIndex(id);
+
+	if (i == -1) {
+		printf(BYEL "%s" BRED " was not declared in this scope.\n", id);
+		exit(0);
+	} 
+
+	struct var *vr = variables + i;
+	
+	if (vr->var_type == TYPE_FUNCTION) {
+		printf(BRED"Function " BBLU "%s" BRED " cannot be changed.\n" RESET, vr->id);
+		exit(0);
+	}
+
+	if (vr->var_type == TYPE_ARRAY && exp->var_type != TYPE_ARRAY) {
+		printf(BRED "Variable " BBLU "%s" BRED " is an array type but the expression is not.\n" RESET, vr->id);
+		exit(0);
+	}
+
+	if (vr->var_type != TYPE_ARRAY && exp->var_type == TYPE_ARRAY) {
+		printf(BRED "Variable " BBLU "%s" BRED " is a normal type but expression is an array.\n" RESET, vr->id);
+		exit(0);
+	}
+	
+	if (vr->type == String && exp->type != String || vr->type != String && exp->type == String) {
+		printf(BRED "Data types should match.\n" RESET);
+		exit(0);
+	}
+	
+	if(vr->cnst)
+	{
+		printf(BRED "Constat variable " BBLU "%s" BRED " cannot be modified.\n", id);
+		exit(0);
+	} 
+
+	if (vr->var_type == TYPE_ARRAY && exp->var_type == TYPE_ARRAY) {
+
+		int n = vr->arraySize;
+		int m = exp->arraySize;
+
+		for (int i = 0; i < n && i < m; i++) {
+			if (vr->type == String) {
+				sprintf(vr->arrayStr[i], "%s", exp->arrayStr[i]);
+			} else if (vr->type == bul) {
+				vr->array[i] = exp->array[i] != 0;
+			} else {
+				vr->array[i] = exp->array[i];
+			}
+		}
+
+		return;
+	}
+
+	vr->isInitilalized[0] = 1;
+	if (vr->type == String) {
+		sprintf(vr->arrayStr[0], "%s", exp->arrayStr[0]);
+	} else if (vr->type == bul) {
+		vr->array[0] = exp->array[0] != 0;
+	} else {
+		vr->array[0] = exp->array[0];
+	}
+
+}
+
+void updateArrValue(char* id, struct var* exp_1, struct var* exp_2) {
+	int i = getVariableIndex(id);
+
+	if (i == -1) {
+		printf(BYEL "%s" BRED " was not declared in this scope.\n" RESET , id);
+		exit(0);
+	}
+
+	struct var *v = variables + i;
+
+	if (v->var_type == TYPE_FUNCTION) {
+		printf(BRED "Invalid expression for function " BBLU "%s" BRED ".\n" RESET, v->id);
+		exit(0);
+	}
+
+	if (exp_1->type == String) {
+		printf(BRED "This array type cannot be accessed with a string expression.\n" RESET);
+		exit(0);
+	}
+
+	int n = (int)exp_1->array[0];
+
+	if (n < 0) {
+		printf(BRED "Array index should be more than " BMAG "0" BRED " but it's " BMAG "%d" BRED ".\n" RESET, n);
+		exit(0);
+	}
+
+	if (n >= v->arraySize) {
+		printf(BRED"Array size exceded for %s: %d, where maximum index is %d.\n" RESET, id, n, v->arraySize - 1);
+		exit(0);
+	}
+
+	if (v->type == String && exp_2->type != String || v->type != String && exp_2->type == String) {
+		printf(BRED "Data type should match for variable " BBLU "%s" BWHT "[" BMAG "%d" BWHT "]" BRED ".\n" RESET, id, n);
+		exit(0);
+	}
+
+	v->isInitilalized[n] = 1;
+
+	if (v->type == String) {
+		sprintf(v->arrayStr[n], "%s", exp_2->arrayStr[0]);
+	} else if (v->type == bul) {
+		v->array[n] = exp_2->array[0] != 0;
+	} else {
+		v->array[n] = exp_2->array[0];
+	}
+}
+
+void pushEmptyVariable(char* id, int type) {
+	int i = getVariableIndex(id);
+
+	if (i != -1) {
+		printf(BRED "The variable " BBLU "%s" BRED " was already declared here\n", id);
+		exit(0);
+	}
+
+	struct var *v = variables + totalVar;
+	
+	sprintf(v->id, "%s", id);
+	v->type = type;
+
+	if (type == String) {
+		sprintf(v->arrayStr[0], "%s", "");
+	} else {
+		v->array[0] = 0;
+	}
+
+	totalVar++;
+}
+
+void pushVariable(char* id, int type, struct var* exp) {
+	int i = getVariableIndex(id);
+
+	if (i != -1) {
+		printf(BRED "The variable " BBLU "%s" BRED " was already declared here\n", id);
+		exit(0);
+	}
+
+	struct var *v = variables + totalVar;
+	
+	sprintf(v->id, "%s", id);
+	v->type = type;
+	v->isInitilalized[0] = 1;
+	if (type == String) {
+		sprintf(v->arrayStr[0], "%s", exp->arrayStr[0]);
+	} else if (type == bul) {
+		v->array[0] = exp->array[0] != 0;
+	} else {
+		v->array[0] = exp->array[0];
+	}
+
+	freeVar(exp);
+	totalVar++;
+}
+
+void pushArray(char* id, int type, struct var* exp) {
+	int i = getVariableIndex(id);
+
+	if (i != -1) {
+		printf(BRED "The variable " BBLU "%s" BRED " was already declared here\n", id);
+		exit(0);
+	}
+
+	if (exp->type == String) {
+		printf(BYEL "Array types cannot be declared with string expressions.\n" RESET);
+		exit(0);
+	}
+
+	int n = (int)exp->array[0];
+
+	if (n <= 0) {
+		printf(BYEL "The array size should be at least 1.\n" RESET);
+		exit(0);
+	}
+
+	struct var *v = variables + totalVar;
+
+	if (v->type == String && exp->type != String || v->type != String && exp->type == String) {
+		printf(BYEL "Data types should match.\n" RESET);
+		exit(0);
+	}
+
+	sprintf(v->id, "%s", id);
+	v->type = type;
+	v->var_type = TYPE_ARRAY;
+	v->arraySize = n;
+
+	totalVar++;
+}
+
+void pushVariableConst(char* id, int type, struct var* exp) {
+	int i = getVariableIndex(id);
+
+	if (i != -1) {
+		printf("The variable %s was already declared here\n", id);
+		exit(0);
+	}
+
+	struct var *v = variables + totalVar;
+	
+	sprintf(v->id, "%s", id);
+	v->type = type;
+
+	if (type == String) {
+		sprintf(v->arrayStr[0], "%s", exp->arrayStr[0]);
+	} else if (type == bul) {
+		v->array[0] = exp->array[0] != 0;
+	} else {
+		v->array[0] = exp->array[0];
+	}
+    v->cnst=1;
+	v->isInitilalized[0] = 1;
+	freeVar(exp);
+	totalVar++;
+}
+
+struct var* comp(struct var* a, struct var* b, int op_type) {
+	
+	struct var* v = initializeVar();
+	double c;
+
+	int n;
+
+	switch (op_type) {
+	case PLUS:;
+		if (a->type == String && b->type == String) {
+			v->type = String;
+			strcpy(v->arrayStr[0], "");
+			strcat(v->arrayStr[0], a->arrayStr[0]);
+			strcat(v->arrayStr[0], b->arrayStr[0]);
+			break;
+		}
+
+		if (a->type != String && b->type == String) {
+			v->type = String;
+			strcpy(v->arrayStr[0], "");
+			sprintf(v->arrayStr[0], "%f", (float)a->array[0]);
+			strcat(v->arrayStr[0], b->arrayStr[0]);
+			break;
+		}
+
+		if (a->type == String && b->type != String) {
+			v->type = String;
+			strcpy(v->arrayStr[0], "");
+
+			strcat(v->arrayStr[0], a->arrayStr[0]);
+			char bfr[10];
+			sprintf(bfr, "%f", (float)b->array[0]);
+			strcat(v->arrayStr[0], bfr);
+			break;
+		}
+
+		if (a->type == litera) {
+			v->type = litera;
+			v->array[0] = (int)(a->array[0] + b->array[0]);
+			break;
+		}
+
+		c = a->array[0] + b->array[0];
+
+		if (c == (int)c) {
+			v->type = integru;
+			v->array[0] = (int)c;
+		} else {
+			v->type = plutitor;
+			v->array[0] = c;
+		}
+		break;
+	case MINUS:;
+
+		if (a->type == litera) {
+			v->type = litera;
+			v->array[0] = (int)(a->array[0] - b->array[0]);
+			break;
+		}
+
+		c = a->array[0] - b->array[0];
+
+		if (c == (int)c) {
+			v->type = integru;
+			v->array[0] = (int)c;
+		} else {
+			v->type = plutitor;
+			v->array[0] = c;
+		}
+		break;
+	case PROD:;
+		c = a->array[0] * b->array[0];
+
+		if (c == (int)c) {
+			v->type = integru;
+			v->array[0] = (int)c;
+		} else {
+			v->type = plutitor;
+			v->array[0] = c;
+		}
+		break;
+	case DIV:;
+	    double c = a->array[0] / b->array[0];
+		if (c == (int)c) 
+			v->type = integru;
+		else
+			v->type = plutitor;
+		if (b->array[0] == 0) {
+			printf(BRED "Division with 0 is not possible.\n" RESET);
+			exit(0);
+		}
+
+	    c = a->array[0] / b->array[0];
+
+		if (c == (int)c) { 
+			v->type = integru;
+			v->array[0] = (int)c;
+		} else {
+			v->type = plutitor;
+			v->array[0] = c;
+		}
+		break;
+	case LS:;
+		if (a->type == String && b->type == String) {
+			n = strcmp(a->arrayStr[0], b->arrayStr[0]);
+			v->array[0] = n == -1;
+		} else {
+			v->array[0] = (int)(a->array[0] < b->array[0]);
+		}
+		v->type = integru;
+		break;
+	case LEQ:;
+		if (a->type == String && b->type == String) {
+			n = strcmp(a->arrayStr[0], b->arrayStr[0]);
+			v->array[0] = n == -1 || n == 0;
+		} else {
+			v->array[0] = (int)(a->array[0] <= b->array[0]);
+		}
+		v->type = integru;
+		break;
+	case GE:;
+		if (a->type == String && b->type == String) {
+			n = strcmp(a->arrayStr[0], b->arrayStr[0]);
+			v->array[0] = n == 1;
+		} else {
+			v->array[0] = (int)(a->array[0] > b->array[0]);
+		}
+		v->type = integru;
+		break;
+	case GEQ:;
+		if (a->type == String && b->type == String) {
+			n = strcmp(a->arrayStr[0], b->arrayStr[0]);
+			v->array[0] = n == 1 || n == 0;
+		} else {
+			v->array[0] = (int)(a->array[0] >= b->array[0]);
+		}
+		v->type = integru;
+		break;
+	case EQEQ:;
+		if (a->type == String && b->type == String) {
+			n = strcmp(a->arrayStr[0], b->arrayStr[0]);
+			v->array[0] = n == 0;
+		} else {
+			v->array[0] = (int)(a->array[0] == b->array[0]);
+		}
+		v->type = integru;
+		break;
+	}
+
+	freeVar(a);
+	freeVar(b);
+	return v;
+}
+
+
+void printValue(struct var* node) {
+	int type = node->type;
+	int n;
+
+	switch (type) {
+	case integru:
+		if (node->var_type == TYPE_ARRAY) {
+			n = node->arraySize;
+			printf("{");
+			for (int i = 0; i < n - 1; i++) {
+				printf("%d, ", (int)node->array[i]);
+			}
+			printf("%d", (int)node->array[n - 1]);
+			printf("}\n");
+			break;
+		}
+		if (node->var_type == TYPE_NORMAL)
+			printf("%d\n", (int)node->array[0]);
+		break;
+	case litera:
+		if (node->var_type == TYPE_ARRAY) {
+			n = node->arraySize;
+			printf("{");
+			for (int i = 0; i < n - 1; i++) {
+				printf("'%c', ", (char)node->array[i]);
+			}
+			printf("'%c'", (char)node->array[n - 1]);
+			printf("}\n");
+			break;
+		}
+		if (node->var_type == TYPE_NORMAL)
+			printf("'%c'\n", (char)node->array[0]);
+		break;
+	case plutitor:
+		if (node->var_type == TYPE_ARRAY) {
+			n = node->arraySize;
+			printf("{");
+			for (int i = 0; i < n - 1; i++) {
+				printf("%f, ", (float)node->array[i]);
+			}
+			printf("%f", (float)node->array[n - 1]);
+			printf("}\n");
+			break;
+		}
+		if (node->var_type == TYPE_NORMAL)
+			printf("%f\n", (float)node->array[0]);
+		break;
+	case String:
+		if (node->var_type == TYPE_ARRAY) {
+			n = node->arraySize;
+			printf("{");
+			for (int i = 0; i < n - 1; i++) {
+				printf("\"%s\", ", node->arrayStr[i]);
+			}
+			printf("\"%s\"", node->arrayStr[n - 1]);
+			printf("}\n");
+			break;
+		}
+		if (node->var_type == TYPE_NORMAL)
+			printf("\"%s\"\n", node->arrayStr[0]);
+		break;
+	case bul:
+		if (node->var_type == TYPE_ARRAY) {
+			n = node->arraySize;
+			printf("{");
+			for (int i = 0; i < n - 1; i++) {
+				printf("\"%d\", ", (int)node->array[i]);
+			}
+			printf("\"%d\"", (int)node->array[n - 1]);
+			printf("}\n");
+			break;
+		}
+		if (node->var_type == TYPE_NORMAL)
+			printf("%d\n", (int)node->array[0]);
+		break;
+	default:
+		break;
+	}
+
+	if (node->var_type == TYPE_FUNCTION) {
+		printf("%s %s", defToDataType(node->type), node->id);
+		n = node->parameterNum;
+		if (n != 0) {
+			printf(" -> {");
+			for (int i = 0; i < n - 1; i++) {
+				printf("%s, ", defToDataType(node->parameterTypes[i]));
+			}
+			printf("%s}", defToDataType(node->parameterTypes[n - 1]));
+		}
+
+		printf("\n");
+	}
+
+}
+
+struct var* initializeVar() {
+	struct var* v = (struct var*)malloc(sizeof(struct var));
+
+	sprintf(v->id, "%s", "");
+	sprintf(v->arrayStr[0], "%s", "");
+
+	v->array[0] = 0;
+	v->var_type = TYPE_NORMAL;
+	v->type = 0;
+
+	return v;
+}
+
+char* defToDataType(int n) {
+	switch (n) {
+	case bul:
+		return "bul";
+		break;
+	case litera:
+		return "Char";
+		break;
+	case integru:
+		return "integru";
+		break;
+	case plutitor:
+		return "plutitor";
+		break;
+	case String:
+		return "String";
+		break;
+	}
+	return "";
+}
+
+int main (void) {
+
+	for (int i = 0; i < 100; i++) {
+		variables[i].var_type = TYPE_NORMAL;
+		variables[i].isInitilalized[0] = 0;
+	}
+
+    yyin = fopen("input.txt", "r");
+	return yyparse();
+}
+
+void yyerror (char *s) 
+{
+	printf (BRED "Error: %s line %d\n" RESET, s, yylineno);
+}

@@ -54,40 +54,31 @@ extern int yydebug;
     YYEOF = 0,                     /* "end of file"  */
     YYerror = 256,                 /* error  */
     YYUNDEF = 257,                 /* "invalid token"  */
-    OR = 258,                      /* OR  */
-    LEQ = 259,                     /* LEQ  */
-    AND = 260,                     /* AND  */
-    GEQ = 261,                     /* GEQ  */
-    EQEQ = 262,                    /* EQEQ  */
-    REAL_EQUAL = 263,              /* REAL_EQUAL  */
-    PLUS = 264,                    /* PLUS  */
-    MINUS = 265,                   /* MINUS  */
-    PRODUCT = 266,                 /* PRODUCT  */
-    DIVIDE = 267,                  /* DIVIDE  */
-    LS = 268,                      /* LS  */
-    GE = 269,                      /* GE  */
-    PT = 270,                      /* PT  */
-    DACA = 271,                    /* DACA  */
-    VEZI = 272,                    /* VEZI  */
-    POATE = 273,                   /* POATE  */
-    ALTFEL = 274,                  /* ALTFEL  */
-    FUNCTIE = 275,                 /* FUNCTIE  */
-    RASTIMP = 276,                 /* RASTIMP  */
-    INTOARCE = 277,                /* INTOARCE  */
-    print = 278,                   /* print  */
-    conservator = 279,             /* conservator  */
-    plutitor = 280,                /* plutitor  */
-    tipu_meu = 281,                /* tipu_meu  */
-    integru = 282,                 /* integru  */
-    bul = 283,                     /* bul  */
-    litera = 284,                  /* litera  */
-    fraza = 285,                   /* fraza  */
-    Valoare_Litera = 286,          /* Valoare_Litera  */
-    Valoare_Fraza = 287,           /* Valoare_Fraza  */
-    am_plecat = 288,               /* am_plecat  */
-    number = 289,                  /* number  */
-    number_r = 290,                /* number_r  */
-    AIDI = 291                     /* AIDI  */
+    print = 258,                   /* print  */
+    integru = 259,                 /* integru  */
+    plutitor = 260,                /* plutitor  */
+    litera = 261,                  /* litera  */
+    bul = 262,                     /* bul  */
+    String = 263,                  /* String  */
+    conservator = 264,             /* conservator  */
+    GEQ = 265,                     /* GEQ  */
+    LEQ = 266,                     /* LEQ  */
+    AND = 267,                     /* AND  */
+    OR = 268,                      /* OR  */
+    EQEQ = 269,                    /* EQEQ  */
+    LS = 270,                      /* LS  */
+    GE = 271,                      /* GE  */
+    PLUS = 272,                    /* PLUS  */
+    MINUS = 273,                   /* MINUS  */
+    PROD = 274,                    /* PROD  */
+    DIV = 275,                     /* DIV  */
+    EQUAL = 276,                   /* EQUAL  */
+    String_Value = 277,            /* String_Value  */
+    Character_Value = 278,         /* Character_Value  */
+    exit_command = 279,            /* exit_command  */
+    number = 280,                  /* number  */
+    number_r = 281,                /* number_r  */
+    IDENTIFIER = 282               /* IDENTIFIER  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -96,54 +87,45 @@ extern int yydebug;
 #define YYEOF 0
 #define YYerror 256
 #define YYUNDEF 257
-#define OR 258
-#define LEQ 259
-#define AND 260
-#define GEQ 261
-#define EQEQ 262
-#define REAL_EQUAL 263
-#define PLUS 264
-#define MINUS 265
-#define PRODUCT 266
-#define DIVIDE 267
-#define LS 268
-#define GE 269
-#define PT 270
-#define DACA 271
-#define VEZI 272
-#define POATE 273
-#define ALTFEL 274
-#define FUNCTIE 275
-#define RASTIMP 276
-#define INTOARCE 277
-#define print 278
-#define conservator 279
-#define plutitor 280
-#define tipu_meu 281
-#define integru 282
-#define bul 283
-#define litera 284
-#define fraza 285
-#define Valoare_Litera 286
-#define Valoare_Fraza 287
-#define am_plecat 288
-#define number 289
-#define number_r 290
-#define AIDI 291
+#define print 258
+#define integru 259
+#define plutitor 260
+#define litera 261
+#define bul 262
+#define String 263
+#define conservator 264
+#define GEQ 265
+#define LEQ 266
+#define AND 267
+#define OR 268
+#define EQEQ 269
+#define LS 270
+#define GE 271
+#define PLUS 272
+#define MINUS 273
+#define PROD 274
+#define DIV 275
+#define EQUAL 276
+#define String_Value 277
+#define Character_Value 278
+#define exit_command 279
+#define number 280
+#define number_r 281
+#define IDENTIFIER 282
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 44 "semantics.y"
+#line 85 "semantics.y"
 
-    char string[1000];
-	int type; 
-	double value; 
-	char name[1000];
-    struct variable_structure* data_structure; 
+	double num; 
+	char string[1000]; 
+	int type_id; 
+	struct var* strct;
+	struct parameter* funParam;
 
-#line 147 "y.tab.h"
+#line 129 "y.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

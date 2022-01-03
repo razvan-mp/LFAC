@@ -1,0 +1,7 @@
+integru a;
+String ss[2];
+
+ss[0] = "Lorem ipsum";
+print ss[0] + ss[1];
+
+print a;
