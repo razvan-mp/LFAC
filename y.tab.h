@@ -73,21 +73,21 @@ extern int yydebug;
     PROD = 274,                    /* PROD  */
     DIV = 275,                     /* DIV  */
     EQUAL = 276,                   /* EQUAL  */
-    IF = 277,                      /* IF  */
-    WHILE = 278,                   /* WHILE  */
+    dak = 277,                     /* dak  */
+    rastimp = 278,                 /* rastimp  */
     pt = 279,                      /* pt  */
-    ELSE = 280,                    /* ELSE  */
-    ELIF = 281,                    /* ELIF  */
-    FUN = 282,                     /* FUN  */
-    RETURN = 283,                  /* RETURN  */
-    DEFINE_TYPE = 284,             /* DEFINE_TYPE  */
-    String_Value = 285,            /* String_Value  */
-    Character_Value = 286,         /* Character_Value  */
-    EVAL = 287,                    /* EVAL  */
-    exit_command = 288,            /* exit_command  */
+    altfel = 280,                  /* altfel  */
+    poate = 281,                   /* poate  */
+    subrutina = 282,               /* subrutina  */
+    ofera = 283,                   /* ofera  */
+    defineste_tip = 284,           /* defineste_tip  */
+    valoare_fraza = 285,           /* valoare_fraza  */
+    valoare_litera = 286,          /* valoare_litera  */
+    vezi = 287,                    /* vezi  */
+    culcat = 288,                  /* culcat  */
     number = 289,                  /* number  */
     number_r = 290,                /* number_r  */
-    IDENTIFIER = 291               /* IDENTIFIER  */
+    AIDI = 291                     /* AIDI  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -115,33 +115,33 @@ extern int yydebug;
 #define PROD 274
 #define DIV 275
 #define EQUAL 276
-#define IF 277
-#define WHILE 278
+#define dak 277
+#define rastimp 278
 #define pt 279
-#define ELSE 280
-#define ELIF 281
-#define FUN 282
-#define RETURN 283
-#define DEFINE_TYPE 284
-#define String_Value 285
-#define Character_Value 286
-#define EVAL 287
-#define exit_command 288
+#define altfel 280
+#define poate 281
+#define subrutina 282
+#define ofera 283
+#define defineste_tip 284
+#define valoare_fraza 285
+#define valoare_litera 286
+#define vezi 287
+#define culcat 288
 #define number 289
 #define number_r 290
-#define IDENTIFIER 291
+#define AIDI 291
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 75 "semantics.y"
+#line 70 "semantics.y"
 
 	double num; 
 	char string[1000]; 
 	int type_id; 
 	struct var* strct;
-	struct parameter* funParam;
+	struct parameter* param_functie;
 
 #line 147 "y.tab.h"
 

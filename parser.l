@@ -11,7 +11,7 @@ int yylex();
 %%
 
 "print"				            	{return print;}
-"exit"				   	        	{return exit_command;}
+"culcat"				   	        {return culcat;}
 "integru"              	        	{yylval.type_id = integru; return integru;}
 "plutitor"                         	{yylval.type_id = plutitor; return plutitor;}
 "litera"                          	{yylval.type_id = litera; return litera;}
@@ -34,12 +34,20 @@ int yylex();
 ">"                             	{return GE;}
 
 "pt"                                {return pt;}
+"rastimp"                           {return rastimp;}
+"dak"                               {return dak;}
+"poate"                             {return poate;}
+"altfel"                            {return altfel;}
+"vezi"                              {return vezi;}
+"subrutina"                         {return subrutina;}
+"ofera"                             {return ofera;}
+"defineste_tip"                             {return defineste_tip;}
 
 [#].*[#]                            {;}
 [()<>]                  	        {return yytext[0];}
-[a-zA-Z]+([a-zA-Z]*[_]*[0-9]*)*	    {strcpy(yylval.string, yytext); return IDENTIFIER;}
-["][^\"]*["]                	    {strcpy(yylval.string, yytext + 1); yylval.string[strlen(yytext + 1) - 1] = '\0'; return String_Value;}
-['].[']                 	        {yytext[2] = '\0'; strcpy(yylval.string, yytext + 1); return Character_Value;}
+[a-zA-Z]+([a-zA-Z]*[_]*[0-9]*)*	    {strcpy(yylval.string, yytext); return AIDI;}
+["][^\"]*["]                	    {strcpy(yylval.string, yytext + 1); yylval.string[strlen(yytext + 1) - 1] = '\0'; return valoare_fraza;}
+['].[']                 	        {yytext[2] = '\0'; strcpy(yylval.string, yytext + 1); return valoare_litera;}
 [0]|[-]?[1-9][0-9]*     	        {yylval.num = atoi(yytext); return number;}
 [0]|[-]?[1-9][0-9]*\.[0-9]+         {yylval.num = atof(yytext); return number_r;}
 [ \t]                  		        ;

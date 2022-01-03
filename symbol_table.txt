@@ -1,3 +1,2 @@
-nume : a  tip = integru valoare = 1  not constant 
-nume : b  tip = integru valoare = 8  constant 
+nume : a  tip = integru valoare = 7  not constant 
 

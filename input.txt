@@ -1,6 +1,11 @@
-integru a = 1;
-conservator integru b = 8;
-pt(a = 0 ; a < b ; a = a + 2)
-{
-    print a;
-}
+conservator integru a = 1;
+
+print a;
+
+culcat;
+
+a = 7;
+
+
+
+print a;

@@ -1,75 +1,70 @@
 %{
 void yyerror (char *s);
 int yylex();
-#include <stdio.h>     /* C declarations used in actions */
+#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <ctype.h>
 
 extern char* yytext;
 extern FILE* yyin;
 extern int yylineno;
-int lineError = 0;
 
-#define TYPE_NORMAL 1
-#define TYPE_ARRAY 2
-#define TYPE_FUNCTION 3
+#define TIP_VARIABILA 1
+#define TIP_ARRAY 2
+#define TIP_SUBRUTINA 3
 
 struct var {
 	char id[100];
-	int var_type;
+	int tip_variable;
 
-	// normal type
 	int type;
-	int cnst;
+	int conservativ;
 
-	// array
-	int arraySize;
+	int dimensiune_array;
 	double array[100];
-	char arrayStr[100][1000];
-	int isInitilalized[100];
+	char array_fraze[100][1000];
+	int e_initializat[100];
 	
-	// function
-	int parameterTypes[10];
-	int parameterNum;
+	int tipuri_parametri[10];
+	int numar_parametri;
 };
 
 struct parameter {
-	int paramNum;
-	int parameterTypes[10];
+	int numar_parametri;
+	int tipuri_parametri[10];
 };
 
-struct var* initializeVar();
+struct var* init_variabila();
 
-int totalVar = 0;
-struct var variables[100];
+int total_variabile = 0;
+struct var variabile[100];
 
-struct var* temporaryPointNum(double, int);
-struct var* temporaryPointStr(void*, int);
-struct var* temporaryPointVar(char*);
-struct var* temporaryPointArr(char*, struct var*);
-struct var* temporaryPointFun(char*, struct parameter*);
+struct var* pointer_nr(double, int);
+struct var* pointer_fraza(void*, int);
+struct var* pointer_variabila(char*);
+struct var* pointer_array(char*, struct var*);
+struct var* pointer_subrutina(char*, struct parameter*);
 
-void freeVar(struct var* v);
-int getVariableIndex(char*);
-void updateValue(char*, struct var*);
-void FloatingPointException(int);
-void pushVariable(char*, int, struct var*);
-void pushVariableConst(char*, int, struct var*);
-void pushEmptyVariable(char*, int);
-void pushStructVariable(char*);
-struct var* comp(struct var*, struct var*, int);
-void printValue(struct var*);
-void print_simbol_table(struct var*,int);
+void elibereaza_variabila(struct var* v);
+int ia_index_variabila(char*);
+void actualizeaza_valoarea(char*, struct var*);
+void exceptie_plutitor(int);
+void impinge_variabila(char*, int, struct var*);
+void impinge_variabila_conservatoare(char*, int, struct var*);
+void impinge_variabila_goala(char*, int);
+void impinge_variabila_structurata(char*);
+struct var* compara_variabile(struct var*, struct var*, int);
+void printeaza_variabile(struct var*);
+void creaza_tabel_simboluri(struct var*,int);
 
-void pushArray(char*, int, struct var*);
-void updateArrValue(char*, struct var*, struct var*);
-void Eval_function(struct var*);
+void impinge_in_array(char*, int, struct var*);
+void actualizeaza_in_array(char*, struct var*, struct var*);
+void functie_evaluare(struct var*);
 
-void pushParam(struct parameter*, int);
-struct parameter* initializeParam(int);
-void pushFunction(char*, int, struct parameter*);
-char* defToDataType(int);
+void impinge_parametru(struct parameter*, int);
+struct parameter* initializeaza_parametru(int);
+void impinge_functie(char*, int, struct parameter*);
+char* definite_la_tip_date(int);
 %}
 
 %union {
@@ -77,14 +72,14 @@ char* defToDataType(int);
 	char string[1000]; 
 	int type_id; 
 	struct var* strct;
-	struct parameter* funParam;
+	struct parameter* param_functie;
 }     
 
 %start program
 
 %token print
 
-%type <type_id> DATA_TYPE
+%type <type_id> TIP_DATA
 %token <type_id> integru plutitor litera bul fraza
 %token conservator
 
@@ -92,31 +87,31 @@ char* defToDataType(int);
 %token PLUS MINUS PROD DIV EQUAL
 
 %type<num> stat
-%token IF WHILE pt
-%type<num> smtm smtm_type smtm_types smtm_fun ELSE_ ELIF_ ELIF_S 
-%token ELSE
-%token ELIF
+%token dak rastimp pt
+%type<num> bloc_cod tip_bloc tipuri_bloc smtm_fun ELSE_ ELIF_ ELIF_S 
+%token altfel
+%token poate
 
-%token FUN RETURN DEFINE_TYPE
+%token subrutina ofera defineste_tip
 %type<num> FUNCTION
 
-%token <string> String_Value Character_Value
+%token <string> valoare_fraza valoare_litera
 
-%type <type_id> paramentru
-%type<funParam> lista_param more_params fun_call_list more_call_param
+%type <type_id> parametru
+%type<param_functie> lista_param more_params lista_apelare_functie parametri_apelare
 
-%token EVAL
+%token vezi
 
-%token exit_command
+%token culcat
 %token <num> number number_r
-%token <string> IDENTIFIER
-%type <num> line declarations
+%token <string> AIDI
+%type <num> linie declarari
 
 %type <strct> exp term 
 
-%type <num> assignment
+%type <num> asignare
 
-%nonassoc IF ELSE ELIF
+%nonassoc dak altfel poate
 
 %right EQUAL
 
@@ -132,989 +127,1132 @@ char* defToDataType(int);
 
 %%
 
-program : declarations { print_simbol_table(variables,totalVar);printf( "Program corect sintactic\n" ); }
+program : declarari { creaza_tabel_simboluri(variabile,total_variabile);printf( "Program corect sintactic\n" ); }
 		; 
 
-declarations   	: line			 			{;}
-				| declarations line				{;}
+declarari   	: linie			 			{;}
+				| declarari linie				{;}
 				;
 
-line 	: assignment ';'								{;}
-		| exit_command ';'								{exit(EXIT_SUCCESS);}
-		| print exp ';'									{printValue($2);}
+linie 	: asignare ';'								{;}
+		| culcat ';'								{exit(EXIT_SUCCESS);}
+		| print exp ';'									{printeaza_variabile($2);}
 		| stat 											{;}
 		| FUNCTION 				   						{;}
-		| EVAL '(' exp ')' ';'          				{Eval_function($3);}
-		| DEFINE_TYPE '{' ELEMENTS '}' IDENTIFIER ';'   {pushStructVariable($5);}
+		| vezi '(' exp ')' ';'          				{functie_evaluare($3);}
+		| defineste_tip '{' ELEMENTE '}' AIDI ';'   {impinge_variabila_structurata($5);}
 		;
 
-ELEMENTS : DATA_TYPE IDENTIFIER ';' ELEMENTS	{;}
+ELEMENTE : TIP_DATA AIDI ';' ELEMENTE	{;}
 		 |										{;}
 		 ;
 
-DATA_TYPE   : integru   	 {$$ = $1;}
+TIP_DATA   : integru   	 {$$ = $1;}
 			| plutitor			 {$$ = $1;}
 			| litera 	 {$$ = $1;}
 			| bul 	 		 {$$ = $1;}
 			| fraza		 {$$ = $1;}
 			;
 
-assignment  : DATA_TYPE IDENTIFIER	 					{pushEmptyVariable($2, $1);}
-			| DATA_TYPE IDENTIFIER EQUAL exp  			{pushVariable($2, $1, $4);}
+asignare  : TIP_DATA AIDI	 					{impinge_variabila_goala($2, $1);}
+			| TIP_DATA AIDI EQUAL exp  			{impinge_variabila($2, $1, $4);}
 		
-			| conservator DATA_TYPE IDENTIFIER EQUAL exp  	{pushVariableConst($3, $2, $5);}
+			| conservator TIP_DATA AIDI EQUAL exp  	{impinge_variabila_conservatoare($3, $2, $5);}
 
-			| DATA_TYPE IDENTIFIER '[' exp ']'			{pushArray($2, $1, $4);}
+			| TIP_DATA AIDI '[' exp ']'			{impinge_in_array($2, $1, $4);}
 
-			| IDENTIFIER EQUAL exp   					{updateValue($1, $3);}
-			| IDENTIFIER '[' exp ']' EQUAL exp			{updateArrValue($1, $3, $6);}
+			| AIDI EQUAL exp   					{actualizeaza_valoarea($1, $3);}
+			| AIDI '[' exp ']' EQUAL exp			{actualizeaza_in_array($1, $3, $6);}
 			;
 
 
 exp    	: term                     	{$$ = $1;}
      	| '(' exp ')'			   	{$$ = $2;}
-       	| exp PLUS exp              {$$ = comp($1, $3, PLUS);}
-       	| exp MINUS exp             {$$ = comp($1, $3, MINUS);}
-       	| exp PROD exp              {$$ = comp($1, $3, PROD);}
-        | exp DIV exp          	   	{$$ = comp($1, $3, DIV);}
+       	| exp PLUS exp              {$$ = compara_variabile($1, $3, PLUS);}
+       	| exp MINUS exp             {$$ = compara_variabile($1, $3, MINUS);}
+       	| exp PROD exp              {$$ = compara_variabile($1, $3, PROD);}
+        | exp DIV exp          	   	{$$ = compara_variabile($1, $3, DIV);}
 
-		| exp AND exp              	{$$ = comp($1, $3, AND);}
-		| exp OR exp               	{$$ = comp($1, $3, OR);}
-		| exp LS exp 				{$$ = comp($1, $3, LS) ;}
-		| exp GE exp 				{$$ = comp($1, $3, GE);}
-		| exp LEQ exp 				{$$ = comp($1, $3, LEQ);}
-		| exp GEQ exp 				{$$ = comp($1, $3, GEQ);}
-		| exp EQEQ exp 				{$$ = comp($1, $3, EQEQ);}
+		| exp AND exp              	{$$ = compara_variabile($1, $3, AND);}
+		| exp OR exp               	{$$ = compara_variabile($1, $3, OR);}
+		| exp LS exp 				{$$ = compara_variabile($1, $3, LS) ;}
+		| exp GE exp 				{$$ = compara_variabile($1, $3, GE);}
+		| exp LEQ exp 				{$$ = compara_variabile($1, $3, LEQ);}
+		| exp GEQ exp 				{$$ = compara_variabile($1, $3, GEQ);}
+		| exp EQEQ exp 				{$$ = compara_variabile($1, $3, EQEQ);}
 		;
 
 
-term	: IDENTIFIER						{$$ = temporaryPointVar($1);} 
-		| IDENTIFIER '[' exp ']'			{$$ = temporaryPointArr($1, $3);}
-		| IDENTIFIER '(' fun_call_list ')' 	{$$ = temporaryPointFun($1, $3);}
-   		| number                			{$$ = temporaryPointNum($1, integru);}
-		| number_r							{$$ = temporaryPointNum($1, plutitor);}
-		| Character_Value					{$$ = temporaryPointStr($1, litera);}
-		| String_Value						{$$ = temporaryPointStr($1, fraza);}
+term	: AIDI						{$$ = pointer_variabila($1);} 
+		| AIDI '[' exp ']'			{$$ = pointer_array($1, $3);}
+		| AIDI '(' lista_apelare_functie ')' 	{$$ = pointer_subrutina($1, $3);}
+   		| number                			{$$ = pointer_nr($1, integru);}
+		| number_r							{$$ = pointer_nr($1, plutitor);}
+		| valoare_litera					{$$ = pointer_fraza($1, litera);}
+		| valoare_fraza						{$$ = pointer_fraza($1, fraza);}
         ;
 
-fun_call_list	: more_call_param			{$$ = $1;}
-				|							{$$ = initializeParam(0);}
+lista_apelare_functie	: parametri_apelare			{$$ = $1;}
+				|							{$$ = initializeaza_parametru(0);}
 				;
 
-more_call_param : exp						{$$ = initializeParam($1->type);}
-				| more_call_param ',' exp	{pushParam($$, $3->type);}
+parametri_apelare : exp						{$$ = initializeaza_parametru($1->type);}
+				| parametri_apelare ',' exp	{impinge_parametru($$, $3->type);}
 				;
 
-stat	: IF '(' exp ')' smtm				{;}
-		| IF '(' exp ')' smtm ELIF_S ELSE_ 	{;}
-		| IF '(' exp ')' smtm ELSE_ 		{;}
-		| IF '(' exp ')' smtm ELIF_S	 	{;}
-		| WHILE '(' exp ')' smtm			{;}
-		| pt '(' IDENTIFIER EQUAL exp ';' exp ';' IDENTIFIER EQUAL exp ')' smtm					{;}
+stat	: dak '(' exp ')' bloc_cod				{;}
+		| dak '(' exp ')' bloc_cod ELIF_S ELSE_ 	{;}
+		| dak '(' exp ')' bloc_cod ELSE_ 		{;}
+		| dak '(' exp ')' bloc_cod ELIF_S	 	{;}
+		| rastimp '(' exp ')' bloc_cod			{;}
+		| pt '(' AIDI EQUAL exp ';' exp ';' AIDI EQUAL exp ')' bloc_cod					{;}
 		;
 
-ELSE_   : ELSE smtm 						{;}
+ELSE_   : altfel bloc_cod 						{;}
 		;
 
 ELIF_S  : ELIF_
 		| ELIF_S ELIF_
 		;
 
-ELIF_   : ELIF '(' exp ')' smtm				{;}
+ELIF_   : poate '(' exp ')' bloc_cod				{;}
 		;
 
-smtm 	: '{' smtm_types '}'				{;}
+bloc_cod 	: '{' tipuri_bloc '}'				{;}
 		| '{' '}'							{;}
 		;
 
-smtm_types  : smtm_type 					{;}
-			| smtm_types smtm_type
+tipuri_bloc  : tip_bloc 					{;}
+			| tipuri_bloc tip_bloc
 			;
 
-smtm_type 	: assignment ';'			{;}
+tip_bloc 	: asignare ';'			{;}
 			| exp        ';'			{;}
-			| print exp ';'				{printValue($2);}
+			| print exp ';'				{printeaza_variabile($2);}
 			| stat 						{;}
 			;
 
 
 
-FUNCTION 	: DATA_TYPE FUN IDENTIFIER '(' lista_param ')' smtm_fun 		{pushFunction($3, $1, $5);}
+FUNCTION 	: TIP_DATA subrutina AIDI '(' lista_param ')' smtm_fun 		{impinge_functie($3, $1, $5);}
 			;
 
 lista_param : more_params													{$$ = $1;}
-			| 																{$$ = initializeParam(0);}
+			| 																{$$ = initializeaza_parametru(0);}
 			;
 
-more_params : paramentru													{$$ = initializeParam($1);}
-			| more_params ',' paramentru									{pushParam($$, $3);}
+more_params : parametru													{$$ = initializeaza_parametru($1);}
+			| more_params ',' parametru									{impinge_parametru($$, $3);}
 			;
 
-paramentru  : DATA_TYPE IDENTIFIER											{$$ = $1;}
+parametru  : TIP_DATA AIDI											{$$ = $1;}
 			;
 
 
-smtm_fun	: '{' smtm_types RETURN exp ';' '}' 		{;}
-			| '{' RETURN exp ';' '}'				{;}
+smtm_fun	: '{' tipuri_bloc ofera exp ';' '}' 		{;}
+			| '{' ofera exp ';' '}'				{;}
 			;
 
 %%
-void pushStructVariable(char*id)
+
+struct var *pointer_array(char *id, struct var *node)
 {
-	int i = getVariableIndex(id);
+    int index = ia_index_variabila(id);
 
-	if (i != -1) {
-		printf( "The variable %s was already declared here\n", id);
-		exit(0);
-	}
+    if (index == -1)
+    {
+        printf("%s"
+               " nu a fost declarat in acest scop.\n",
+               id);
+        exit(0);
+    }
 
-	struct var *v = variables + totalVar;
-	
-	sprintf(v->id, "%s", id);
-	v->type = 0;
+    struct var *variabila = variabile + index;
 
-	totalVar++;
+    if (variabila->tip_variable != TIP_ARRAY)
+    {
+        printf("Viariabila %s nu e array.\n", variabila->id);
+        exit(0);
+    }
+
+    if (node->type == fraza)
+    {
+        printf("Problema array: expresie tip fraza.\n");
+        exit(0);
+    }
+
+    int n = (int)node->array[0];
+
+    if (n < 0)
+    {
+        printf("Array-u nu accepta index negativ %d.\n", n);
+        exit(0);
+    }
+
+    if (n >= variabila->dimensiune_array)
+    {
+        printf("S-a depasit size-ul maxim pentru variabila %s \n", id);
+        exit(0);
+    }
+
+    struct var *exp = init_variabila();
+
+    exp->type = variabila->type;
+
+    if (variabila->tip_variable == TIP_ARRAY && variabila->e_initializat[n] == 0)
+    {
+        printf("%s[%d] nu a fost initializat. Valoarea predefinita va fi folosita. Linia %d.\n", id, n, yylineno);
+    }
+
+    if (variabila->type == fraza)
+    {
+        sprintf(exp->array_fraze[0], "%s", variabila->array_fraze[n]);
+    }
+    else if (variabila->type == bul)
+    {
+        exp->array[0] = variabila->array[n] != 0;
+    }
+    else
+    {
+        exp->array[0] = variabila->array[n];
+    }
+
+    return exp;
 }
-
-void pushFunction(char* id, int retType, struct parameter* p) {
-	int i = getVariableIndex(id);
-
-	if (i != -1) {
-		printf( "Name for function %s was already taken.\n" , id);
-		exit(0);
-	}
-
-	struct var *v = variables + totalVar;
-	
-	sprintf(v->id, "%s", id);
-	v->var_type = TYPE_FUNCTION;
-	v->type = retType;
-	v->parameterNum = p->paramNum;
-	for (int i = 0; i < p->paramNum; i++) {
-		v->parameterTypes[i] = p->parameterTypes[i];
-	}
-
-	free(p);
-	totalVar++;
-}
-
-void pushParam(struct parameter* p, int type) {
-	p->parameterTypes[p->paramNum++] = type;	
-}
-
-struct parameter* initializeParam(int type) {
-	struct parameter *p = (struct parameter*)malloc(sizeof(struct parameter));
-	if (type == 0) {
-		p->paramNum = 0;
-		return p;
-	}
-
-	p->paramNum = 1;
-	p->parameterTypes[0] = type;
-
-	return p;
-}
-
-void Eval_function(struct var* x)
+void creaza_tabel_simboluri(struct var *variabila, int n)
 {
-  if(x->type == integru)
-  		printf( "%d\n" ,(int)x->array[0]);
-  else
-  {
-	  	printf( "Eval function must have an integer type parameter.\n" );
-		exit(0);
-  }
-   
-}
+    FILE *fd;
+    fd = fopen("symbol_table.txt", "w");
+    if (fd == NULL)
+    {
+        char buffer[100];
+        sprintf(buffer, "Nu pot deschide fisierul symbol_table.txt.");
+        yyerror(buffer);
+        exit(0);
+    }
 
-void print_simbol_table(struct var* v,int n)
+    for (int i = 0; i < n; i++)
+    {
+        if (variabila[i].tip_variable != TIP_ARRAY && variabila[i].tip_variable != TIP_SUBRUTINA)
+        {
+            fprintf(fd, "nume : %s  ", variabila[i].id);
+            switch (variabila[i].type)
+            {
+            case integru:
+                fprintf(fd, "tip = integru valoare = %d  ", (int)variabila[i].array[0]);
+                break;
+            case litera:
+                fprintf(fd, "tip = litera valoare = '%c' ", (char)variabila[i].array[0]);
+                break;
+            case plutitor:
+                fprintf(fd, "tip = plutitor valoare = %f ", (float)variabila[i].array[0]);
+                break;
+            case fraza:
+                fprintf(fd, "tip = fraza valoare = \"%s\" ", (char *)variabila[i].array_fraze[0]);
+                break;
+            case bul:
+                fprintf(fd, "tip = bul valoare = %d ", (int)variabila[i].array[0]);
+                break;
+            case 0:
+                fprintf(fd, "tip = User Defined Type\n");
+                break;
+            default:
+                break;
+            }
+            if (variabila[i].type != 0)
+                if (variabila[i].conservativ)
+                    fprintf(fd, "constanta \n");
+                else
+                    fprintf(fd, "nu e constanta \n");
+        }
+        else if (variabila[i].tip_variable != TIP_SUBRUTINA)
+        {
+            fprintf(fd, "nume : %s  ", variabila[i].id);
+            switch (variabila[i].type)
+            {
+            case integru:
+                fprintf(fd, "tip = array de integru");
+                for (int j = 0; j < variabila[i].dimensiune_array; j++)
+                {
+                    fprintf(fd, "%s[%d] = %d  ", variabila[i].id, j, (int)variabila[i].array[j]);
+                }
+                break;
+            case litera:
+                fprintf(fd, "tip = array de litera");
+                for (int j = 0; j < variabila[i].dimensiune_array; j++)
+                {
+                    fprintf(fd, "%s[%d] = %c  ", variabila[i].id, j, (char)variabila[i].array[j]);
+                }
+                break;
+            case plutitor:
+                fprintf(fd, "tip = array de plutitor");
+                for (int j = 0; j < variabila[i].dimensiune_array; j++)
+                {
+                    fprintf(fd, "%s[%d] = %f  ", variabila[i].id, j, (float)variabila[i].array[j]);
+                }
+                break;
+            case fraza:
+                fprintf(fd, "tip = array de fraza");
+                for (int j = 0; j < variabila[i].dimensiune_array; j++)
+                {
+                    fprintf(fd, " %s[%d] = \"%s\" ", variabila[i].id, j, (char *)variabila[i].array_fraze[j]);
+                }
+                break;
+            case bul:
+                fprintf(fd, "tip = array de bul");
+                for (int j = 0; j < variabila[i].dimensiune_array; j++)
+                {
+                    fprintf(fd, "%s[%d] = %d  ", variabila[i].id, j, (int)variabila[i].array[j]);
+                }
+                break;
+            default:
+                break;
+            }
+            fprintf(fd, "\n");
+        }
+    }
+    fprintf(fd, "\n");
+    for (int i = 0; i < n; ++i)
+    {
+        if (variabila[i].tip_variable == TIP_SUBRUTINA)
+        {
+            fprintf(fd, "Functia : ");
+            fprintf(fd, "%s %s", definite_la_tip_date(variabila[i].type), variabila[i].id);
+            int nr = variabila[i].numar_parametri;
+            if (nr != 0)
+            {
+                fprintf(fd, " (");
+                for (int j = 0; j < nr - 1; ++j)
+                {
+                    fprintf(fd, "%s, ", definite_la_tip_date(variabila[i].tipuri_parametri[j]));
+                }
+                fprintf(fd, "%s", definite_la_tip_date(variabila[i].tipuri_parametri[nr - 1]));
+                fprintf(fd, ") ");
+            }
+            else
+            {
+                fprintf(fd, "();");
+            }
+
+            fprintf(fd, "\n");
+        }
+    }
+}
+struct var *pointer_variabila(char *id)
 {
-	FILE *fd;
-	fd = fopen("symbol_table.txt", "w");
-	if(fd == NULL)
-	{
-		char buffer[100];
-		sprintf(buffer, "Nu pot deschide fisierul symbol_table.txt.");
-		yyerror(buffer);
-		exit(0);
-	}
- 	
- 	for(int i=0;i<n;i++)
-	{
-	    if(v[i].var_type != TYPE_ARRAY && v[i].var_type != TYPE_FUNCTION)
-		{
-			fprintf(fd,"nume : %s  ",v[i].id);
-			switch (v[i].type) {
-			case integru:
-				fprintf(fd, "tip = integru valoare = %d  ", (int)v[i].array[0]);
-				break;
-			case litera:
-				fprintf(fd, "tip = litera valoare = '%c' ", (char)v[i].array[0]);
-				break;
-			case plutitor:
-				fprintf(fd, "tip = plutitor valoare = %f ", (float)v[i].array[0]);
-				break;
-			case fraza:
-				fprintf(fd, "tip = fraza valoare = \"%s\" ", (char*)v[i].arrayStr[0]);
-				break;
-			case bul:
-				fprintf(fd, "tip = bul valoare = %d ", (int)v[i].array[0]);
-				break;
-			case 0:
-				fprintf(fd, "tip = User Defined Type\n");
-				break;
-			default:
-				break;
-			}
-			if(v[i].type!=0)
-				if(v[i].cnst)
-					fprintf(fd, "constant \n");
-				else
-					fprintf(fd, "not constant \n");
-		}
-		else if(v[i].var_type != TYPE_FUNCTION)
-		{
-			fprintf(fd,"nume : %s  ",v[i].id);
-			switch (v[i].type) {
-			case integru:
-				fprintf(fd, "tip = integru Array ");
-				for(int j=0;j<v[i].arraySize;j++)
-				{
-				 	fprintf(fd,"%s[%d] = %d  ", v[i].id, j, (int)v[i].array[j]);
-				}
-				break;
-			case litera:
-				fprintf(fd, "tip = Chraracter Array ");
-				for(int j=0;j<v[i].arraySize;j++)
-				{
-				 	fprintf(fd,"%s[%d] = %c  ", v[i].id, j, (char)v[i].array[j]);
-				}
-				break;
-			case plutitor:
-				fprintf(fd, "tip = plutitor Array ");
-				for(int j=0;j<v[i].arraySize;j++)
-				{
-				 	fprintf(fd,"%s[%d] = %f  ", v[i].id, j, (float)v[i].array[j]);
-				}
-				break;
-			case fraza:
-				fprintf(fd, "tip = fraza Array");
-				for(int j=0;j<v[i].arraySize;j++)
-				{
-					fprintf(fd," %s[%d] = \"%s\" ", v[i].id, j, (char*)v[i].arrayStr[j]);
-				}
-				break;
-			case bul:
-				fprintf(fd, "tip = bul Array ");
-				for(int j=0;j<v[i].arraySize;j++)
-				{
-				 	fprintf(fd,"%s[%d] = %d  ", v[i].id, j, (int)v[i].array[j]);
-				}
-				break;
-			default:
-				break;
-			}
-			fprintf(fd,"\n");
-		}
+    int index = ia_index_variabila(id);
 
-	}
-	fprintf(fd,"\n");
-    for(int i=0;i<n;i++)
-	{
-		if(v[i].var_type == TYPE_FUNCTION)
-		{
-            fprintf(fd, "Function : ");
-			fprintf(fd, "%s %s", defToDataType(v[i].type), v[i].id);
-			int nr = v[i].parameterNum;
-			if (nr != 0) 
-			{   
-				fprintf(fd,  " (");
-				for (int j = 0; j < nr-1 ; j++)
-				{
-					fprintf(fd, "%s, ", defToDataType(v[i].parameterTypes[j]));
-				}
-				fprintf(fd, "%s", defToDataType(v[i].parameterTypes[nr-1]));
-				fprintf(fd,  ") ");
-			}
-			else
-			{
-			 fprintf(fd, "();");
-			}
+    if (index == -1)
+    {
+        printf("%s"
+               " nu a fost declarat in acest scop.\n",
+               id);
+        exit(0);
+    }
 
-			fprintf(fd, "\n");
-			
-		}
-	}
+    struct var *variabila = variabile + index;
+
+    if (variabila->tip_variable == TIP_VARIABILA && variabila->e_initializat[0] == 0)
+    {
+        printf("%s nu a fost initializat. Vom folosi o valoare arbitrara. La linia %d.\n", id, yylineno);
+    }
+
+    if (variabila->tip_variable == TIP_SUBRUTINA)
+    {
+        variabila->array[0] = 0;
+    }
+
+    return variabila;
+}
+struct var *pointer_subrutina(char *id, struct parameter *pr)
+{
+    int index = ia_index_variabila(id);
+
+    if (index == -1)
+    {
+        printf("Functia %s nu a fost declarata in acest scop.\n", id);
+        exit(0);
+    }
+
+    struct var *variabila = variabile + index;
+
+    if (variabila->tip_variable != TIP_SUBRUTINA)
+    {
+        printf("%s nu e o variabila, e o functie.\n", variabila->id);
+        exit(0);
+    }
+
+    if (variabila->numar_parametri != pr->numar_parametri)
+    {
+        printf("Respecta numarul de variabile %s.\n", variabila->id);
+        exit(0);
+    }
+
+    int n = variabila->numar_parametri;
+
+    int *funParams = variabila->tipuri_parametri;
+    int *callParams = pr->tipuri_parametri;
+
+    for (int i = 0; i < n; i++)
+    {
+        if (funParams[i] != callParams[i])
+        {
+            printf("%s respecta tipu de date.\n", variabila->id);
+            printf("Parametrul %d e %s dar trebuie sa fie %s.\n", i + 1, definite_la_tip_date(callParams[i]), definite_la_tip_date(funParams[i]));
+            exit(0);
+        }
+    }
+
+    variabila = init_variabila();
+    variabila->type = integru;
+    variabila->array[0] = 0;
+
+    return variabila;
+}
+void impinge_functie(char *id, int retType, struct parameter *p)
+{
+    int index = ia_index_variabila(id);
+
+    if (index != -1)
+    {
+        printf("Numele functiei %s a mai fost utilizat.\n", id);
+        exit(0);
+    }
+
+    struct var *new_variable = variabile + total_variabile;
+
+    sprintf(new_variable->id, "%s", id);
+    new_variable->tip_variable = TIP_SUBRUTINA;
+    new_variable->type = retType;
+    new_variable->numar_parametri = p->numar_parametri;
+    for (int i = 0; i < p->numar_parametri; ++i)
+    {
+        new_variable->tipuri_parametri[i] = p->tipuri_parametri[i];
+    }
+
+    free(p);
+    total_variabile++;
+}
+void functie_evaluare(struct var *x)
+{
+    if (x->type == integru)
+        printf("%d\n", (int)x->array[0]);
+    else
+    {
+        printf("Tipul trebuie sa fie integru.\n");
+        exit(0);
+    }
+}
+int ia_index_variabila(char *varName)
+{
+    for (int i = 0; i < total_variabile; i++)
+    {
+        if (strcmp(varName, variabile[i].id) == 0)
+        {
+            return i;
+        }
+    }
+
+    return -1;
+}
+struct var *pointer_fraza(void *val, int type)
+{
+    struct var *variabila = init_variabila();
+
+    variabila->type = type;
+
+    if (type == fraza)
+    {
+        sprintf(variabila->array_fraze[0], "%s", (char *)val);
+    }
+    else
+    {
+        variabila->array[0] = ((char *)val)[0];
+    }
+
+    return variabila;
 }
 
-struct var* temporaryPointNum(double val, int type) {
-	struct var *v = initializeVar();
+void impinge_parametru(struct parameter *p, int type)
+{
+    p->tipuri_parametri[p->numar_parametri++] = type;
+}
+struct parameter *initializeaza_parametru(int type)
+{
+    struct parameter *new_parameter = (struct parameter *)malloc(sizeof(struct parameter));
+    if (type == 0)
+    {
+        new_parameter->numar_parametri = 0;
+        return new_parameter;
+    }
 
-	v->array[0] = val;
-	v->type = type;
+    new_parameter->numar_parametri = 1;
+    new_parameter->tipuri_parametri[0] = type;
 
-	return v;
+    return new_parameter;
 }
 
-struct var* temporaryPointStr(void* val, int type) {
-	struct var *v = initializeVar();
+void printeaza_variabile(struct var *node)
+{
+    int type = node->type;
+    int n;
 
-	v->type = type;
+    switch (type)
+    {
+    case integru:
+        if (node->tip_variable == TIP_ARRAY)
+        {
+            n = node->dimensiune_array;
+            printf("{");
+            for (int index = 0; index < n - 1; index++)
+            {
+                printf("%d, ", (int)node->array[index]);
+            }
+            printf("%d", (int)node->array[n - 1]);
+            printf("}\n");
+            break;
+        }
+        if (node->tip_variable == TIP_VARIABILA)
+            printf("%d\n", (int)node->array[0]);
+        break;
+    case plutitor:
+        if (node->tip_variable == TIP_ARRAY)
+        {
+            n = node->dimensiune_array;
+            printf("{");
+            for (int index = 0; index < n - 1; index++)
+            {
+                printf("%f, ", (float)node->array[index]);
+            }
+            printf("%f", (float)node->array[n - 1]);
+            printf("}\n");
+            break;
+        }
+        if (node->tip_variable == TIP_VARIABILA)
+            printf("%f\n", (float)node->array[0]);
+        break;
+    case bul:
+        if (node->tip_variable == TIP_ARRAY)
+        {
+            n = node->dimensiune_array;
+            printf("{");
+            for (int index = 0; index < n - 1; index++)
+            {
+                printf("\"%d\", ", (int)node->array[index]);
+            }
+            printf("\"%d\"", (int)node->array[n - 1]);
+            printf("}\n");
+            break;
+        }
+        if (node->tip_variable == TIP_VARIABILA)
+            printf("%d\n", (int)node->array[0]);
+        break;
+    case litera:
+        if (node->tip_variable == TIP_ARRAY)
+        {
+            n = node->dimensiune_array;
+            printf("{");
+            for (int index = 0; index < n - 1; index++)
+            {
+                printf("'%c', ", (char)node->array[index]);
+            }
+            printf("'%c'", (char)node->array[n - 1]);
+            printf("}\n");
+            break;
+        }
+        if (node->tip_variable == TIP_VARIABILA)
+            printf("'%c'\n", (char)node->array[0]);
+        break;
+    case fraza:
+        if (node->tip_variable == TIP_ARRAY)
+        {
+            n = node->dimensiune_array;
+            printf("{");
+            for (int index = 0; index < n - 1; index++)
+            {
+                printf("\"%s\", ", node->array_fraze[index]);
+            }
+            printf("\"%s\"", node->array_fraze[n - 1]);
+            printf("}\n");
+            break;
+        }
+        if (node->tip_variable == TIP_VARIABILA)
+            printf("\"%s\"\n", node->array_fraze[0]);
+        break;
+    default:
+        break;
+    }
 
-	if (type == fraza) {
-		sprintf(v->arrayStr[0], "%s", (char*)val);
-	} else {
-		v->array[0] = ((char*)val)[0];
-	}
+    if (node->tip_variable == TIP_SUBRUTINA)
+    {
+        printf("%s %s", definite_la_tip_date(node->type), node->id);
+        n = node->numar_parametri;
+        if (n != 0)
+        {
+            printf(" -> {");
+            for (int index = 0; index < n - 1; index++)
+            {
+                printf("%s, ", definite_la_tip_date(node->tipuri_parametri[index]));
+            }
+            printf("%s}", definite_la_tip_date(node->tipuri_parametri[n - 1]));
+        }
 
-	return v;
+        printf("\n");
+    }
 }
 
-struct var* temporaryPointFun(char* id, struct parameter* pr) {
-	int i = getVariableIndex(id);
+struct var *pointer_nr(double val, int type)
+{
+    struct var *variabila = init_variabila();
 
-	if (i == -1) {
-		printf( "Function %s was not declared in this scope.\n", id);
-		exit(0);
-	}
+    variabila->array[0] = val;
+    variabila->type = type;
 
-	struct var* v = variables + i;
-
-	if (v->var_type != TYPE_FUNCTION) {
-		printf( "%s"  " should be a function, not a variable.\n" , v->id);
-		exit(0);
-	}
-
-	if (v->parameterNum != pr->paramNum) {
-		printf( "The number of variables should match for function %s.\n" , v->id);
-		exit(0);
-	}
-
-	int n = v->parameterNum;
-
-	int *funParams = v->parameterTypes;
-	int *callParams = pr->parameterTypes;
-
-	for (int i = 0; i < n; i++) {
-		if (funParams[i] != callParams[i]) {
-			printf( "%s"  " parameters should match function definition.\n" , v->id);
-			printf( "Parameter %d is %s but in definition is %s.\n" , i + 1, defToDataType(callParams[i]), defToDataType(funParams[i]));
-			exit(0);
-		}
-	}
-
-	v = initializeVar();
-	v->type = integru;
-	v->array[0] = 0;
-
-	return v;
+    return variabila;
 }
 
-struct var* temporaryPointVar(char* id) {
-	int i = getVariableIndex(id);
-
-	if (i == -1) {
-		printf( "%s"  " was not declared in this scope.\n", id);
-		exit(0);
-	}
-	
-	struct var* v = variables + i;
-	
-	if (v->var_type == TYPE_NORMAL && v->isInitilalized[0] == 0) {
-		printf( "%s was not initialzied. The default value will be used. Line %d.\n" , id, yylineno);
-	}
-
-	if (v->var_type == TYPE_FUNCTION) {
-		v->array[0] = 0;
-	}
-
-	return v;
+void elibereaza_variabila(struct var *variabila)
+{
+    if (strlen(variabila->id) == 0)
+    {
+        free(variabila);
+    }
 }
 
-struct var* temporaryPointArr(char* id, struct var* node) {
-	int i = getVariableIndex(id);
+void impinge_variabila_structurata(char *id)
+{
+    int index = ia_index_variabila(id);
 
-	if (i == -1) {
-		printf( "%s"  " was not declared in this scope.\n", id);
-		exit(0);
-	}
+    if (index != -1)
+    {
+        printf("Variabila %s a fost declarata\n", id);
+        exit(0);
+    }
 
-	struct var *v = variables + i;
+    struct var *new_variable = variabile + total_variabile;
 
-	if (v->var_type != TYPE_ARRAY) {
-		printf( "Varialbe %s is not an array type.\n" , v->id);
-		exit(0);
-	}
+    sprintf(new_variable->id, "%s", id);
+    new_variable->type = 0;
 
-	if (node->type == fraza) {
-		printf("This array type cannot be accessed with a string expression.\n" );
-		exit(0);
-	}
-
-	int n = (int)node->array[0];
-
-	if (n < 0) {
-		printf( "Array index should be more than 0 but it's %d.\n" , n);
-		exit(0);
-	}
-
-	if (n >= v->arraySize) {
-		printf( "Array size exceded for variable %s from expression: %d, where maximum index is %d.\n" , id, n, v->arraySize - 1);
-		exit(0);
-	}
-
-	struct var *exp = initializeVar();
-
-	exp->type = v->type;
-
-	if (v->var_type == TYPE_ARRAY && v->isInitilalized[n] == 0) {
-		printf( "%s[%d] was not initialzied. The default value will be used. Line %d.\n" , id, n, yylineno);
-	}
-
-	if (v->type == fraza) {
-		sprintf(exp->arrayStr[0], "%s", v->arrayStr[n]);
-	} else if (v->type == bul) {
-		exp->array[0] = v->array[n] != 0;
-	} else {
-		exp->array[0] = v->array[n];
-	}
-
-	return exp;
+    total_variabile++;
 }
 
-void freeVar(struct var* v) {
-	if (strlen(v->id) == 0) {
-		free(v);
-	}
+void impinge_variabila_goala(char *id, int type)
+{
+    int identifier = ia_index_variabila(id);
+
+    if (identifier != -1)
+    {
+        printf("Variabila %s a fost declarata anterior.\n", id);
+        exit(0);
+    }
+
+    struct var *variable = variabile + total_variabile;
+
+    sprintf(variable->id, "%s", id);
+    variable->type = type;
+
+    if (type == fraza)
+    {
+        sprintf(variable->array_fraze[0], "%s", "");
+    }
+    else
+    {
+        variable->array[0] = 0;
+    }
+
+    total_variabile++;
 }
 
-int getVariableIndex(char* varName) {
-	for (int i = 0; i < totalVar; i++) {
-		if (strcmp(varName, variables[i].id) == 0) {
-			return i;
-		}
-	}
+void impinge_variabila(char *id, int type, struct var *exp)
+{
+    int identifier = ia_index_variabila(id);
 
-	return -1;
-} 
+    if (identifier != -1)
+    {
+        printf("Variabila %s a fost deja declarata.\n", id);
+        exit(0);
+    }
 
-void updateValue(char* id, struct var* exp) {
-	int i = getVariableIndex(id);
+    struct var *variable = variabile + total_variabile;
 
-	if (i == -1) {
-		printf( "%s"  " was not declared in this scope.\n", id);
-		exit(0);
-	} 
+    sprintf(variable->id, "%s", id);
+    variable->type = type;
+    variable->e_initializat[0] = 1;
+    if (type == fraza)
+    {
+        sprintf(variable->array_fraze[0], "%s", exp->array_fraze[0]);
+    }
+    else if (type == bul)
+    {
+        variable->array[0] = exp->array[0] != 0;
+    }
+    else
+    {
+        variable->array[0] = exp->array[0];
+    }
 
-	struct var *vr = variables + i;
-	
-	if (vr->var_type == TYPE_FUNCTION) {
-		printf("Function %s cannot be changed.\n" , vr->id);
-		exit(0);
-	}
-
-	if (vr->var_type == TYPE_ARRAY && exp->var_type != TYPE_ARRAY) {
-		printf( "Variable %s is an array type but the expression is not.\n" , vr->id);
-		exit(0);
-	}
-
-	if (vr->var_type != TYPE_ARRAY && exp->var_type == TYPE_ARRAY) {
-		printf( "Variable %s is a normal type but expression is an array.\n" , vr->id);
-		exit(0);
-	}
-	
-	if (vr->type == fraza && exp->type != fraza || vr->type != fraza && exp->type == fraza) {
-		printf( "Data types should match.\n" );
-		exit(0);
-	}
-	
-	if(vr->cnst)
-	{
-		printf( "Constat variable %s cannot be modified.\n", id);
-		exit(0);
-	} 
-
-	if (vr->var_type == TYPE_ARRAY && exp->var_type == TYPE_ARRAY) {
-
-		int n = vr->arraySize;
-		int m = exp->arraySize;
-
-		for (int i = 0; i < n && i < m; i++) {
-			if (vr->type == fraza) {
-				sprintf(vr->arrayStr[i], "%s", exp->arrayStr[i]);
-			} else if (vr->type == bul) {
-				vr->array[i] = exp->array[i] != 0;
-			} else {
-				vr->array[i] = exp->array[i];
-			}
-		}
-
-		return;
-	}
-
-	vr->isInitilalized[0] = 1;
-	if (vr->type == fraza) {
-		sprintf(vr->arrayStr[0], "%s", exp->arrayStr[0]);
-	} else if (vr->type == bul) {
-		vr->array[0] = exp->array[0] != 0;
-	} else {
-		vr->array[0] = exp->array[0];
-	}
-
+    elibereaza_variabila(exp);
+    total_variabile++;
 }
 
-void updateArrValue(char* id, struct var* exp_1, struct var* exp_2) {
-	int i = getVariableIndex(id);
+void actualizeaza_valoarea(char *id, struct var *exp)
+{
+    int index = ia_index_variabila(id);
 
-	if (i == -1) {
-		printf( "%s"  " was not declared in this scope.\n"  , id);
-		exit(0);
-	}
+    if (index == -1)
+    {
+        printf("%s nu a fost declarata.\n", id);
+        exit(0);
+    }
 
-	struct var *v = variables + i;
+    struct var *vr = variabile + index;
 
-	if (v->var_type == TYPE_FUNCTION) {
-		printf( "Invalid expression for function %s.\n" , v->id);
-		exit(0);
-	}
+    if (vr->tip_variable == TIP_SUBRUTINA)
+    {
+        printf("Functia %s nu poate fi stearsa.\n", vr->id);
+        exit(0);
+    }
 
-	if (exp_1->type == fraza) {
-		printf( "This array type cannot be accessed with a string expression.\n" );
-		exit(0);
-	}
+    if (vr->tip_variable == TIP_ARRAY && exp->tip_variable != TIP_ARRAY)
+    {
+        printf("Variabila %s e un array, dar expresia nu e.\n", vr->id);
+        exit(0);
+    }
 
-	int n = (int)exp_1->array[0];
+    if (vr->tip_variable != TIP_ARRAY && exp->tip_variable == TIP_ARRAY)
+    {
+        printf("Variabila %s nu e array.\n", vr->id);
+        exit(0);
+    }
 
-	if (n < 0) {
-		printf( "Array index should be more than "  "0"  " but it's %d.\n" , n);
-		exit(0);
-	}
+    if (vr->type == fraza && exp->type != fraza || vr->type != fraza && exp->type == fraza)
+    {
+        printf("Tipu de date trebuie sa fie la fel.\n");
+        exit(0);
+    }
 
-	if (n >= v->arraySize) {
-		printf("Array size exceded for %s: %d, where maximum index is %d.\n" , id, n, v->arraySize - 1);
-		exit(0);
-	}
+    if (vr->conservativ)
+    {
+        printf("Variabila %s e constanta.\n", id);
+        exit(0);
+    }
 
-	if (v->type == fraza && exp_2->type != fraza || v->type != fraza && exp_2->type == fraza) {
-		printf( "Data type should match for variable %s[%d]"  ".\n" , id, n);
-		exit(0);
-	}
+    if (vr->tip_variable == TIP_ARRAY && exp->tip_variable == TIP_ARRAY)
+    {
 
-	v->isInitilalized[n] = 1;
+        int n = vr->dimensiune_array;
+        int m = exp->dimensiune_array;
 
-	if (v->type == fraza) {
-		sprintf(v->arrayStr[n], "%s", exp_2->arrayStr[0]);
-	} else if (v->type == bul) {
-		v->array[n] = exp_2->array[0] != 0;
-	} else {
-		v->array[n] = exp_2->array[0];
-	}
+        for (int i = 0; i < n && i < m; i++)
+        {
+            if (vr->type == fraza)
+            {
+                sprintf(vr->array_fraze[i], "%s", exp->array_fraze[i]);
+            }
+            else if (vr->type == bul)
+            {
+                vr->array[i] = exp->array[i] != 0;
+            }
+            else
+            {
+                vr->array[i] = exp->array[i];
+            }
+        }
+
+        return;
+    }
+
+    vr->e_initializat[0] = 1;
+    if (vr->type == fraza)
+    {
+        sprintf(vr->array_fraze[0], "%s", exp->array_fraze[0]);
+    }
+    else if (vr->type == bul)
+    {
+        vr->array[0] = exp->array[0] != 0;
+    }
+    else
+    {
+        vr->array[0] = exp->array[0];
+    }
 }
 
-void pushEmptyVariable(char* id, int type) {
-	int i = getVariableIndex(id);
+void impinge_variabila_conservatoare(char *id, int type, struct var *exp)
+{
+    int identifier = ia_index_variabila(id);
 
-	if (i != -1) {
-		printf( "The variable %s was already declared here\n", id);
-		exit(0);
-	}
+    if (identifier != -1)
+    {
+        printf("Variabila %s a fost declarata anterior.\n", id);
+        exit(0);
+    }
 
-	struct var *v = variables + totalVar;
-	
-	sprintf(v->id, "%s", id);
-	v->type = type;
+    struct var *variable = variabile + total_variabile;
 
-	if (type == fraza) {
-		sprintf(v->arrayStr[0], "%s", "");
-	} else {
-		v->array[0] = 0;
-	}
+    sprintf(variable->id, "%s", id);
+    variable->type = type;
 
-	totalVar++;
+    if (type == fraza)
+    {
+        sprintf(variable->array_fraze[0], "%s", exp->array_fraze[0]);
+    }
+    else if (type == bul)
+    {
+        variable->array[0] = exp->array[0] != 0;
+    }
+    else
+    {
+        variable->array[0] = exp->array[0];
+    }
+    variable->conservativ = 1;
+    variable->e_initializat[0] = 1;
+    elibereaza_variabila(exp);
+    total_variabile++;
 }
 
-void pushVariable(char* id, int type, struct var* exp) {
-	int i = getVariableIndex(id);
+void impinge_in_array(char *id, int type, struct var *exp)
+{
+    int identifier = ia_index_variabila(id);
 
-	if (i != -1) {
-		printf( "The variable %s was already declared here\n", id);
-		exit(0);
-	}
+    if (identifier != -1)
+    {
+        printf("Variabila %s a fost declarata anterior.\n", id);
+        exit(0);
+    }
 
-	struct var *v = variables + totalVar;
-	
-	sprintf(v->id, "%s", id);
-	v->type = type;
-	v->isInitilalized[0] = 1;
-	if (type == fraza) {
-		sprintf(v->arrayStr[0], "%s", exp->arrayStr[0]);
-	} else if (type == bul) {
-		v->array[0] = exp->array[0] != 0;
-	} else {
-		v->array[0] = exp->array[0];
-	}
+    if (exp->type == fraza)
+    {
+        printf("Tipurile array nu pot fi declarate folosing o expresie de tip fraza.\n");
+        exit(0);
+    }
 
-	freeVar(exp);
-	totalVar++;
-}
+    int n = (int)exp->array[0];
 
-void pushArray(char* id, int type, struct var* exp) {
-	int i = getVariableIndex(id);
+    if (n <= 0)
+    {
+        printf("Dimnesiunea unui array trebuie sa fie macar 1.\n");
+        exit(0);
+    }
 
-	if (i != -1) {
-		printf( "The variable %s was already declared here\n", id);
-		exit(0);
-	}
+    struct var *variable = variabile + total_variabile;
 
-	if (exp->type == fraza) {
-		printf( "Array types cannot be declared with string expressions.\n" );
-		exit(0);
-	}
+    if (variable->type == fraza && exp->type != fraza || variable->type != fraza && exp->type == fraza)
+    {
+        printf("Tipurile de date ar trebui sa fie aceleasi.\n");
+        exit(0);
+    }
 
-	int n = (int)exp->array[0];
+    sprintf(variable->id, "%s", id);
 
-	if (n <= 0) {
-		printf( "The array size should be at least 1.\n" );
-		exit(0);
-	}
+    variable->type = type;
+    variable->tip_variable = TIP_ARRAY;
+    variable->dimensiune_array = n;
 
-	struct var *v = variables + totalVar;
-
-	if (v->type == fraza && exp->type != fraza || v->type != fraza && exp->type == fraza) {
-		printf( "Data types should match.\n" );
-		exit(0);
-	}
-
-	sprintf(v->id, "%s", id);
-	v->type = type;
-	v->var_type = TYPE_ARRAY;
-	v->arraySize = n;
-
-	totalVar++;
-}
-
-void pushVariableConst(char* id, int type, struct var* exp) {
-	int i = getVariableIndex(id);
-
-	if (i != -1) {
-		printf("The variable %s was already declared here\n", id);
-		exit(0);
-	}
-
-	struct var *v = variables + totalVar;
-	
-	sprintf(v->id, "%s", id);
-	v->type = type;
-
-	if (type == fraza) {
-		sprintf(v->arrayStr[0], "%s", exp->arrayStr[0]);
-	} else if (type == bul) {
-		v->array[0] = exp->array[0] != 0;
-	} else {
-		v->array[0] = exp->array[0];
-	}
-    v->cnst=1;
-	v->isInitilalized[0] = 1;
-	freeVar(exp);
-	totalVar++;
-}
-
-struct var* comp(struct var* a, struct var* b, int op_type) {
-	
-	struct var* v = initializeVar();
-	double c;
-
-	int n;
-
-	switch (op_type) {
-	case PLUS:;
-		if (a->type == fraza && b->type == fraza) {
-			v->type = fraza;
-			strcpy(v->arrayStr[0], "");
-			strcat(v->arrayStr[0], a->arrayStr[0]);
-			strcat(v->arrayStr[0], b->arrayStr[0]);
-			break;
-		}
-
-		if (a->type != fraza && b->type == fraza) {
-			v->type = fraza;
-			strcpy(v->arrayStr[0], "");
-			sprintf(v->arrayStr[0], "%f", (float)a->array[0]);
-			strcat(v->arrayStr[0], b->arrayStr[0]);
-			break;
-		}
-
-		if (a->type == fraza && b->type != fraza) {
-			v->type = fraza;
-			strcpy(v->arrayStr[0], "");
-
-			strcat(v->arrayStr[0], a->arrayStr[0]);
-			char bfr[10];
-			sprintf(bfr, "%f", (float)b->array[0]);
-			strcat(v->arrayStr[0], bfr);
-			break;
-		}
-
-		if (a->type == litera) {
-			v->type = litera;
-			v->array[0] = (int)(a->array[0] + b->array[0]);
-			break;
-		}
-
-		c = a->array[0] + b->array[0];
-
-		if (c == (int)c) {
-			v->type = integru;
-			v->array[0] = (int)c;
-		} else {
-			v->type = plutitor;
-			v->array[0] = c;
-		}
-		break;
-	case MINUS:;
-
-		if (a->type == litera) {
-			v->type = litera;
-			v->array[0] = (int)(a->array[0] - b->array[0]);
-			break;
-		}
-
-		c = a->array[0] - b->array[0];
-
-		if (c == (int)c) {
-			v->type = integru;
-			v->array[0] = (int)c;
-		} else {
-			v->type = plutitor;
-			v->array[0] = c;
-		}
-		break;
-	case PROD:;
-		c = a->array[0] * b->array[0];
-
-		if (c == (int)c) {
-			v->type = integru;
-			v->array[0] = (int)c;
-		} else {
-			v->type = plutitor;
-			v->array[0] = c;
-		}
-		break;
-	case DIV:;
-	    double c = a->array[0] / b->array[0];
-		if (c == (int)c) 
-			v->type = integru;
-		else
-			v->type = plutitor;
-		if (b->array[0] == 0) {
-			printf( "Division with 0 is not possible.\n" );
-			exit(0);
-		}
-
-	    c = a->array[0] / b->array[0];
-
-		if (c == (int)c) { 
-			v->type = integru;
-			v->array[0] = (int)c;
-		} else {
-			v->type = plutitor;
-			v->array[0] = c;
-		}
-		break;
-	case LS:;
-		if (a->type == fraza && b->type == fraza) {
-			n = strcmp(a->arrayStr[0], b->arrayStr[0]);
-			v->array[0] = n == -1;
-		} else {
-			v->array[0] = (int)(a->array[0] < b->array[0]);
-		}
-		v->type = integru;
-		break;
-	case LEQ:;
-		if (a->type == fraza && b->type == fraza) {
-			n = strcmp(a->arrayStr[0], b->arrayStr[0]);
-			v->array[0] = n == -1 || n == 0;
-		} else {
-			v->array[0] = (int)(a->array[0] <= b->array[0]);
-		}
-		v->type = integru;
-		break;
-	case GE:;
-		if (a->type == fraza && b->type == fraza) {
-			n = strcmp(a->arrayStr[0], b->arrayStr[0]);
-			v->array[0] = n == 1;
-		} else {
-			v->array[0] = (int)(a->array[0] > b->array[0]);
-		}
-		v->type = integru;
-		break;
-	case GEQ:;
-		if (a->type == fraza && b->type == fraza) {
-			n = strcmp(a->arrayStr[0], b->arrayStr[0]);
-			v->array[0] = n == 1 || n == 0;
-		} else {
-			v->array[0] = (int)(a->array[0] >= b->array[0]);
-		}
-		v->type = integru;
-		break;
-	case EQEQ:;
-		if (a->type == fraza && b->type == fraza) {
-			n = strcmp(a->arrayStr[0], b->arrayStr[0]);
-			v->array[0] = n == 0;
-		} else {
-			v->array[0] = (int)(a->array[0] == b->array[0]);
-		}
-		v->type = integru;
-		break;
-	}
-
-	freeVar(a);
-	freeVar(b);
-	return v;
+    total_variabile++;
 }
 
 
-void printValue(struct var* node) {
-	int type = node->type;
-	int n;
+void actualizeaza_in_array(char *id, struct var *first_expression, struct var *second_expression)
+{
+    int identifier = ia_index_variabila(id);
 
-	switch (type) {
-	case integru:
-		if (node->var_type == TYPE_ARRAY) {
-			n = node->arraySize;
-			printf("{");
-			for (int i = 0; i < n - 1; i++) {
-				printf("%d, ", (int)node->array[i]);
-			}
-			printf("%d", (int)node->array[n - 1]);
-			printf("}\n");
-			break;
-		}
-		if (node->var_type == TYPE_NORMAL)
-			printf("%d\n", (int)node->array[0]);
-		break;
-	case litera:
-		if (node->var_type == TYPE_ARRAY) {
-			n = node->arraySize;
-			printf("{");
-			for (int i = 0; i < n - 1; i++) {
-				printf("'%c', ", (char)node->array[i]);
-			}
-			printf("'%c'", (char)node->array[n - 1]);
-			printf("}\n");
-			break;
-		}
-		if (node->var_type == TYPE_NORMAL)
-			printf("'%c'\n", (char)node->array[0]);
-		break;
-	case plutitor:
-		if (node->var_type == TYPE_ARRAY) {
-			n = node->arraySize;
-			printf("{");
-			for (int i = 0; i < n - 1; i++) {
-				printf("%f, ", (float)node->array[i]);
-			}
-			printf("%f", (float)node->array[n - 1]);
-			printf("}\n");
-			break;
-		}
-		if (node->var_type == TYPE_NORMAL)
-			printf("%f\n", (float)node->array[0]);
-		break;
-	case fraza:
-		if (node->var_type == TYPE_ARRAY) {
-			n = node->arraySize;
-			printf("{");
-			for (int i = 0; i < n - 1; i++) {
-				printf("\"%s\", ", node->arrayStr[i]);
-			}
-			printf("\"%s\"", node->arrayStr[n - 1]);
-			printf("}\n");
-			break;
-		}
-		if (node->var_type == TYPE_NORMAL)
-			printf("\"%s\"\n", node->arrayStr[0]);
-		break;
-	case bul:
-		if (node->var_type == TYPE_ARRAY) {
-			n = node->arraySize;
-			printf("{");
-			for (int i = 0; i < n - 1; i++) {
-				printf("\"%d\", ", (int)node->array[i]);
-			}
-			printf("\"%d\"", (int)node->array[n - 1]);
-			printf("}\n");
-			break;
-		}
-		if (node->var_type == TYPE_NORMAL)
-			printf("%d\n", (int)node->array[0]);
-		break;
-	default:
-		break;
-	}
+    if (identifier == -1)
+    {
+        printf("%s nu a fost declarat in acest scope.\n", id);
+        exit(0);
+    }
 
-	if (node->var_type == TYPE_FUNCTION) {
-		printf("%s %s", defToDataType(node->type), node->id);
-		n = node->parameterNum;
-		if (n != 0) {
-			printf(" -> {");
-			for (int i = 0; i < n - 1; i++) {
-				printf("%s, ", defToDataType(node->parameterTypes[i]));
-			}
-			printf("%s}", defToDataType(node->parameterTypes[n - 1]));
-		}
+    struct var *variable = variabile + identifier;
 
-		printf("\n");
-	}
+    if (variable->tip_variable == TIP_SUBRUTINA)
+    {
+        printf("Expresie invalida pentru functia: \"%s\".\n", variable->id);
+        exit(0);
+    }
 
+    if (first_expression->type == fraza)
+    {
+        printf("Array-ul nu poate fi accesat cu o expresie tip \"fraza\".\n");
+        exit(0);
+    }
+
+    int n = (int)first_expression->array[0];
+
+    if (n < 0)
+    {
+        printf("Index-ul array-ului ar trebui sa fie mai mare decat 0, dar este: %d.\n", n);
+        exit(0);
+    }
+
+    if (n >= variable->dimensiune_array)
+    {
+        printf("Dimensiunea array-ului depasita pentru array-ul %s: %d, unde index-ul maxim este: %d.\n", id, n, variable->dimensiune_array - 1);
+        exit(0);
+    }
+
+    if (variable->type == fraza && second_expression->type != fraza || variable->type != fraza && second_expression->type == fraza)
+    {
+        printf("Tipul de date ar trebui sa fie acelasi pentru: %s[%d].\n", id, n);
+        exit(0);
+    }
+
+    variable->e_initializat[n] = 1;
+
+    if (variable->type == fraza)
+    {
+        sprintf(variable->array_fraze[n], "%s", second_expression->array_fraze[0]);
+    }
+    else if (variable->type == bul)
+    {
+        variable->array[n] = second_expression->array[0] != 0;
+    }
+    else
+    {
+        variable->array[n] = second_expression->array[0];
+    }
 }
 
-struct var* initializeVar() {
-	struct var* v = (struct var*)malloc(sizeof(struct var));
+struct var *compara_variabile(struct var *first_var, struct var *second_var, int tip_op)
+{
 
-	sprintf(v->id, "%s", "");
-	sprintf(v->arrayStr[0], "%s", "");
+    struct var *variable = init_variabila();
+    double c;
 
-	v->array[0] = 0;
-	v->var_type = TYPE_NORMAL;
-	v->type = 0;
+    int n;
 
-	return v;
+    switch (tip_op)
+    {
+    case PLUS:;
+        if (first_var->type == fraza && second_var->type == fraza)
+        {
+            variable->type = fraza;
+            strcpy(variable->array_fraze[0], "");
+            strcat(variable->array_fraze[0], first_var->array_fraze[0]);
+            strcat(variable->array_fraze[0], second_var->array_fraze[0]);
+            break;
+        }
+
+        if (first_var->type != fraza && second_var->type == fraza)
+        {
+            variable->type = fraza;
+            strcpy(variable->array_fraze[0], "");
+            sprintf(variable->array_fraze[0], "%f", (float)first_var->array[0]);
+            strcat(variable->array_fraze[0], second_var->array_fraze[0]);
+            break;
+        }
+
+        if (first_var->type == fraza && second_var->type != fraza)
+        {
+            variable->type = fraza;
+            strcpy(variable->array_fraze[0], "");
+
+            strcat(variable->array_fraze[0], first_var->array_fraze[0]);
+            char bfr[10];
+            sprintf(bfr, "%f", (float)second_var->array[0]);
+            strcat(variable->array_fraze[0], bfr);
+            break;
+        }
+
+        if (first_var->type == litera)
+        {
+            variable->type = litera;
+            variable->array[0] = (int)(first_var->array[0] + second_var->array[0]);
+            break;
+        }
+
+        c = first_var->array[0] + second_var->array[0];
+
+        if (c == (int)c)
+        {
+            variable->type = integru;
+            variable->array[0] = (int)c;
+        }
+        else
+        {
+            variable->type = plutitor;
+            variable->array[0] = c;
+        }
+        break;
+    case MINUS:;
+
+        if (first_var->type == litera)
+        {
+            variable->type = litera;
+            variable->array[0] = (int)(first_var->array[0] - second_var->array[0]);
+            break;
+        }
+
+        c = first_var->array[0] - second_var->array[0];
+
+        if (c == (int)c)
+        {
+            variable->type = integru;
+            variable->array[0] = (int)c;
+        }
+        else
+        {
+            variable->type = plutitor;
+            variable->array[0] = c;
+        }
+        break;
+    case PROD:;
+        c = first_var->array[0] * second_var->array[0];
+
+        if (c == (int)c)
+        {
+            variable->type = integru;
+            variable->array[0] = (int)c;
+        }
+        else
+        {
+            variable->type = plutitor;
+            variable->array[0] = c;
+        }
+        break;
+    case DIV:;
+        double c = first_var->array[0] / second_var->array[0];
+        if (c == (int)c)
+            variable->type = integru;
+        else
+            variable->type = plutitor;
+        if (second_var->array[0] == 0)
+        {
+            printf("Impartirea la 0 este imposibila.\n");
+            exit(0);
+        }
+
+        c = first_var->array[0] / second_var->array[0];
+
+        if (c == (int)c)
+        {
+            variable->type = integru;
+            variable->array[0] = (int)c;
+        }
+        else
+        {
+            variable->type = plutitor;
+            variable->array[0] = c;
+        }
+        break;
+    case LS:;
+        if (first_var->type == fraza && second_var->type == fraza)
+        {
+            n = strcmp(first_var->array_fraze[0], second_var->array_fraze[0]);
+            variable->array[0] = n == -1;
+        }
+        else
+        {
+            variable->array[0] = (int)(first_var->array[0] < second_var->array[0]);
+        }
+        variable->type = integru;
+        break;
+    case LEQ:;
+        if (first_var->type == fraza && second_var->type == fraza)
+        {
+            n = strcmp(first_var->array_fraze[0], second_var->array_fraze[0]);
+            variable->array[0] = n == -1 || n == 0;
+        }
+        else
+        {
+            variable->array[0] = (int)(first_var->array[0] <= second_var->array[0]);
+        }
+        variable->type = integru;
+        break;
+    case GE:;
+        if (first_var->type == fraza && second_var->type == fraza)
+        {
+            n = strcmp(first_var->array_fraze[0], second_var->array_fraze[0]);
+            variable->array[0] = n == 1;
+        }
+        else
+        {
+            variable->array[0] = (int)(first_var->array[0] > second_var->array[0]);
+        }
+        variable->type = integru;
+        break;
+    case GEQ:;
+        if (first_var->type == fraza && second_var->type == fraza)
+        {
+            n = strcmp(first_var->array_fraze[0], second_var->array_fraze[0]);
+            variable->array[0] = n == 1 || n == 0;
+        }
+        else
+        {
+            variable->array[0] = (int)(first_var->array[0] >= second_var->array[0]);
+        }
+        variable->type = integru;
+        break;
+    case EQEQ:;
+        if (first_var->type == fraza && second_var->type == fraza)
+        {
+            n = strcmp(first_var->array_fraze[0], second_var->array_fraze[0]);
+            variable->array[0] = n == 0;
+        }
+        else
+        {
+            variable->array[0] = (int)(first_var->array[0] == second_var->array[0]);
+        }
+        variable->type = integru;
+        break;
+    }
+
+    elibereaza_variabila(first_var);
+    elibereaza_variabila(second_var);
+    return variable;
 }
 
-char* defToDataType(int n) {
-	switch (n) {
-	case bul:
-		return "bul";
-		break;
-	case litera:
-		return "Char";
-		break;
-	case integru:
-		return "integru";
-		break;
-	case plutitor:
-		return "plutitor";
-		break;
-	case fraza:
-		return "fraza";
-		break;
-	}
-	return "";
+struct var *init_variabila()
+{
+    struct var *variable = (struct var *)malloc(sizeof(struct var));
+
+    sprintf(variable->id, "%s", "");
+    sprintf(variable->array_fraze[0], "%s", "");
+
+    variable->array[0] = 0;
+    variable->tip_variable = TIP_VARIABILA;
+    variable->type = 0;
+
+    return variable;
 }
 
-int main (void) {
+char *definite_la_tip_date(int n)
+{
+    switch (n)
+    {
+    case bul:
+        return "bul";
+        break;
+    case litera:
+        return "litera";
+        break;
+    case integru:
+        return "integru";
+        break;
+    case plutitor:
+        return "plutitor";
+        break;
+    case fraza:
+        return "fraza";
+        break;
+    }
+    return "";
+}
 
-	for (int i = 0; i < 100; i++) {
-		variables[i].var_type = TYPE_NORMAL;
-		variables[i].isInitilalized[0] = 0;
-	}
+int main(void)
+{
+
+    for (int index = 0; index < 100; index++)
+    {
+        variabile[index].tip_variable = TIP_VARIABILA;
+        variabile[index].e_initializat[0] = 0;
+    }
 
     yyin = fopen("input.txt", "r");
-	return yyparse();
+    return yyparse();
 }
 
-void yyerror (char *s) 
+void yyerror(char *s)
 {
-	printf ( "Error: %s line %d\n" , s, yylineno);
+    printf("Eroare: %s la linia %d\n", s, yylineno);
 }
