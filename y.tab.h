@@ -117,7 +117,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 85 "semantics.y"
+#line 75 "semantics.y"
 
 	double num; 
 	char string[1000]; 
