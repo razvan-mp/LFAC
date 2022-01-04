@@ -1,11 +1,61 @@
-conservator integru a = 1;
+integru a = 8;
 
+print "a: ";
 print a;
 
-culcat;
+conservator plutitor b = 12.785;
+print b;
 
-a = 7;
+integru i = 5;
+pt (i = 5 ; i < b ; i = i + 2)
+{
+    print i;
+}
 
+rastimp(i < 7)
+{
+    print b;
+}
 
+litera d[5];
+d[0] = 'a'; d[1] = 'b'; d[4] = 'c';
+print d;
 
-print a;
+bul e = 0;
+
+integru subrutina cmmdc(integru x)
+{
+    ofera 10;
+}
+
+print cmmdc(a);
+
+dak(a < 20)
+{
+    print a;
+}
+altfel
+{
+    print b;
+}
+
+dak(a < 20)
+{
+    print "";
+}
+poate (b > 7)
+{
+    print d;
+}
+
+bul f = 7 == 1;
+print f;
+
+f = 7 >= 1;
+print f;
+
+f = 1 <= 7;
+print f;
+
+f = 1 == 1;
+print f;

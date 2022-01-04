@@ -41,7 +41,7 @@ int yylex();
 "vezi"                              {return vezi;}
 "subrutina"                         {return subrutina;}
 "ofera"                             {return ofera;}
-"defineste_tip"                             {return defineste_tip;}
+"defineste_tip"                     {return defineste_tip;}
 
 [#].*[#]                            {;}
 [()<>]                  	        {return yytext[0];}
@@ -53,7 +53,7 @@ int yylex();
 [ \t]                  		        ;
 [\n]                    	        {yylineno++;}
 [-+=*/{};,\[\]]                     {return yytext[0];}
-.                       	        {ECHO; yyerror ("unexpected character"); printf("%s\n", yytext);}
+.                       	        {ECHO; yyerror ("Caracter dubios"); printf("%s\n", yytext);}
 
 %%
 int yywrap (void) {return 1;}

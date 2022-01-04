@@ -100,7 +100,7 @@ char* definite_la_tip_date(int);
 %token <string> valoare_fraza valoare_litera
 
 %type <type_id> parametru
-%type<param_functie> lista_param more_params lista_apelare_functie parametri_apelare
+%type<param_functie> lista_param mai_multi_param lista_apelare_functie parametri_apelare
 
 %token vezi
 
@@ -239,12 +239,12 @@ tip_bloc 	: asignare ';'			    {;}
 FUNCTION 	: TIP_DATA subrutina AIDI '(' lista_param ')' bloc_functie 		{impinge_functie($3, $1, $5);}
 			;
 
-lista_param : more_params													{$$ = $1;}
+lista_param : mai_multi_param													{$$ = $1;}
 			| 																{$$ = initializeaza_parametru(0);}
 			;
 
-more_params : parametru													{$$ = initializeaza_parametru($1);}
-			| more_params ',' parametru									{impinge_parametru($$, $3);}
+mai_multi_param : parametru													{$$ = initializeaza_parametru($1);}
+			| mai_multi_param ',' parametru									{impinge_parametru($$, $3);}
 			;
 
 parametru  : TIP_DATA AIDI											{$$ = $1;}
@@ -318,6 +318,7 @@ struct var *pointer_array(char *id, struct var *node)
 
     return exp;
 }
+
 void creaza_tabel_simboluri(struct var *variabila, int n)
 {
     FILE *fd;
@@ -452,7 +453,7 @@ struct var *pointer_variabila(char *id)
     int identifier;
     if ((identifier = ia_index_variabila(id)) == -1)
     {
-        printf("%s nu a fost declarat in acest scop.\n", id);
+        printf("%s nu a fost declarat in acest scope.\n", id);
         exit(0);
     }
 
@@ -470,6 +471,7 @@ struct var *pointer_variabila(char *id)
 
     return variabila;
 }
+
 struct var *pointer_subrutina(char *id, struct parameter *pr)
 {
     int identifier;
@@ -489,7 +491,7 @@ struct var *pointer_subrutina(char *id, struct parameter *pr)
 
     if (variabila->numar_parametri != pr->numar_parametri)
     {
-        printf("Respecta numarul de variabile %s.\n", variabila->id);
+        printf("Nu se respecta numarul de variabile %s.\n", variabila->id);
         exit(0);
     }
 
@@ -502,7 +504,7 @@ struct var *pointer_subrutina(char *id, struct parameter *pr)
     {
         if (funParams[i] != callParams[i])
         {
-            printf("%s respecta tipu de date.\n", variabila->id);
+            printf("%s nu respecta tipul de date.\n", variabila->id);
             printf("Parametrul %d e %s dar trebuie sa fie %s.\n", i + 1, definite_la_tip_date(callParams[i]), definite_la_tip_date(funParams[i]));
             exit(0);
         }
