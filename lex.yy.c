@@ -1069,7 +1069,7 @@ YY_RULE_SETUP
 case 40:
 YY_RULE_SETUP
 #line 56 "parser.l"
-{ECHO; yyerror ("unexpected character"); printf("%s\n", yytext);}
+{ECHO; yyerror ("Caracter dubios"); printf("%s\n", yytext);}
 	YY_BREAK
 case 41:
 YY_RULE_SETUP

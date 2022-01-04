@@ -1022,7 +1022,7 @@ struct var *compara_variabile(struct var *first_var, struct var *second_var, int
 
     switch (tip_op)
     {
-        case PLUS:;
+        case PLUS:
             if (first_var->type == fraza && second_var->type == fraza)
             {
                 variable->type = fraza;
@@ -1073,7 +1073,7 @@ struct var *compara_variabile(struct var *first_var, struct var *second_var, int
                 variable->array[0] = c;
             }
             break;
-        case MINUS:;
+        case MINUS:
 
             if (first_var->type == litera)
             {
@@ -1095,7 +1095,7 @@ struct var *compara_variabile(struct var *first_var, struct var *second_var, int
                 variable->array[0] = c;
             }
             break;
-        case PROD:;
+        case PROD:
             c = first_var->array[0] * second_var->array[0];
 
             if (c == (int)c)
@@ -1109,7 +1109,7 @@ struct var *compara_variabile(struct var *first_var, struct var *second_var, int
                 variable->array[0] = c;
             }
             break;
-        case DIV:;
+        case DIV:
             double c = first_var->array[0] / second_var->array[0];
             if (c == (int)c)
                 variable->type = integru;
@@ -1134,7 +1134,7 @@ struct var *compara_variabile(struct var *first_var, struct var *second_var, int
                 variable->array[0] = c;
             }
             break;
-        case LS:;
+        case LS:
             if (first_var->type == fraza && second_var->type == fraza)
             {
                 n = strcmp(first_var->array_fraze[0], second_var->array_fraze[0]);
@@ -1146,7 +1146,7 @@ struct var *compara_variabile(struct var *first_var, struct var *second_var, int
             }
             variable->type = integru;
             break;
-        case LEQ:;
+        case LEQ:
             if (first_var->type == fraza && second_var->type == fraza)
             {
                 n = strcmp(first_var->array_fraze[0], second_var->array_fraze[0]);
@@ -1158,7 +1158,7 @@ struct var *compara_variabile(struct var *first_var, struct var *second_var, int
             }
             variable->type = integru;
             break;
-        case GE:;
+        case GE:
             if (first_var->type == fraza && second_var->type == fraza)
             {
                 n = strcmp(first_var->array_fraze[0], second_var->array_fraze[0]);
@@ -1170,7 +1170,7 @@ struct var *compara_variabile(struct var *first_var, struct var *second_var, int
             }
             variable->type = integru;
             break;
-        case GEQ:;
+        case GEQ:
             if (first_var->type == fraza && second_var->type == fraza)
             {
                 n = strcmp(first_var->array_fraze[0], second_var->array_fraze[0]);
@@ -1182,7 +1182,7 @@ struct var *compara_variabile(struct var *first_var, struct var *second_var, int
             }
             variable->type = integru;
             break;
-        case EQEQ:;
+        case EQEQ:
             if (first_var->type == fraza && second_var->type == fraza)
             {
                 n = strcmp(first_var->array_fraze[0], second_var->array_fraze[0]);

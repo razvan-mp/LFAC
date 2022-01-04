@@ -354,7 +354,7 @@ enum yysymbol_kind_t
   YYSYMBOL_tip_bloc = 62,                  /* tip_bloc  */
   YYSYMBOL_FUNCTION = 63,                  /* FUNCTION  */
   YYSYMBOL_lista_param = 64,               /* lista_param  */
-  YYSYMBOL_more_params = 65,               /* more_params  */
+  YYSYMBOL_mai_multi_param = 65,           /* mai_multi_param  */
   YYSYMBOL_parametru = 66,                 /* parametru  */
   YYSYMBOL_bloc_functie = 67               /* bloc_functie  */
 };
@@ -772,7 +772,7 @@ static const char *const yytname[] =
   "']'", "','", "$accept", "program", "declarari", "linie", "ELEMENTE",
   "TIP_DATA", "asignare", "exp", "term", "lista_apelare_functie",
   "parametri_apelare", "drp", "ELSE_", "ELIF_S", "ELIF_", "bloc_cod",
-  "tipuri_bloc", "tip_bloc", "FUNCTION", "lista_param", "more_params",
+  "tipuri_bloc", "tip_bloc", "FUNCTION", "lista_param", "mai_multi_param",
   "parametru", "bloc_functie", YY_NULLPTR
 };
 
@@ -1890,7 +1890,7 @@ yyreduce:
 #line 1891 "y.tab.c"
     break;
 
-  case 68: /* lista_param: more_params  */
+  case 68: /* lista_param: mai_multi_param  */
 #line 242 "semantics.y"
                                                                                                                                 {(yyval.param_functie) = (yyvsp[0].param_functie);}
 #line 1897 "y.tab.c"
@@ -1902,13 +1902,13 @@ yyreduce:
 #line 1903 "y.tab.c"
     break;
 
-  case 70: /* more_params: parametru  */
+  case 70: /* mai_multi_param: parametru  */
 #line 246 "semantics.y"
-                                                                                                                        {(yyval.param_functie) = initializeaza_parametru((yyvsp[0].type_id));}
+                                                                                                                                {(yyval.param_functie) = initializeaza_parametru((yyvsp[0].type_id));}
 #line 1909 "y.tab.c"
     break;
 
-  case 71: /* more_params: more_params ',' parametru  */
+  case 71: /* mai_multi_param: mai_multi_param ',' parametru  */
 #line 247 "semantics.y"
                                                                                                                         {impinge_parametru((yyval.param_functie), (yyvsp[0].type_id));}
 #line 1915 "y.tab.c"
@@ -2191,6 +2191,7 @@ struct var *pointer_array(char *id, struct var *node)
 
     return exp;
 }
+
 void creaza_tabel_simboluri(struct var *variabila, int n)
 {
     FILE *fd;
@@ -2325,7 +2326,7 @@ struct var *pointer_variabila(char *id)
     int identifier;
     if ((identifier = ia_index_variabila(id)) == -1)
     {
-        printf("%s nu a fost declarat in acest scop.\n", id);
+        printf("%s nu a fost declarat in acest scope.\n", id);
         exit(0);
     }
 
@@ -2343,6 +2344,7 @@ struct var *pointer_variabila(char *id)
 
     return variabila;
 }
+
 struct var *pointer_subrutina(char *id, struct parameter *pr)
 {
     int identifier;
@@ -2362,7 +2364,7 @@ struct var *pointer_subrutina(char *id, struct parameter *pr)
 
     if (variabila->numar_parametri != pr->numar_parametri)
     {
-        printf("Respecta numarul de variabile %s.\n", variabila->id);
+        printf("Nu se respecta numarul de variabile %s.\n", variabila->id);
         exit(0);
     }
 
@@ -2375,7 +2377,7 @@ struct var *pointer_subrutina(char *id, struct parameter *pr)
     {
         if (funParams[i] != callParams[i])
         {
-            printf("%s respecta tipu de date.\n", variabila->id);
+            printf("%s nu respecta tipul de date.\n", variabila->id);
             printf("Parametrul %d e %s dar trebuie sa fie %s.\n", i + 1, definite_la_tip_date(callParams[i]), definite_la_tip_date(funParams[i]));
             exit(0);
         }
@@ -2893,7 +2895,7 @@ struct var *compara_variabile(struct var *first_var, struct var *second_var, int
 
     switch (tip_op)
     {
-        case PLUS:;
+        case PLUS:
             if (first_var->type == fraza && second_var->type == fraza)
             {
                 variable->type = fraza;
@@ -2944,7 +2946,7 @@ struct var *compara_variabile(struct var *first_var, struct var *second_var, int
                 variable->array[0] = c;
             }
             break;
-        case MINUS:;
+        case MINUS:
 
             if (first_var->type == litera)
             {
@@ -2966,7 +2968,7 @@ struct var *compara_variabile(struct var *first_var, struct var *second_var, int
                 variable->array[0] = c;
             }
             break;
-        case PROD:;
+        case PROD:
             c = first_var->array[0] * second_var->array[0];
 
             if (c == (int)c)
@@ -2980,7 +2982,7 @@ struct var *compara_variabile(struct var *first_var, struct var *second_var, int
                 variable->array[0] = c;
             }
             break;
-        case DIV:;
+        case DIV:
             double c = first_var->array[0] / second_var->array[0];
             if (c == (int)c)
                 variable->type = integru;
@@ -3005,7 +3007,7 @@ struct var *compara_variabile(struct var *first_var, struct var *second_var, int
                 variable->array[0] = c;
             }
             break;
-        case LS:;
+        case LS:
             if (first_var->type == fraza && second_var->type == fraza)
             {
                 n = strcmp(first_var->array_fraze[0], second_var->array_fraze[0]);
@@ -3017,7 +3019,7 @@ struct var *compara_variabile(struct var *first_var, struct var *second_var, int
             }
             variable->type = integru;
             break;
-        case LEQ:;
+        case LEQ:
             if (first_var->type == fraza && second_var->type == fraza)
             {
                 n = strcmp(first_var->array_fraze[0], second_var->array_fraze[0]);
@@ -3029,7 +3031,7 @@ struct var *compara_variabile(struct var *first_var, struct var *second_var, int
             }
             variable->type = integru;
             break;
-        case GE:;
+        case GE:
             if (first_var->type == fraza && second_var->type == fraza)
             {
                 n = strcmp(first_var->array_fraze[0], second_var->array_fraze[0]);
@@ -3041,7 +3043,7 @@ struct var *compara_variabile(struct var *first_var, struct var *second_var, int
             }
             variable->type = integru;
             break;
-        case GEQ:;
+        case GEQ:
             if (first_var->type == fraza && second_var->type == fraza)
             {
                 n = strcmp(first_var->array_fraze[0], second_var->array_fraze[0]);
@@ -3053,7 +3055,7 @@ struct var *compara_variabile(struct var *first_var, struct var *second_var, int
             }
             variable->type = integru;
             break;
-        case EQEQ:;
+        case EQEQ:
             if (first_var->type == fraza && second_var->type == fraza)
             {
                 n = strcmp(first_var->array_fraze[0], second_var->array_fraze[0]);

@@ -48,6 +48,8 @@ poate (b > 7)
     print d;
 }
 
+vezi((24 / 3 + 2) * 2 - 5);
+
 bul f = 7 == 1;
 print f;
 
