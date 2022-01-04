@@ -672,7 +672,7 @@ static const char *const yytname[] =
   "number_r", "AIDI", "';'", "'('", "')'", "'{'", "'}'", "'['", "']'",
   "','", "$accept", "program", "declarari", "linie", "ELEMENTE",
   "TIP_DATA", "asignare", "exp", "term", "lista_apelare_functie",
-  "parametri_apelare", "stat", "ELSE_", "ELIF_S", "ELIF_", "bloc_cod",
+  "parametri_apelare", "drp", "ELSE_", "ELIF_S", "ELIF_", "bloc_cod",
   "tipuri_bloc", "tip_bloc", "FUNCTION", "lista_param", "more_params",
   "parametru", "bloc_functie", YY_NULLPTR
 };
@@ -1967,25 +1967,25 @@ yyreduce:
 
   case 59:
 #line 223 "semantics.y"
-                                                                {;}
+                                                                    {;}
 #line 1972 "y.tab.c"
     break;
 
   case 60:
 #line 224 "semantics.y"
-                                                                                {;}
+                                                                                        {;}
 #line 1978 "y.tab.c"
     break;
 
   case 61:
 #line 227 "semantics.y"
-                                                                {;}
+                                                                        {;}
 #line 1984 "y.tab.c"
     break;
 
   case 63:
 #line 231 "semantics.y"
-                                                {;}
+                                                    {;}
 #line 1990 "y.tab.c"
     break;
 
@@ -2293,15 +2293,14 @@ yyreturn:
 
 struct var *pointer_array(char *id, struct var *node)
 {
-    int index = ia_index_variabila(id);
-
-    if (index == -1)
+    int identifier;
+    if ((identifier = ia_index_variabila(id)) == -1)
     {
         printf("%s nu a fost declarat in acest scop.\n", id);
         exit(0);
     }
 
-    struct var *variabila = variabile + index;
+    struct var *variabila = variabile + identifier;
 
     if (variabila->tip_variable != TIP_ARRAY)
     {
@@ -2365,33 +2364,39 @@ void creaza_tabel_simboluri(struct var *variabila, int n)
         exit(0);
     }
 
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < n; ++i)
     {
         if (variabila[i].tip_variable != TIP_ARRAY && variabila[i].tip_variable != TIP_SUBRUTINA)
         {
             fprintf(fd, "nume : %s  ", variabila[i].id);
             switch (variabila[i].type)
             {
-            case integru:
-                fprintf(fd, "tip = integru valoare = %d  ", (int)variabila[i].array[0]);
-                break;
-            case litera:
-                fprintf(fd, "tip = litera valoare = '%c' ", (char)variabila[i].array[0]);
-                break;
-            case plutitor:
-                fprintf(fd, "tip = plutitor valoare = %f ", (float)variabila[i].array[0]);
-                break;
-            case fraza:
-                fprintf(fd, "tip = fraza valoare = \"%s\" ", (char *)variabila[i].array_fraze[0]);
-                break;
-            case bul:
-                fprintf(fd, "tip = bul valoare = %d ", (int)variabila[i].array[0]);
-                break;
-            case 0:
-                fprintf(fd, "tip = User Defined Type\n");
-                break;
-            default:
-                break;
+                case integru:
+                    fprintf(fd, "tip = integru valoare = %d  ", (int)variabila[i].array[0]);
+                    break;
+
+                case litera:
+                    fprintf(fd, "tip = litera valoare = '%c' ", (char)variabila[i].array[0]);
+                    break;
+
+                case plutitor:
+                    fprintf(fd, "tip = plutitor valoare = %f ", (float)variabila[i].array[0]);
+                    break;
+
+                case fraza:
+                    fprintf(fd, "tip = fraza valoare = \"%s\" ", (char *)variabila[i].array_fraze[0]);
+                    break;
+
+                case bul:
+                    fprintf(fd, "tip = bul valoare = %d ", (int)variabila[i].array[0]);
+                    break;
+
+                case 0:
+                    fprintf(fd, "tip = User Defined Type\n");
+                    break;
+
+                default:
+                    break;
             }
             if (variabila[i].type != 0)
                 if (variabila[i].conservativ)
@@ -2404,43 +2409,47 @@ void creaza_tabel_simboluri(struct var *variabila, int n)
             fprintf(fd, "nume : %s  ", variabila[i].id);
             switch (variabila[i].type)
             {
-            case integru:
-                fprintf(fd, "tip = array de integru");
-                for (int j = 0; j < variabila[i].dimensiune_array; j++)
-                {
-                    fprintf(fd, "%s[%d] = %d  ", variabila[i].id, j, (int)variabila[i].array[j]);
-                }
-                break;
-            case litera:
-                fprintf(fd, "tip = array de litera");
-                for (int j = 0; j < variabila[i].dimensiune_array; j++)
-                {
-                    fprintf(fd, "%s[%d] = %c  ", variabila[i].id, j, (char)variabila[i].array[j]);
-                }
-                break;
-            case plutitor:
-                fprintf(fd, "tip = array de plutitor");
-                for (int j = 0; j < variabila[i].dimensiune_array; j++)
-                {
-                    fprintf(fd, "%s[%d] = %f  ", variabila[i].id, j, (float)variabila[i].array[j]);
-                }
-                break;
-            case fraza:
-                fprintf(fd, "tip = array de fraza");
-                for (int j = 0; j < variabila[i].dimensiune_array; j++)
-                {
-                    fprintf(fd, " %s[%d] = \"%s\" ", variabila[i].id, j, (char *)variabila[i].array_fraze[j]);
-                }
-                break;
-            case bul:
-                fprintf(fd, "tip = array de bul");
-                for (int j = 0; j < variabila[i].dimensiune_array; j++)
-                {
-                    fprintf(fd, "%s[%d] = %d  ", variabila[i].id, j, (int)variabila[i].array[j]);
-                }
-                break;
-            default:
-                break;
+                case integru:
+                    fprintf(fd, "tip = array de integru");
+                    for (int j = 0; j < variabila[i].dimensiune_array; ++j)
+                    {
+                        fprintf(fd, "%s[%d] = %d  ", variabila[i].id, j, (int)variabila[i].array[j]);
+                    }
+                    break; 
+
+                case litera:
+                    fprintf(fd, "tip = array de litera");
+                    for (int j = 0; j < variabila[i].dimensiune_array; ++j)
+                    {
+                        fprintf(fd, "%s[%d] = %c  ", variabila[i].id, j, (char)variabila[i].array[j]);
+                    }
+                    break;
+
+                case plutitor:
+                    fprintf(fd, "tip = array de plutitor");
+                    for (int j = 0; j < variabila[i].dimensiune_array; ++j)
+                    {
+                        fprintf(fd, "%s[%d] = %f  ", variabila[i].id, j, (float)variabila[i].array[j]);
+                    }
+                    break;
+
+                case fraza:
+                    fprintf(fd, "tip = array de fraza");
+                    for (int j = 0; j < variabila[i].dimensiune_array; ++j)
+                    {
+                        fprintf(fd, " %s[%d] = \"%s\" ", variabila[i].id, j, (char *)variabila[i].array_fraze[j]);
+                    }
+                    break;
+
+                case bul:
+                    fprintf(fd, "tip = array de bul");
+                    for (int j = 0; j < variabila[i].dimensiune_array; ++j)
+                    {
+                        fprintf(fd, "%s[%d] = %d  ", variabila[i].id, j, (int)variabila[i].array[j]);
+                    }
+                    break;
+                default:
+                    break;
             }
             fprintf(fd, "\n");
         }
@@ -2474,17 +2483,14 @@ void creaza_tabel_simboluri(struct var *variabila, int n)
 }
 struct var *pointer_variabila(char *id)
 {
-    int index = ia_index_variabila(id);
-
-    if (index == -1)
+    int identifier;
+    if ((identifier = ia_index_variabila(id)) == -1)
     {
-        printf("%s"
-               " nu a fost declarat in acest scop.\n",
-               id);
+        printf("%s nu a fost declarat in acest scop.\n", id);
         exit(0);
     }
 
-    struct var *variabila = variabile + index;
+    struct var *variabila = variabile + identifier;
 
     if (variabila->tip_variable == TIP_VARIABILA && variabila->e_initializat[0] == 0)
     {
@@ -2500,15 +2506,14 @@ struct var *pointer_variabila(char *id)
 }
 struct var *pointer_subrutina(char *id, struct parameter *pr)
 {
-    int index = ia_index_variabila(id);
-
-    if (index == -1)
+    int identifier;
+    if ((identifier = ia_index_variabila(id)) == -1)
     {
         printf("Functia %s nu a fost declarata in acest scop.\n", id);
         exit(0);
     }
 
-    struct var *variabila = variabile + index;
+    struct var *variabila = variabile + identifier;
 
     if (variabila->tip_variable != TIP_SUBRUTINA)
     {
@@ -2527,7 +2532,7 @@ struct var *pointer_subrutina(char *id, struct parameter *pr)
     int *funParams = variabila->tipuri_parametri;
     int *callParams = pr->tipuri_parametri;
 
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < n; ++i)
     {
         if (funParams[i] != callParams[i])
         {
@@ -2545,9 +2550,7 @@ struct var *pointer_subrutina(char *id, struct parameter *pr)
 }
 void impinge_functie(char *id, int retType, struct parameter *p)
 {
-    int index = ia_index_variabila(id);
-
-    if (index != -1)
+    if (ia_index_variabila(id) != -1)
     {
         printf("Numele functiei %s a mai fost utilizat.\n", id);
         exit(0);
@@ -2565,7 +2568,7 @@ void impinge_functie(char *id, int retType, struct parameter *p)
     }
 
     free(p);
-    total_variabile++;
+    ++total_variabile;
 }
 void functie_evaluare(struct var *x)
 {
@@ -2579,7 +2582,7 @@ void functie_evaluare(struct var *x)
 }
 int ia_index_variabila(char *varName)
 {
-    for (int i = 0; i < total_variabile; i++)
+    for (int i = 0; i < total_variabile; ++i)
     {
         if (strcmp(varName, variabile[i].id) == 0)
         {
@@ -2611,6 +2614,7 @@ void impinge_parametru(struct parameter *p, int type)
 {
     p->tipuri_parametri[p->numar_parametri++] = type;
 }
+
 struct parameter *initializeaza_parametru(int type)
 {
     struct parameter *new_parameter = (struct parameter *)malloc(sizeof(struct parameter));
@@ -2633,88 +2637,93 @@ void printeaza_variabile(struct var *node)
 
     switch (type)
     {
-    case integru:
-        if (node->tip_variable == TIP_ARRAY)
-        {
-            n = node->dimensiune_array;
-            printf("{");
-            for (int index = 0; index < n - 1; index++)
+        case integru:
+            if (node->tip_variable == TIP_ARRAY)
             {
-                printf("%d, ", (int)node->array[index]);
+                n = node->dimensiune_array;
+                printf("{");
+                for (int index = 0; index < n - 1; ++index)
+                {
+                    printf("%d, ", (int)node->array[index]);
+                }
+                printf("%d", (int)node->array[n - 1]);
+                printf("}\n");
+                break;
             }
-            printf("%d", (int)node->array[n - 1]);
-            printf("}\n");
+            if (node->tip_variable == TIP_VARIABILA)
+                printf("%d\n", (int)node->array[0]);
             break;
-        }
-        if (node->tip_variable == TIP_VARIABILA)
-            printf("%d\n", (int)node->array[0]);
-        break;
-    case plutitor:
-        if (node->tip_variable == TIP_ARRAY)
-        {
-            n = node->dimensiune_array;
-            printf("{");
-            for (int index = 0; index < n - 1; index++)
+
+        case plutitor:
+            if (node->tip_variable == TIP_ARRAY)
             {
-                printf("%f, ", (float)node->array[index]);
+                n = node->dimensiune_array;
+                printf("{");
+                for (int index = 0; index < n - 1; ++index)
+                {
+                    printf("%f, ", (float)node->array[index]);
+                }
+                printf("%f", (float)node->array[n - 1]);
+                printf("}\n");
+                break;
             }
-            printf("%f", (float)node->array[n - 1]);
-            printf("}\n");
+            if (node->tip_variable == TIP_VARIABILA)
+                printf("%f\n", (float)node->array[0]);
             break;
-        }
-        if (node->tip_variable == TIP_VARIABILA)
-            printf("%f\n", (float)node->array[0]);
-        break;
-    case bul:
-        if (node->tip_variable == TIP_ARRAY)
-        {
-            n = node->dimensiune_array;
-            printf("{");
-            for (int index = 0; index < n - 1; index++)
+
+        case bul:
+            if (node->tip_variable == TIP_ARRAY)
             {
-                printf("\"%d\", ", (int)node->array[index]);
+                n = node->dimensiune_array;
+                printf("{");
+                for (int index = 0; index < n - 1; ++index)
+                {
+                    printf("\"%d\", ", (int)node->array[index]);
+                }
+                printf("\"%d\"", (int)node->array[n - 1]);
+                printf("}\n");
+                break;
             }
-            printf("\"%d\"", (int)node->array[n - 1]);
-            printf("}\n");
+            if (node->tip_variable == TIP_VARIABILA)
+                printf("%d\n", (int)node->array[0]);
             break;
-        }
-        if (node->tip_variable == TIP_VARIABILA)
-            printf("%d\n", (int)node->array[0]);
-        break;
-    case litera:
-        if (node->tip_variable == TIP_ARRAY)
-        {
-            n = node->dimensiune_array;
-            printf("{");
-            for (int index = 0; index < n - 1; index++)
+
+        case litera:
+            if (node->tip_variable == TIP_ARRAY)
             {
-                printf("'%c', ", (char)node->array[index]);
+                n = node->dimensiune_array;
+                printf("{");
+                for (int index = 0; index < n - 1; ++index)
+                {
+                    printf("'%c', ", (char)node->array[index]);
+                }
+                printf("'%c'", (char)node->array[n - 1]);
+                printf("}\n");
+                break;
             }
-            printf("'%c'", (char)node->array[n - 1]);
-            printf("}\n");
+            if (node->tip_variable == TIP_VARIABILA)
+                printf("'%c'\n", (char)node->array[0]);
             break;
-        }
-        if (node->tip_variable == TIP_VARIABILA)
-            printf("'%c'\n", (char)node->array[0]);
-        break;
-    case fraza:
-        if (node->tip_variable == TIP_ARRAY)
-        {
-            n = node->dimensiune_array;
-            printf("{");
-            for (int index = 0; index < n - 1; index++)
+
+        case fraza:
+            if (node->tip_variable == TIP_ARRAY)
             {
-                printf("\"%s\", ", node->array_fraze[index]);
+                n = node->dimensiune_array;
+                printf("{");
+                for (int index = 0; index < n - 1; ++index)
+                {
+                    printf("\"%s\", ", node->array_fraze[index]);
+                }
+                printf("\"%s\"", node->array_fraze[n - 1]);
+                printf("}\n");
+                break;
             }
-            printf("\"%s\"", node->array_fraze[n - 1]);
-            printf("}\n");
+            if (node->tip_variable == TIP_VARIABILA)
+                printf("\"%s\"\n", node->array_fraze[0]);
             break;
-        }
-        if (node->tip_variable == TIP_VARIABILA)
-            printf("\"%s\"\n", node->array_fraze[0]);
-        break;
-    default:
-        break;
+
+        default:
+            break;
     }
 
     if (node->tip_variable == TIP_SUBRUTINA)
@@ -2724,7 +2733,7 @@ void printeaza_variabile(struct var *node)
         if (n != 0)
         {
             printf(" -> {");
-            for (int index = 0; index < n - 1; index++)
+            for (int index = 0; index < n - 1; ++index)
             {
                 printf("%s, ", definite_la_tip_date(node->tipuri_parametri[index]));
             }
@@ -2755,9 +2764,7 @@ void elibereaza_variabila(struct var *variabila)
 
 void impinge_variabila_structurata(char *id)
 {
-    int index = ia_index_variabila(id);
-
-    if (index != -1)
+    if (ia_index_variabila(id) != -1)
     {
         printf("Variabila %s a fost declarata\n", id);
         exit(0);
@@ -2768,14 +2775,12 @@ void impinge_variabila_structurata(char *id)
     sprintf(new_variable->id, "%s", id);
     new_variable->type = 0;
 
-    total_variabile++;
+    ++total_variabile;
 }
 
 void impinge_variabila_goala(char *id, int type)
 {
-    int identifier = ia_index_variabila(id);
-
-    if (identifier != -1)
+    if (ia_index_variabila(id) != -1)
     {
         printf("Variabila %s a fost declarata anterior.\n", id);
         exit(0);
@@ -2795,14 +2800,12 @@ void impinge_variabila_goala(char *id, int type)
         variable->array[0] = 0;
     }
 
-    total_variabile++;
+    ++total_variabile;
 }
 
 void impinge_variabila(char *id, int type, struct var *exp)
 {
-    int identifier = ia_index_variabila(id);
-
-    if (identifier != -1)
+    if (ia_index_variabila(id) != -1)
     {
         printf("Variabila %s a fost deja declarata.\n", id);
         exit(0);
@@ -2827,24 +2830,23 @@ void impinge_variabila(char *id, int type, struct var *exp)
     }
 
     elibereaza_variabila(exp);
-    total_variabile++;
+    ++total_variabile;
 }
 
 void actualizeaza_valoarea(char *id, struct var *exp)
 {
-    int index = ia_index_variabila(id);
-
-    if (index == -1)
+    int identifier;
+    if ((identifier = ia_index_variabila(id)) == -1)
     {
         printf("%s nu a fost declarata.\n", id);
         exit(0);
     }
 
-    struct var *vr = variabile + index;
+    struct var *vr = variabile + identifier;
 
     if (vr->tip_variable == TIP_SUBRUTINA)
     {
-        printf("Functia %s nu poate fi stearsa.\n", vr->id);
+        printf("Functia %s nu poate fi modificata.\n", vr->id);
         exit(0);
     }
 
@@ -2878,7 +2880,7 @@ void actualizeaza_valoarea(char *id, struct var *exp)
         int n = vr->dimensiune_array;
         int m = exp->dimensiune_array;
 
-        for (int i = 0; i < n && i < m; i++)
+        for (int i = 0; i < n && i < m; ++i)
         {
             if (vr->type == fraza)
             {
@@ -2914,9 +2916,7 @@ void actualizeaza_valoarea(char *id, struct var *exp)
 
 void impinge_variabila_conservatoare(char *id, int type, struct var *exp)
 {
-    int identifier = ia_index_variabila(id);
-
-    if (identifier != -1)
+    if (ia_index_variabila(id) != -1)
     {
         printf("Variabila %s a fost declarata anterior.\n", id);
         exit(0);
@@ -2942,14 +2942,12 @@ void impinge_variabila_conservatoare(char *id, int type, struct var *exp)
     variable->conservativ = 1;
     variable->e_initializat[0] = 1;
     elibereaza_variabila(exp);
-    total_variabile++;
+    ++total_variabile;
 }
 
 void impinge_in_array(char *id, int type, struct var *exp)
 {
-    int identifier = ia_index_variabila(id);
-
-    if (identifier != -1)
+    if (ia_index_variabila(id) != -1)
     {
         printf("Variabila %s a fost declarata anterior.\n", id);
         exit(0);
@@ -2983,15 +2981,14 @@ void impinge_in_array(char *id, int type, struct var *exp)
     variable->tip_variable = TIP_ARRAY;
     variable->dimensiune_array = n;
 
-    total_variabile++;
+    ++total_variabile;
 }
 
 
 void actualizeaza_in_array(char *id, struct var *first_expression, struct var *second_expression)
 {
-    int identifier = ia_index_variabila(id);
-
-    if (identifier == -1)
+    int identifier;
+    if ((identifier = ia_index_variabila(id)) == -1)
     {
         printf("%s nu a fost declarat in acest scope.\n", id);
         exit(0);
@@ -3057,178 +3054,178 @@ struct var *compara_variabile(struct var *first_var, struct var *second_var, int
 
     switch (tip_op)
     {
-    case PLUS:;
-        if (first_var->type == fraza && second_var->type == fraza)
-        {
-            variable->type = fraza;
-            strcpy(variable->array_fraze[0], "");
-            strcat(variable->array_fraze[0], first_var->array_fraze[0]);
-            strcat(variable->array_fraze[0], second_var->array_fraze[0]);
+        case PLUS:;
+            if (first_var->type == fraza && second_var->type == fraza)
+            {
+                variable->type = fraza;
+                strcpy(variable->array_fraze[0], "");
+                strcat(variable->array_fraze[0], first_var->array_fraze[0]);
+                strcat(variable->array_fraze[0], second_var->array_fraze[0]);
+                break;
+            }
+
+            if (first_var->type != fraza && second_var->type == fraza)
+            {
+                variable->type = fraza;
+                strcpy(variable->array_fraze[0], "");
+                sprintf(variable->array_fraze[0], "%f", (float)first_var->array[0]);
+                strcat(variable->array_fraze[0], second_var->array_fraze[0]);
+                break;
+            }
+
+            if (first_var->type == fraza && second_var->type != fraza)
+            {
+                variable->type = fraza;
+                strcpy(variable->array_fraze[0], "");
+
+                strcat(variable->array_fraze[0], first_var->array_fraze[0]);
+                char bfr[10];
+                sprintf(bfr, "%f", (float)second_var->array[0]);
+                strcat(variable->array_fraze[0], bfr);
+                break;
+            }
+
+            if (first_var->type == litera)
+            {
+                variable->type = litera;
+                variable->array[0] = (int)(first_var->array[0] + second_var->array[0]);
+                break;
+            }
+
+            c = first_var->array[0] + second_var->array[0];
+
+            if (c == (int)c)
+            {
+                variable->type = integru;
+                variable->array[0] = (int)c;
+            }
+            else
+            {
+                variable->type = plutitor;
+                variable->array[0] = c;
+            }
             break;
-        }
+        case MINUS:;
 
-        if (first_var->type != fraza && second_var->type == fraza)
-        {
-            variable->type = fraza;
-            strcpy(variable->array_fraze[0], "");
-            sprintf(variable->array_fraze[0], "%f", (float)first_var->array[0]);
-            strcat(variable->array_fraze[0], second_var->array_fraze[0]);
+            if (first_var->type == litera)
+            {
+                variable->type = litera;
+                variable->array[0] = (int)(first_var->array[0] - second_var->array[0]);
+                break;
+            }
+
+            c = first_var->array[0] - second_var->array[0];
+
+            if (c == (int)c)
+            {
+                variable->type = integru;
+                variable->array[0] = (int)c;
+            }
+            else
+            {
+                variable->type = plutitor;
+                variable->array[0] = c;
+            }
             break;
-        }
+        case PROD:;
+            c = first_var->array[0] * second_var->array[0];
 
-        if (first_var->type == fraza && second_var->type != fraza)
-        {
-            variable->type = fraza;
-            strcpy(variable->array_fraze[0], "");
-
-            strcat(variable->array_fraze[0], first_var->array_fraze[0]);
-            char bfr[10];
-            sprintf(bfr, "%f", (float)second_var->array[0]);
-            strcat(variable->array_fraze[0], bfr);
+            if (c == (int)c)
+            {
+                variable->type = integru;
+                variable->array[0] = (int)c;
+            }
+            else
+            {
+                variable->type = plutitor;
+                variable->array[0] = c;
+            }
             break;
-        }
+        case DIV:;
+            double c = first_var->array[0] / second_var->array[0];
+            if (c == (int)c)
+                variable->type = integru;
+            else
+                variable->type = plutitor;
+            if (second_var->array[0] == 0)
+            {
+                printf("Impartirea la 0 este imposibila.\n");
+                exit(0);
+            }
 
-        if (first_var->type == litera)
-        {
-            variable->type = litera;
-            variable->array[0] = (int)(first_var->array[0] + second_var->array[0]);
+            c = first_var->array[0] / second_var->array[0];
+
+            if (c == (int)c)
+            {
+                variable->type = integru;
+                variable->array[0] = (int)c;
+            }
+            else
+            {
+                variable->type = plutitor;
+                variable->array[0] = c;
+            }
             break;
-        }
-
-        c = first_var->array[0] + second_var->array[0];
-
-        if (c == (int)c)
-        {
+        case LS:;
+            if (first_var->type == fraza && second_var->type == fraza)
+            {
+                n = strcmp(first_var->array_fraze[0], second_var->array_fraze[0]);
+                variable->array[0] = n == -1;
+            }
+            else
+            {
+                variable->array[0] = (int)(first_var->array[0] < second_var->array[0]);
+            }
             variable->type = integru;
-            variable->array[0] = (int)c;
-        }
-        else
-        {
-            variable->type = plutitor;
-            variable->array[0] = c;
-        }
-        break;
-    case MINUS:;
-
-        if (first_var->type == litera)
-        {
-            variable->type = litera;
-            variable->array[0] = (int)(first_var->array[0] - second_var->array[0]);
             break;
-        }
-
-        c = first_var->array[0] - second_var->array[0];
-
-        if (c == (int)c)
-        {
+        case LEQ:;
+            if (first_var->type == fraza && second_var->type == fraza)
+            {
+                n = strcmp(first_var->array_fraze[0], second_var->array_fraze[0]);
+                variable->array[0] = n == -1 || n == 0;
+            }
+            else
+            {
+                variable->array[0] = (int)(first_var->array[0] <= second_var->array[0]);
+            }
             variable->type = integru;
-            variable->array[0] = (int)c;
-        }
-        else
-        {
-            variable->type = plutitor;
-            variable->array[0] = c;
-        }
-        break;
-    case PROD:;
-        c = first_var->array[0] * second_var->array[0];
-
-        if (c == (int)c)
-        {
+            break;
+        case GE:;
+            if (first_var->type == fraza && second_var->type == fraza)
+            {
+                n = strcmp(first_var->array_fraze[0], second_var->array_fraze[0]);
+                variable->array[0] = n == 1;
+            }
+            else
+            {
+                variable->array[0] = (int)(first_var->array[0] > second_var->array[0]);
+            }
             variable->type = integru;
-            variable->array[0] = (int)c;
-        }
-        else
-        {
-            variable->type = plutitor;
-            variable->array[0] = c;
-        }
-        break;
-    case DIV:;
-        double c = first_var->array[0] / second_var->array[0];
-        if (c == (int)c)
+            break;
+        case GEQ:;
+            if (first_var->type == fraza && second_var->type == fraza)
+            {
+                n = strcmp(first_var->array_fraze[0], second_var->array_fraze[0]);
+                variable->array[0] = n == 1 || n == 0;
+            }
+            else
+            {
+                variable->array[0] = (int)(first_var->array[0] >= second_var->array[0]);
+            }
             variable->type = integru;
-        else
-            variable->type = plutitor;
-        if (second_var->array[0] == 0)
-        {
-            printf("Impartirea la 0 este imposibila.\n");
-            exit(0);
-        }
-
-        c = first_var->array[0] / second_var->array[0];
-
-        if (c == (int)c)
-        {
+            break;
+        case EQEQ:;
+            if (first_var->type == fraza && second_var->type == fraza)
+            {
+                n = strcmp(first_var->array_fraze[0], second_var->array_fraze[0]);
+                variable->array[0] = n == 0;
+            }
+            else
+            {
+                variable->array[0] = (int)(first_var->array[0] == second_var->array[0]);
+            }
             variable->type = integru;
-            variable->array[0] = (int)c;
-        }
-        else
-        {
-            variable->type = plutitor;
-            variable->array[0] = c;
-        }
-        break;
-    case LS:;
-        if (first_var->type == fraza && second_var->type == fraza)
-        {
-            n = strcmp(first_var->array_fraze[0], second_var->array_fraze[0]);
-            variable->array[0] = n == -1;
-        }
-        else
-        {
-            variable->array[0] = (int)(first_var->array[0] < second_var->array[0]);
-        }
-        variable->type = integru;
-        break;
-    case LEQ:;
-        if (first_var->type == fraza && second_var->type == fraza)
-        {
-            n = strcmp(first_var->array_fraze[0], second_var->array_fraze[0]);
-            variable->array[0] = n == -1 || n == 0;
-        }
-        else
-        {
-            variable->array[0] = (int)(first_var->array[0] <= second_var->array[0]);
-        }
-        variable->type = integru;
-        break;
-    case GE:;
-        if (first_var->type == fraza && second_var->type == fraza)
-        {
-            n = strcmp(first_var->array_fraze[0], second_var->array_fraze[0]);
-            variable->array[0] = n == 1;
-        }
-        else
-        {
-            variable->array[0] = (int)(first_var->array[0] > second_var->array[0]);
-        }
-        variable->type = integru;
-        break;
-    case GEQ:;
-        if (first_var->type == fraza && second_var->type == fraza)
-        {
-            n = strcmp(first_var->array_fraze[0], second_var->array_fraze[0]);
-            variable->array[0] = n == 1 || n == 0;
-        }
-        else
-        {
-            variable->array[0] = (int)(first_var->array[0] >= second_var->array[0]);
-        }
-        variable->type = integru;
-        break;
-    case EQEQ:;
-        if (first_var->type == fraza && second_var->type == fraza)
-        {
-            n = strcmp(first_var->array_fraze[0], second_var->array_fraze[0]);
-            variable->array[0] = n == 0;
-        }
-        else
-        {
-            variable->array[0] = (int)(first_var->array[0] == second_var->array[0]);
-        }
-        variable->type = integru;
-        break;
+            break;
     }
 
     elibereaza_variabila(first_var);
@@ -3254,21 +3251,21 @@ char *definite_la_tip_date(int n)
 {
     switch (n)
     {
-    case bul:
-        return "bul";
-        break;
-    case litera:
-        return "litera";
-        break;
-    case integru:
-        return "integru";
-        break;
-    case plutitor:
-        return "plutitor";
-        break;
-    case fraza:
-        return "fraza";
-        break;
+        case bul:
+            return "bul";
+            break;
+        case litera:
+            return "litera";
+            break;
+        case integru:
+            return "integru";
+            break;
+        case plutitor:
+            return "plutitor";
+            break;
+        case fraza:
+            return "fraza";
+            break;
     }
     return "";
 }
@@ -3276,7 +3273,7 @@ char *definite_la_tip_date(int n)
 int main(void)
 {
 
-    for (int index = 0; index < 100; index++)
+    for (int index = 0; index < 100; ++index)
     {
         variabile[index].tip_variable = TIP_VARIABILA;
         variabile[index].e_initializat[0] = 0;
