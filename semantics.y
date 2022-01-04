@@ -1,17 +1,19 @@
 %{
 void yyerror (char *s);
 int yylex();
-#include <stdio.h>
+
 #include <string.h>
 #include <stdlib.h>
-
-extern char* yytext;
-extern FILE* yyin;
-extern int yylineno;
+#include <stdio.h>
 
 #define TIP_VARIABILA 1
 #define TIP_ARRAY 2
 #define TIP_SUBRUTINA 3
+
+extern char* yytext;
+extern int yylineno;
+extern FILE* yyin;
+
 
 struct var {
 	char id[100];
@@ -88,7 +90,7 @@ char* definite_la_tip_date(int);
 
 %type<num> stat
 %token dak rastimp pt
-%type<num> bloc_cod tip_bloc tipuri_bloc smtm_fun ELSE_ ELIF_ ELIF_S 
+%type<num> bloc_cod tip_bloc tipuri_bloc bloc_functie ELSE_ ELIF_ ELIF_S 
 %token altfel
 %token poate
 
@@ -234,7 +236,7 @@ tip_bloc 	: asignare ';'			{;}
 
 
 
-FUNCTION 	: TIP_DATA subrutina AIDI '(' lista_param ')' smtm_fun 		{impinge_functie($3, $1, $5);}
+FUNCTION 	: TIP_DATA subrutina AIDI '(' lista_param ')' bloc_functie 		{impinge_functie($3, $1, $5);}
 			;
 
 lista_param : more_params													{$$ = $1;}
@@ -249,7 +251,7 @@ parametru  : TIP_DATA AIDI											{$$ = $1;}
 			;
 
 
-smtm_fun	: '{' tipuri_bloc ofera exp ';' '}' 		{;}
+bloc_functie	: '{' tipuri_bloc ofera exp ';' '}' 		{;}
 			| '{' ofera exp ';' '}'				{;}
 			;
 
