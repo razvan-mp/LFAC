@@ -88,7 +88,7 @@ char* definite_la_tip_date(int);
 %token GEQ LEQ AND OR EQEQ LS GE
 %token PLUS MINUS PROD DIV EQUAL
 
-%type<num> stat
+%type<num> drp
 %token dak rastimp pt
 %type<num> bloc_cod tip_bloc tipuri_bloc bloc_functie ELSE_ ELIF_ ELIF_S 
 %token altfel
@@ -139,7 +139,7 @@ declarari   	: linie			 			{;}
 linie 	: asignare ';'								{;}
 		| culcat ';'								{exit(EXIT_SUCCESS);}
 		| print exp ';'									{printeaza_variabile($2);}
-		| stat 											{;}
+		| drp 											{;}
 		| FUNCTION 				   						{;}
 		| vezi '(' exp ')' ';'          				{functie_evaluare($3);}
 		| defineste_tip '{' ELEMENTE '}' AIDI ';'   {impinge_variabila_structurata($5);}
@@ -202,7 +202,7 @@ parametri_apelare : exp						{$$ = initializeaza_parametru($1->type);}
 				| parametri_apelare ',' exp	{impinge_parametru($$, $3->type);}
 				;
 
-stat	: dak '(' exp ')' bloc_cod				{;}
+drp	: dak '(' exp ')' bloc_cod				{;}
 		| dak '(' exp ')' bloc_cod ELIF_S ELSE_ 	{;}
 		| dak '(' exp ')' bloc_cod ELSE_ 		{;}
 		| dak '(' exp ')' bloc_cod ELIF_S	 	{;}
@@ -220,18 +220,18 @@ ELIF_S  : ELIF_
 ELIF_   : poate '(' exp ')' bloc_cod				{;}
 		;
 
-bloc_cod 	: '{' tipuri_bloc '}'				{;}
-		| '{' '}'							{;}
+bloc_cod 	: '{' tipuri_bloc '}'				    {;}
+		| '{' '}'							        {;}
 		;
 
-tipuri_bloc  : tip_bloc 					{;}
+tipuri_bloc  : tip_bloc 					        {;}
 			| tipuri_bloc tip_bloc
 			;
 
-tip_bloc 	: asignare ';'			{;}
+tip_bloc 	: asignare ';'			    {;}
 			| exp        ';'			{;}
 			| print exp ';'				{printeaza_variabile($2);}
-			| stat 						{;}
+			| drp 						{;}
 			;
 
 
