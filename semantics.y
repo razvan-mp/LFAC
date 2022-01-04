@@ -261,9 +261,7 @@ struct var *pointer_array(char *id, struct var *node)
 
     if (index == -1)
     {
-        printf("%s"
-               " nu a fost declarat in acest scop.\n",
-               id);
+        printf("%s nu a fost declarat in acest scop.\n", id);
         exit(0);
     }
 
