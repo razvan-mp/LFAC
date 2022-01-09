@@ -54,36 +54,38 @@ extern int yydebug;
     TERMINA_DECL = 260,
     INCEPE_MAIN = 261,
     TERMINA_MAIN = 262,
-    integru = 263,
-    plutitor = 264,
-    litera = 265,
-    bul = 266,
-    fraza = 267,
-    conservator = 268,
-    GEQ = 269,
-    LEQ = 270,
-    AND = 271,
-    OR = 272,
-    EQEQ = 273,
-    LS = 274,
-    GE = 275,
-    PLUS = 276,
-    MINUS = 277,
-    PROD = 278,
-    DIV = 279,
-    EQUAL = 280,
-    dak = 281,
-    altfel = 282,
-    subrutina = 283,
-    ofera = 284,
-    defineste_tip = 285,
-    valoare_fraza = 286,
-    valoare_litera = 287,
-    vezi = 288,
-    culcat = 289,
-    number = 290,
-    number_r = 291,
-    AIDI = 292
+    INCEPE_DECL_FUN = 263,
+    TERMINA_DECL_FUN = 264,
+    integru = 265,
+    plutitor = 266,
+    litera = 267,
+    bul = 268,
+    fraza = 269,
+    conservator = 270,
+    GEQ = 271,
+    LEQ = 272,
+    AND = 273,
+    OR = 274,
+    EQEQ = 275,
+    LS = 276,
+    GE = 277,
+    PLUS = 278,
+    MINUS = 279,
+    PROD = 280,
+    DIV = 281,
+    EQUAL = 282,
+    dak = 283,
+    altfel = 284,
+    subrutina = 285,
+    ofera = 286,
+    defineste_tip = 287,
+    valoare_fraza = 288,
+    valoare_litera = 289,
+    vezi = 290,
+    culcat = 291,
+    number = 292,
+    number_r = 293,
+    AIDI = 294
   };
 #endif
 /* Tokens.  */
@@ -92,36 +94,38 @@ extern int yydebug;
 #define TERMINA_DECL 260
 #define INCEPE_MAIN 261
 #define TERMINA_MAIN 262
-#define integru 263
-#define plutitor 264
-#define litera 265
-#define bul 266
-#define fraza 267
-#define conservator 268
-#define GEQ 269
-#define LEQ 270
-#define AND 271
-#define OR 272
-#define EQEQ 273
-#define LS 274
-#define GE 275
-#define PLUS 276
-#define MINUS 277
-#define PROD 278
-#define DIV 279
-#define EQUAL 280
-#define dak 281
-#define altfel 282
-#define subrutina 283
-#define ofera 284
-#define defineste_tip 285
-#define valoare_fraza 286
-#define valoare_litera 287
-#define vezi 288
-#define culcat 289
-#define number 290
-#define number_r 291
-#define AIDI 292
+#define INCEPE_DECL_FUN 263
+#define TERMINA_DECL_FUN 264
+#define integru 265
+#define plutitor 266
+#define litera 267
+#define bul 268
+#define fraza 269
+#define conservator 270
+#define GEQ 271
+#define LEQ 272
+#define AND 273
+#define OR 274
+#define EQEQ 275
+#define LS 276
+#define GE 277
+#define PLUS 278
+#define MINUS 279
+#define PROD 280
+#define DIV 281
+#define EQUAL 282
+#define dak 283
+#define altfel 284
+#define subrutina 285
+#define ofera 286
+#define defineste_tip 287
+#define valoare_fraza 288
+#define valoare_litera 289
+#define vezi 290
+#define culcat 291
+#define number 292
+#define number_r 293
+#define AIDI 294
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -135,7 +139,7 @@ union YYSTYPE
 	struct var* strct;
 	struct parameter* param_functie;
 
-#line 139 "y.tab.h"
+#line 143 "y.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

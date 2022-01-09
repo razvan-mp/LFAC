@@ -1,4 +1,6 @@
-nume : ss  tip = array de integruss[0] = 2  ss[1] = 12  
 nume : a  tip = integru valoare = 3  nu e constanta 
+nume : b  tip = plutitor valoare = 1.213100 nu e constanta 
+nume : ss  tip = array de integruss[0] = 2  ss[1] = 12  
+nume : z  tip = definit de utilizator
 
-Functia : integru cmmdc (integru) 
+Functia : integru cmmdc (integru, plutitor) 
