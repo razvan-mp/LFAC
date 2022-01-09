@@ -10,6 +10,11 @@ int yylex();
 %}
 %%
 
+"aici_declar"                       {return INCEPE_DECL;}
+"nu_mai_declar"                     {return TERMINA_DECL;}
+"pe_principala"                     {return INCEPE_MAIN;}
+"nu_mai_principala"                 {return TERMINA_MAIN;}
+
 "print"				            	{return print;}
 "culcat"				   	        {return culcat;}
 "integru"              	        	{yylval.type_id = integru; return integru;}
@@ -33,10 +38,7 @@ int yylex();
 "<"                             	{return LS;}
 ">"                             	{return GE;}
 
-"pt"                                {return pt;}
-"rastimp"                           {return rastimp;}
 "dak"                               {return dak;}
-"poate"                             {return poate;}
 "altfel"                            {return altfel;}
 "vezi"                              {return vezi;}
 "subrutina"                         {return subrutina;}

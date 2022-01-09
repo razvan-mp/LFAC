@@ -1,8 +1,8 @@
-/* A Bison parser, made by GNU Bison 3.7.6.  */
+/* A Bison parser, made by GNU Bison 3.5.1.  */
 
 /* Bison interface for Yacc-like parsers in C
 
-   Copyright (C) 1984, 1989-1990, 2000-2015, 2018-2021 Free Software Foundation,
+   Copyright (C) 1984, 1989-1990, 2000-2015, 2018-2020 Free Software Foundation,
    Inc.
 
    This program is free software: you can redistribute it and/or modify
@@ -16,7 +16,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* As a special exception, you may create a larger work that contains
    part or all of the Bison parser skeleton and distribute that work
@@ -31,9 +31,8 @@
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
-/* DO NOT RELY ON FEATURES THAT ARE NOT DOCUMENTED in the manual,
-   especially those whose name start with YY_ or yy_.  They are
-   private implementation details that can be changed or removed.  */
+/* Undocumented macros, especially those whose name start with YY_,
+   are private implementation details.  Do not rely on them.  */
 
 #ifndef YY_YY_Y_TAB_H_INCLUDED
 # define YY_YY_Y_TAB_H_INCLUDED
@@ -45,97 +44,90 @@
 extern int yydebug;
 #endif
 
-/* Token kinds.  */
+/* Token type.  */
 #ifndef YYTOKENTYPE
 # define YYTOKENTYPE
   enum yytokentype
   {
-    YYEMPTY = -2,
-    YYEOF = 0,                     /* "end of file"  */
-    YYerror = 256,                 /* error  */
-    YYUNDEF = 257,                 /* "invalid token"  */
-    print = 258,                   /* print  */
-    integru = 259,                 /* integru  */
-    plutitor = 260,                /* plutitor  */
-    litera = 261,                  /* litera  */
-    bul = 262,                     /* bul  */
-    fraza = 263,                   /* fraza  */
-    conservator = 264,             /* conservator  */
-    GEQ = 265,                     /* GEQ  */
-    LEQ = 266,                     /* LEQ  */
-    AND = 267,                     /* AND  */
-    OR = 268,                      /* OR  */
-    EQEQ = 269,                    /* EQEQ  */
-    LS = 270,                      /* LS  */
-    GE = 271,                      /* GE  */
-    PLUS = 272,                    /* PLUS  */
-    MINUS = 273,                   /* MINUS  */
-    PROD = 274,                    /* PROD  */
-    DIV = 275,                     /* DIV  */
-    EQUAL = 276,                   /* EQUAL  */
-    dak = 277,                     /* dak  */
-    rastimp = 278,                 /* rastimp  */
-    pt = 279,                      /* pt  */
-    altfel = 280,                  /* altfel  */
-    poate = 281,                   /* poate  */
-    subrutina = 282,               /* subrutina  */
-    ofera = 283,                   /* ofera  */
-    defineste_tip = 284,           /* defineste_tip  */
-    valoare_fraza = 285,           /* valoare_fraza  */
-    valoare_litera = 286,          /* valoare_litera  */
-    vezi = 287,                    /* vezi  */
-    culcat = 288,                  /* culcat  */
-    number = 289,                  /* number  */
-    number_r = 290,                /* number_r  */
-    AIDI = 291                     /* AIDI  */
+    print = 258,
+    INCEPE_DECL = 259,
+    TERMINA_DECL = 260,
+    INCEPE_MAIN = 261,
+    TERMINA_MAIN = 262,
+    integru = 263,
+    plutitor = 264,
+    litera = 265,
+    bul = 266,
+    fraza = 267,
+    conservator = 268,
+    GEQ = 269,
+    LEQ = 270,
+    AND = 271,
+    OR = 272,
+    EQEQ = 273,
+    LS = 274,
+    GE = 275,
+    PLUS = 276,
+    MINUS = 277,
+    PROD = 278,
+    DIV = 279,
+    EQUAL = 280,
+    dak = 281,
+    altfel = 282,
+    subrutina = 283,
+    ofera = 284,
+    defineste_tip = 285,
+    valoare_fraza = 286,
+    valoare_litera = 287,
+    vezi = 288,
+    culcat = 289,
+    number = 290,
+    number_r = 291,
+    AIDI = 292
   };
-  typedef enum yytokentype yytoken_kind_t;
 #endif
-/* Token kinds.  */
-#define YYEMPTY -2
-#define YYEOF 0
-#define YYerror 256
-#define YYUNDEF 257
+/* Tokens.  */
 #define print 258
-#define integru 259
-#define plutitor 260
-#define litera 261
-#define bul 262
-#define fraza 263
-#define conservator 264
-#define GEQ 265
-#define LEQ 266
-#define AND 267
-#define OR 268
-#define EQEQ 269
-#define LS 270
-#define GE 271
-#define PLUS 272
-#define MINUS 273
-#define PROD 274
-#define DIV 275
-#define EQUAL 276
-#define dak 277
-#define rastimp 278
-#define pt 279
-#define altfel 280
-#define poate 281
-#define subrutina 282
-#define ofera 283
-#define defineste_tip 284
-#define valoare_fraza 285
-#define valoare_litera 286
-#define vezi 287
-#define culcat 288
-#define number 289
-#define number_r 290
-#define AIDI 291
+#define INCEPE_DECL 259
+#define TERMINA_DECL 260
+#define INCEPE_MAIN 261
+#define TERMINA_MAIN 262
+#define integru 263
+#define plutitor 264
+#define litera 265
+#define bul 266
+#define fraza 267
+#define conservator 268
+#define GEQ 269
+#define LEQ 270
+#define AND 271
+#define OR 272
+#define EQEQ 273
+#define LS 274
+#define GE 275
+#define PLUS 276
+#define MINUS 277
+#define PROD 278
+#define DIV 279
+#define EQUAL 280
+#define dak 281
+#define altfel 282
+#define subrutina 283
+#define ofera 284
+#define defineste_tip 285
+#define valoare_fraza 286
+#define valoare_litera 287
+#define vezi 288
+#define culcat 289
+#define number 290
+#define number_r 291
+#define AIDI 292
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 72 "semantics.y"
+#line 73 "semantics.y"
 
 	double num; 
 	char string[1000]; 
@@ -143,7 +135,7 @@ union YYSTYPE
 	struct var* strct;
 	struct parameter* param_functie;
 
-#line 147 "y.tab.h"
+#line 139 "y.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

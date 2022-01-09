@@ -17,6 +17,7 @@ extern FILE* yyin;
 
 struct var {
 	char id[100];
+    char scope[100];
 	int tip_variable;
 
 	int type;
@@ -77,9 +78,11 @@ char* definite_la_tip_date(int);
 	struct parameter* param_functie;
 }     
 
-%start program
+%start s
 
 %token print
+
+%token INCEPE_DECL TERMINA_DECL INCEPE_MAIN TERMINA_MAIN
 
 %type <type_id> TIP_DATA
 %token <type_id> integru plutitor litera bul fraza
@@ -88,11 +91,10 @@ char* definite_la_tip_date(int);
 %token GEQ LEQ AND OR EQEQ LS GE
 %token PLUS MINUS PROD DIV EQUAL
 
-%type<num> drp
-%token dak rastimp pt
-%type<num> bloc_cod tip_bloc tipuri_bloc bloc_functie ELSE_ ELIF_ ELIF_S 
+
+%token dak
+%type<num> tip_bloc tipuri_bloc bloc_functie
 %token altfel
-%token poate
 
 %token subrutina ofera defineste_tip
 %type<num> FUNCTION
@@ -107,13 +109,13 @@ char* definite_la_tip_date(int);
 %token culcat
 %token <num> number number_r
 %token <string> AIDI
-%type <num> linie declarari
+%type <num> linie_decl linie_principala declarari
 
 %type <strct> exp term 
 
 %type <num> asignare
 
-%nonassoc dak altfel poate
+%nonassoc dak altfel
 
 %right EQUAL
 
@@ -129,44 +131,57 @@ char* definite_la_tip_date(int);
 
 %%
 
-program : declarari { creaza_tabel_simboluri(variabile,total_variabile);printf( "Program corect sintactic\n" ); }
-		; 
+s   : decl main                                 { creaza_tabel_simboluri(variabile,total_variabile);printf( "Program corect sintactic\n" ); }
+    | main
+    |
+	; 
 
-declarari   	: linie			 			{;}
-				| declarari linie				{;}
+decl    : INCEPE_DECL declarari TERMINA_DECL
+        ;
+
+declarari   	: linie_decl		 			{;}
+				| declarari linie_decl			{;}
 				;
 
-linie 	: asignare ';'								{;}
-		| culcat ';'								{exit(EXIT_SUCCESS);}
-		| print exp ';'									{printeaza_variabile($2);}
-		| drp 											{;}
-		| FUNCTION 				   						{;}
-		| vezi '(' exp ')' ';'          				{functie_evaluare($3);}
-		| defineste_tip '{' ELEMENTE '}' AIDI ';'   {impinge_variabila_structurata($5);}
-		;
+main    : INCEPE_MAIN principala TERMINA_MAIN
+        ;
 
-ELEMENTE : TIP_DATA AIDI ';' ELEMENTE	{;}
+principala  : linie_principala                  {;}
+            | principala linie_principala       {;}
+            ;
+
+linie_principala    : asignare ';'                      {;}
+                    | culcat ';'                        {exit(EXIT_SUCCESS);}
+                    | print exp ';'                     {printeaza_variabile($2);}
+                    | IF_ST                             {;}
+                    | vezi '(' exp ')' ';'              {;}
+                    ;
+
+linie_decl : asignare ';'                               {;}
+           | FUNCTION                                   {;}
+           | defineste_tip '{' ELEMENTE '}' AIDI ';'    {impinge_variabila_structurata($5);}
+
+ELEMENTE : TIP_DATA AIDI ';' ELEMENTE	        {;}
 		 |										{;}
 		 ;
 
-TIP_DATA   : integru   	 {$$ = $1;}
-			| plutitor			 {$$ = $1;}
-			| litera 	 {$$ = $1;}
-			| bul 	 		 {$$ = $1;}
-			| fraza		 {$$ = $1;}
+TIP_DATA   : integru   	            {$$ = $1;}
+			| plutitor			    {$$ = $1;}
+			| litera 	            {$$ = $1;}
+			| bul 	 		        {$$ = $1;}
+			| fraza		            {$$ = $1;}
 			;
 
-asignare  : TIP_DATA AIDI	 					{impinge_variabila_goala($2, $1);}
-			| TIP_DATA AIDI EQUAL exp  			{impinge_variabila($2, $1, $4);}
+asignare  : TIP_DATA AIDI	 					    {impinge_variabila_goala($2, $1);}
+			| TIP_DATA AIDI EQUAL exp  			    {impinge_variabila($2, $1, $4);}
 		
 			| conservator TIP_DATA AIDI EQUAL exp  	{impinge_variabila_conservatoare($3, $2, $5);}
 
-			| TIP_DATA AIDI '[' exp ']'			{impinge_in_array($2, $1, $4);}
+			| TIP_DATA AIDI '[' exp ']' 			{impinge_in_array($2, $1, $4);}
 
-			| AIDI EQUAL exp   					{actualizeaza_valoarea($1, $3);}
+			| AIDI EQUAL exp   					    {actualizeaza_valoarea($1, $3);}
 			| AIDI '[' exp ']' EQUAL exp			{actualizeaza_in_array($1, $3, $6);}
 			;
-
 
 exp    	: term                     	{$$ = $1;}
      	| '(' exp ')'			   	{$$ = $2;}
@@ -174,7 +189,7 @@ exp    	: term                     	{$$ = $1;}
        	| exp MINUS exp             {$$ = compara_variabile($1, $3, MINUS);}
        	| exp PROD exp              {$$ = compara_variabile($1, $3, PROD);}
         | exp DIV exp          	   	{$$ = compara_variabile($1, $3, DIV);}
-
+        | print exp ';'             {printeaza_variabile($2);}
 		| exp AND exp              	{$$ = compara_variabile($1, $3, AND);}
 		| exp OR exp               	{$$ = compara_variabile($1, $3, OR);}
 		| exp LS exp 				{$$ = compara_variabile($1, $3, LS) ;}
@@ -185,44 +200,40 @@ exp    	: term                     	{$$ = $1;}
 		;
 
 
-term	: AIDI						{$$ = pointer_variabila($1);} 
-		| AIDI '[' exp ']'			{$$ = pointer_array($1, $3);}
-		| AIDI '(' lista_apelare_functie ')' 	{$$ = pointer_subrutina($1, $3);}
-   		| number                			{$$ = pointer_nr($1, integru);}
-		| number_r							{$$ = pointer_nr($1, plutitor);}
-		| valoare_litera					{$$ = pointer_fraza($1, litera);}
-		| valoare_fraza						{$$ = pointer_fraza($1, fraza);}
+term	: AIDI						                {$$ = pointer_variabila($1);} 
+		| AIDI '[' exp ']'			                {$$ = pointer_array($1, $3);}
+		| AIDI '(' lista_apelare_functie ')' 	    {$$ = pointer_subrutina($1, $3);}
+   		| number                			        {$$ = pointer_nr($1, integru);}
+		| number_r							        {$$ = pointer_nr($1, plutitor);}
+		| valoare_litera					        {$$ = pointer_fraza($1, litera);}
+		| valoare_fraza						        {$$ = pointer_fraza($1, fraza);}
         ;
 
 lista_apelare_functie	: parametri_apelare			{$$ = $1;}
-				|							{$$ = initializeaza_parametru(0);}
-				;
+				        |							{$$ = initializeaza_parametru(0);}
+				        ;
 
-parametri_apelare : exp						{$$ = initializeaza_parametru($1->type);}
-				| parametri_apelare ',' exp	{impinge_parametru($$, $3->type);}
-				;
+parametri_apelare   : exp						        {$$ = initializeaza_parametru($1->type);}
+				    | parametri_apelare ',' exp	        {impinge_parametru($$, $3->type);}
+				    ;
 
-drp	: dak '(' exp ')' bloc_cod				{;}
-		| dak '(' exp ')' bloc_cod ELIF_S ELSE_ 	{;}
-		| dak '(' exp ')' bloc_cod ELSE_ 		{;}
-		| dak '(' exp ')' bloc_cod ELIF_S	 	{;}
-		| rastimp '(' exp ')' bloc_cod			{;}
-		| pt '(' AIDI EQUAL exp ';' exp ';' AIDI EQUAL exp ')' bloc_cod					{;}
-		;
+IF_ST   : dak '(' exp_2 ')' ST1 ';' altfel ST1 ';'
+        | dak '(' exp_2 ')' ST1 ';'
+        ;
 
-ELSE_   : altfel bloc_cod 						{;}
-		;
+ST1     : IF_ST
+        | exp
+        ;
 
-ELIF_S  : ELIF_
-		| ELIF_S ELIF_
-		;
-
-ELIF_   : poate '(' exp ')' bloc_cod				{;}
-		;
-
-bloc_cod 	: '{' tipuri_bloc '}'				    {;}
-		| '{' '}'							        {;}
-		;
+exp_2   : exp LS exp
+        | exp GE exp
+        | exp LEQ exp
+        | exp GEQ exp
+        | exp EQEQ exp
+        | exp OR exp
+        | exp AND exp
+        | term
+        ;
 
 tipuri_bloc  : tip_bloc 					        {;}
 			| tipuri_bloc tip_bloc
@@ -231,23 +242,23 @@ tipuri_bloc  : tip_bloc 					        {;}
 tip_bloc 	: asignare ';'			    {;}
 			| exp        ';'			{;}
 			| print exp ';'				{printeaza_variabile($2);}
-			| drp 						{;}
+			| IF_ST 						{;}
 			;
 
 
 
-FUNCTION 	: TIP_DATA subrutina AIDI '(' lista_param ')' bloc_functie 		{impinge_functie($3, $1, $5);}
+FUNCTION 	: TIP_DATA subrutina AIDI '(' lista_param ')' bloc_functie 		    {impinge_functie($3, $1, $5);}
 			;
 
 lista_param : mai_multi_param													{$$ = $1;}
-			| 																{$$ = initializeaza_parametru(0);}
+			| 																    {$$ = initializeaza_parametru(0);}
 			;
 
-mai_multi_param : parametru													{$$ = initializeaza_parametru($1);}
-			| mai_multi_param ',' parametru									{impinge_parametru($$, $3);}
+mai_multi_param : parametru													    {$$ = initializeaza_parametru($1);}
+			| mai_multi_param ',' parametru									    {impinge_parametru($$, $3);}
 			;
 
-parametru  : TIP_DATA AIDI											{$$ = $1;}
+parametru  : TIP_DATA AIDI											            {$$ = $1;}
 			;
 
 
@@ -262,7 +273,7 @@ struct var *pointer_array(char *id, struct var *node)
     int identifier;
     if ((identifier = ia_index_variabila(id)) == -1)
     {
-        printf("%s nu a fost declarat in acest scop.\n", id);
+        printf("%s nu a fost declarat.\n", id);
         exit(0);
     }
 
@@ -359,7 +370,7 @@ void creaza_tabel_simboluri(struct var *variabila, int n)
                     break;
 
                 case 0:
-                    fprintf(fd, "tip = User Defined Type\n");
+                    fprintf(fd, "tip = definit de utilizator\n");
                     break;
 
                 default:
@@ -516,6 +527,7 @@ struct var *pointer_subrutina(char *id, struct parameter *pr)
 
     return variabila;
 }
+
 void impinge_functie(char *id, int retType, struct parameter *p)
 {
     if (ia_index_variabila(id) != -1)
@@ -1110,7 +1122,7 @@ struct var *compara_variabile(struct var *first_var, struct var *second_var, int
             }
             break;
         case DIV:
-            double c = first_var->array[0] / second_var->array[0];
+            c = first_var->array[0] / second_var->array[0];
             if (c == (int)c)
                 variable->type = integru;
             else

@@ -1,63 +1,25 @@
-integru a = 8;
-
-print "a: ";
-print a;
-
-conservator plutitor b = 12.785;
-print b;
-
-integru i = 5;
-pt (i = 5 ; i < b ; i = i + 2)
-{
-    print i;
-}
-
-rastimp(i < 7)
-{
-    print b;
-}
-
-litera d[5];
-d[0] = 'a'; d[1] = 'b'; d[4] = 'c';
-print d;
-
-bul e = 0;
+aici_declar
 
 integru subrutina cmmdc(integru x)
 {
     ofera 10;
 }
 
-print cmmdc(a);
+integru ss[2];
+ss[0] = 2;
+ss[1] = 12;
 
-dak(a < 20)
-{
-    print a;
-}
-altfel
-{
-    print b;
-}
+nu_mai_declar
 
-dak(a < 20)
-{
-    print "";
-}
-poate (b > 7)
-{
-    print d;
-}
+pe_principala
 
-vezi((24 / 3 + 2) * 2 - 5);
+integru a = 3;
 
-bul f = 7 == 1;
-print f;
+dak (a > 20)
+    print 2;
 
-f = 7 >= 1;
-print f;
+print ss[0];
+print ss[1] + 5;
+print "a";
 
-f = 1 <= 7;
-print f;
-
-f = 1 == 1;
-print f;
+nu_mai_principala
