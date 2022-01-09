@@ -40,6 +40,8 @@ int yylex();
 "<"                             	{return LS;}
 ">"                             	{return GE;}
 
+"pt"                                {return pt;}
+"rastimp"                           {return rastimp;}
 "dak"                               {return dak;}
 "altfel"                            {return altfel;}
 "vezi"                              {return vezi;}

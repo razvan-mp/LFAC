@@ -92,7 +92,7 @@ char* definite_la_tip_date(int);
 %token PLUS MINUS PROD DIV EQUAL
 
 
-%token dak
+%token dak pt rastimp
 %type<num> tip_bloc tipuri_bloc bloc_functie
 %token altfel
 
@@ -164,6 +164,8 @@ principala  : linie_principala                  {;}
 linie_principala    : culcat ';'                        {exit(EXIT_SUCCESS);}
                     | print '(' exp ',' exp ')' ';'				{printeaza_variabile($3, $5);}
                     | IF_ST                             {;}
+                    | FOR_ST                            {;}
+                    | WHILE_ST                          {;}
                     | vezi '(' exp ')' ';'              {functie_evaluare($3);}
                     ;
 linie_decl : asignare ';'                               {;}
@@ -242,6 +244,12 @@ exp_2   : exp LS exp
         | term
         ;
 
+FOR_ST  : pt '(' AIDI EQUAL exp ';' exp ';' AIDI EQUAL exp ')' '{' tipuri_bloc '}'
+        ;
+
+WHILE_ST    : rastimp '(' exp ')' '{' tipuri_bloc '}'
+            ;
+
 tipuri_bloc  : tip_bloc 					        {;}
 			| tipuri_bloc tip_bloc
 			;
@@ -252,8 +260,6 @@ tip_bloc 	: asignare ';'			    {;}
 			| IF_ST 						{;}
 			;
 
-
-
 FUNCTION 	: TIP_DATA subrutina AIDI '(' lista_param ')' bloc_functie 		    {impinge_functie($3, $1, $5);}
 			;
 
@@ -262,16 +268,16 @@ lista_param : mai_multi_param													{$$ = $1;}
 			;
 
 mai_multi_param : parametru													    {$$ = initializeaza_parametru($1);}
-			| mai_multi_param ',' parametru									    {impinge_parametru($$, $3);}
-			;
+			    | mai_multi_param ',' parametru									    {impinge_parametru($$, $3);}
+			    ;
 
-parametru  : TIP_DATA AIDI											            {$$ = $1;}
+parametru   : TIP_DATA AIDI											            {$$ = $1;}
 			;
 
 
 bloc_functie	: '{' tipuri_bloc ofera exp ';' '}' 		{;}
-			| '{' ofera exp ';' '}'				{;}
-			;
+			    | '{' ofera exp ';' '}'				{;}
+			    ;
 
 %%
 

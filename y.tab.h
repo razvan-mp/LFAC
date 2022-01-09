@@ -75,17 +75,19 @@ extern int yydebug;
     DIV = 281,
     EQUAL = 282,
     dak = 283,
-    altfel = 284,
-    subrutina = 285,
-    ofera = 286,
-    defineste_tip = 287,
-    valoare_fraza = 288,
-    valoare_litera = 289,
-    vezi = 290,
-    culcat = 291,
-    number = 292,
-    number_r = 293,
-    AIDI = 294
+    pt = 284,
+    rastimp = 285,
+    altfel = 286,
+    subrutina = 287,
+    ofera = 288,
+    defineste_tip = 289,
+    valoare_fraza = 290,
+    valoare_litera = 291,
+    vezi = 292,
+    culcat = 293,
+    number = 294,
+    number_r = 295,
+    AIDI = 296
   };
 #endif
 /* Tokens.  */
@@ -115,17 +117,19 @@ extern int yydebug;
 #define DIV 281
 #define EQUAL 282
 #define dak 283
-#define altfel 284
-#define subrutina 285
-#define ofera 286
-#define defineste_tip 287
-#define valoare_fraza 288
-#define valoare_litera 289
-#define vezi 290
-#define culcat 291
-#define number 292
-#define number_r 293
-#define AIDI 294
+#define pt 284
+#define rastimp 285
+#define altfel 286
+#define subrutina 287
+#define ofera 288
+#define defineste_tip 289
+#define valoare_fraza 290
+#define valoare_litera 291
+#define vezi 292
+#define culcat 293
+#define number 294
+#define number_r 295
+#define AIDI 296
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -139,7 +143,7 @@ union YYSTYPE
 	struct var* strct;
 	struct parameter* param_functie;
 
-#line 143 "y.tab.h"
+#line 147 "y.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

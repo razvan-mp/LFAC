@@ -1,36 +1,23 @@
 aici_declar
 
-integru a = 3;
+integru empty_var_1;
+plutitor empty_var_2;
 
-plutitor b = 1.2131;
+litera lfac[4];
+lfac[0] = 'l'; lfac[1] = 'f'; lfac[2] = 'a'; lfac[3] = 'c';
 
-integru ss[2];
-ss[0] = 2;
-ss[1] = 12;
+integru 
 
 nu_mai_declar
 
 dau_functii
 
-defineste_tip
-{
-    integru x;
-    plutitor y;
-} z;
 
-integru subrutina cmmdc(integru x, plutitor y)
-{
-    ofera 10;
-}
 
 nu_mai_dau
 
 pe_principala
 
 
-print("Ceva ", ss[0]);
-print("Altceva ", ss[1] + 5);
-print("ajkldsa ", 9);
-print("cmmdc: ", cmmdc(a, b));
 
 nu_mai_principala
