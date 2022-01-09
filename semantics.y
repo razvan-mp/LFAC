@@ -82,7 +82,7 @@ char* definite_la_tip_date(int);
 
 %token print
 
-%token INCEPE_DECL TERMINA_DECL INCEPE_MAIN TERMINA_MAIN
+%token INCEPE_DECL TERMINA_DECL INCEPE_MAIN TERMINA_MAIN INCEPE_DECL_FUN TERMINA_DECL_FUN
 
 %type <type_id> TIP_DATA
 %token <type_id> integru plutitor litera bul fraza
@@ -131,9 +131,9 @@ char* definite_la_tip_date(int);
 
 %%
 
-s   : decl main                                 { creaza_tabel_simboluri(variabile,total_variabile);printf( "Program corect sintactic\n" ); }
-    | main
-    |
+s   : decl decl_functii main                                 { creaza_tabel_simboluri(variabile,total_variabile);printf( "Program corect sintactic\n" ); }
+    | decl main                                             { creaza_tabel_simboluri(variabile,total_variabile);printf( "Program corect sintactic\n" ); }
+    | main                                                  { creaza_tabel_simboluri(variabile,total_variabile);printf( "Program corect sintactic\n" ); }
 	; 
 
 decl    : INCEPE_DECL declarari TERMINA_DECL
@@ -143,6 +143,17 @@ declarari   	: linie_decl		 			{;}
 				| declarari linie_decl			{;}
 				;
 
+decl_functii    : INCEPE_DECL_FUN decl_fun TERMINA_DECL_FUN
+                ;
+
+decl_fun    : linie_decl_fun                    {;}
+            | decl_fun linie_decl_fun           {;}
+            ;
+
+linie_decl_fun  : FUNCTION                                   {;}
+                | defineste_tip '{' ELEMENTE '}' AIDI ';'    {impinge_variabila_structurata($5);}
+                ;
+
 main    : INCEPE_MAIN principala TERMINA_MAIN
         ;
 
@@ -150,16 +161,13 @@ principala  : linie_principala                  {;}
             | principala linie_principala       {;}
             ;
 
-linie_principala    : asignare ';'                      {;}
-                    | culcat ';'                        {exit(EXIT_SUCCESS);}
+linie_principala    : culcat ';'                        {exit(EXIT_SUCCESS);}
                     | print '(' exp ',' exp ')' ';'				{printeaza_variabile($3, $5);}
                     | IF_ST                             {;}
-                    | vezi '(' exp ')' ';'              {;}
+                    | vezi '(' exp ')' ';'              {functie_evaluare($3);}
                     ;
-
 linie_decl : asignare ';'                               {;}
-           | FUNCTION                                   {;}
-           | defineste_tip '{' ELEMENTE '}' AIDI ';'    {impinge_variabila_structurata($5);}
+           ;
 
 ELEMENTE : TIP_DATA AIDI ';' ELEMENTE	        {;}
 		 |										{;}
@@ -171,10 +179,9 @@ TIP_DATA   : integru   	            {$$ = $1;}
 			| bul 	 		        {$$ = $1;}
 			| fraza		            {$$ = $1;}
 			;
-
-asignare  : TIP_DATA AIDI	 					    {impinge_variabila_goala($2, $1);}
+asignare    : TIP_DATA AIDI	 					    {impinge_variabila_goala($2, $1);}
 			| TIP_DATA AIDI EQUAL exp  			    {impinge_variabila($2, $1, $4);}
-		
+
 			| conservator TIP_DATA AIDI EQUAL exp  	{impinge_variabila_conservatoare($3, $2, $5);}
 
 			| TIP_DATA AIDI '[' exp ']' 			{impinge_in_array($2, $1, $4);}
