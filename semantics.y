@@ -57,7 +57,7 @@ void impinge_variabila_conservatoare(char*, int, struct var*);
 void impinge_variabila_goala(char*, int);
 void impinge_variabila_structurata(char*);
 struct var* compara_variabile(struct var*, struct var*, int);
-void printeaza_variabile(struct var*);
+void printeaza_variabile(struct var*, struct var*);
 void creaza_tabel_simboluri(struct var*,int);
 
 void impinge_in_array(char*, int, struct var*);
@@ -152,7 +152,7 @@ principala  : linie_principala                  {;}
 
 linie_principala    : asignare ';'                      {;}
                     | culcat ';'                        {exit(EXIT_SUCCESS);}
-                    | print exp ';'                     {printeaza_variabile($2);}
+                    | print '(' exp ',' exp ')' ';'				{printeaza_variabile($3, $5);}
                     | IF_ST                             {;}
                     | vezi '(' exp ')' ';'              {;}
                     ;
@@ -189,7 +189,7 @@ exp    	: term                     	{$$ = $1;}
        	| exp MINUS exp             {$$ = compara_variabile($1, $3, MINUS);}
        	| exp PROD exp              {$$ = compara_variabile($1, $3, PROD);}
         | exp DIV exp          	   	{$$ = compara_variabile($1, $3, DIV);}
-        | print exp ';'             {printeaza_variabile($2);}
+        | print '(' exp ',' exp ')' ';'				{printeaza_variabile($3, $5);}
 		| exp AND exp              	{$$ = compara_variabile($1, $3, AND);}
 		| exp OR exp               	{$$ = compara_variabile($1, $3, OR);}
 		| exp LS exp 				{$$ = compara_variabile($1, $3, LS) ;}
@@ -241,7 +241,7 @@ tipuri_bloc  : tip_bloc 					        {;}
 
 tip_bloc 	: asignare ';'			    {;}
 			| exp        ';'			{;}
-			| print exp ';'				{printeaza_variabile($2);}
+			| print '(' exp ',' exp ')' ';'				{printeaza_variabile($3, $5);}
 			| IF_ST 						{;}
 			;
 
@@ -610,114 +610,143 @@ struct parameter *initializeaza_parametru(int type)
     return new_parameter;
 }
 
-void printeaza_variabile(struct var *node)
+void printeaza_variabile(struct var *node, struct var *node2)
 {
+    char msg[1000];
+    bzero(msg, sizeof(msg));
+
     int type = node->type;
     int n;
+    // Pentru node
+
+    switch (type)
+    {
+        case fraza:
+            if (node->tip_variable == TIP_VARIABILA)
+            {
+                strcat(msg, node->array_fraze[0]);
+            }
+            else
+            {
+                printf("EROARE: Sintaxa print-ului este: Fraza + integru/plutitor/etc\n");
+                exit(0);
+            }
+                //printf("\"%s\"\n", node->array_fraze[0]);
+            break;
+
+        default:
+            printf("EROARE: Sintaxa print-ului este: Fraza + integru/plutitor/etc\n");
+            exit(0);
+            break;
+    }
+
+    printf("%s", msg);
+    type = node2->type;
 
     switch (type)
     {
         case integru:
-            if (node->tip_variable == TIP_ARRAY)
+            if (node2->tip_variable == TIP_ARRAY)
             {
-                n = node->dimensiune_array;
+                n = node2->dimensiune_array;
                 printf("{");
                 for (int index = 0; index < n - 1; ++index)
                 {
-                    printf("%d, ", (int)node->array[index]);
+                    printf("%d, ", (int)node2->array[index]);
                 }
-                printf("%d", (int)node->array[n - 1]);
+                printf("%d", (int)node2->array[n - 1]);
                 printf("}\n");
                 break;
             }
-            if (node->tip_variable == TIP_VARIABILA)
-                printf("%d\n", (int)node->array[0]);
+            if (node2->tip_variable == TIP_VARIABILA)
+                printf("%d\n", (int)node2->array[0]);
             break;
 
         case plutitor:
-            if (node->tip_variable == TIP_ARRAY)
+            if (node2->tip_variable == TIP_ARRAY)
             {
-                n = node->dimensiune_array;
+                
+                n = node2->dimensiune_array;
                 printf("{");
                 for (int index = 0; index < n - 1; ++index)
                 {
-                    printf("%f, ", (float)node->array[index]);
+                    printf("%f, ", (float)node2->array[index]);
                 }
-                printf("%f", (float)node->array[n - 1]);
+                printf("%f", (float)node2->array[n - 1]);
                 printf("}\n");
                 break;
             }
-            if (node->tip_variable == TIP_VARIABILA)
-                printf("%f\n", (float)node->array[0]);
+            if (node2->tip_variable == TIP_VARIABILA)
+                printf("%f\n", (float)node2->array[0]);
             break;
 
         case bul:
-            if (node->tip_variable == TIP_ARRAY)
+            if (node2->tip_variable == TIP_ARRAY)
             {
-                n = node->dimensiune_array;
+                n = node2->dimensiune_array;
                 printf("{");
                 for (int index = 0; index < n - 1; ++index)
                 {
-                    printf("\"%d\", ", (int)node->array[index]);
+                    printf("\"%d\", ", (int)node2->array[index]);
                 }
-                printf("\"%d\"", (int)node->array[n - 1]);
+                printf("\"%d\"", (int)node2->array[n - 1]);
                 printf("}\n");
                 break;
             }
-            if (node->tip_variable == TIP_VARIABILA)
-                printf("%d\n", (int)node->array[0]);
+            if (node2->tip_variable == TIP_VARIABILA)
+                printf("%d\n", (int)node2->array[0]);
             break;
 
         case litera:
-            if (node->tip_variable == TIP_ARRAY)
+            if (node2->tip_variable == TIP_ARRAY)
             {
-                n = node->dimensiune_array;
+                n = node2->dimensiune_array;
                 printf("{");
                 for (int index = 0; index < n - 1; ++index)
                 {
-                    printf("'%c', ", (char)node->array[index]);
+                    printf("'%c', ", (char)node2->array[index]);
                 }
-                printf("'%c'", (char)node->array[n - 1]);
+                printf("'%c'", (char)node2->array[n - 1]);
                 printf("}\n");
                 break;
             }
-            if (node->tip_variable == TIP_VARIABILA)
-                printf("'%c'\n", (char)node->array[0]);
+            if (node2->tip_variable == TIP_VARIABILA)
+                printf("'%c'\n", (char)node2->array[0]);
             break;
 
         case fraza:
-            if (node->tip_variable == TIP_ARRAY)
+            if (node2->tip_variable == TIP_ARRAY)
             {
-                n = node->dimensiune_array;
+                n = node2->dimensiune_array;
                 printf("{");
                 for (int index = 0; index < n - 1; ++index)
                 {
-                    printf("\"%s\", ", node->array_fraze[index]);
+                    printf("\"%s\", ", node2->array_fraze[index]);
                 }
-                printf("\"%s\"", node->array_fraze[n - 1]);
+                printf("\"%s\"", node2->array_fraze[n - 1]);
                 printf("}\n");
                 break;
             }
-            if (node->tip_variable == TIP_VARIABILA)
-                printf("\"%s\"\n", node->array_fraze[0]);
+            if (node2->tip_variable == TIP_VARIABILA)
+                printf("\"%s\"\n", node2->array_fraze[0]);
             break;
 
         default:
             break;
     }
 
-    if (node->tip_variable == TIP_SUBRUTINA)
+    if (node2->tip_variable == TIP_SUBRUTINA)
     {
-        printf("%s %s", definite_la_tip_date(node->type), node->id);
-        n = node->numar_parametri;
+        printf("%s %s", definite_la_tip_date(node2->type), node2->id);
+        n = node2->numar_parametri;
         if (n != 0)
         {
             printf(" -> {");
             for (int index = 0; index < n - 1; ++index)
             {
-                printf("%s, ", definite_la_tip_date(node->tipuri_parametri[index]));
+                printf("%s, ", definite_la_tip_date(node2->tipuri_parametri[index]));
             }
-            printf("%s}", definite_la_tip_date(node->tipuri_parametri[n - 1]));
+            printf("%s}", definite_la_tip_date(node2->tipuri_parametri[n - 1]));
         }
 
         printf("\n");

@@ -15,11 +15,11 @@ pe_principala
 
 integru a = 3;
 
-dak (a > 20)
-    print 2;
 
-print ss[0];
-print ss[1] + 5;
-print "a";
+print("Ceva ", ss[0]);
+print("Altceva ", ss[1] + 5);
+print("ajkldsa ", 9);
+print(4, "Test");
+print("Test);
 
 nu_mai_principala

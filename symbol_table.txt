@@ -1,4 +1,4 @@
 nume : ss  tip = array de integruss[0] = 2  ss[1] = 12  
-nume : a  tip = integru valoare = 0  nu e constanta 
+nume : a  tip = integru valoare = 3  nu e constanta 
 
 Functia : integru cmmdc (integru) 
