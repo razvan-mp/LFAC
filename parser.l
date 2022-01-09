@@ -10,6 +10,8 @@ int yylex();
 %}
 %%
 
+"dau_functii"                       {return INCEPE_DECL_FUN;} 
+"nu_mai_dau"                        {return TERMINA_DECL_FUN;}
 "aici_declar"                       {return INCEPE_DECL;}
 "nu_mai_declar"                     {return TERMINA_DECL;}
 "pe_principala"                     {return INCEPE_MAIN;}
