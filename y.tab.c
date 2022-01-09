@@ -2536,10 +2536,16 @@ struct var *pointer_subrutina(char *id, struct parameter *pr)
 
 void impinge_functie(char *id, int retType, struct parameter *p)
 {
-    if (ia_index_variabila(id) != -1)
+    for (int i = 0; i < total_variabile; ++i)
     {
-        printf("Numele functiei %s a mai fost utilizat.\n", id);
-        exit(0);
+        if (strcmp(id, variabile[i].id) == 0)
+        {
+            if(variabile[i].type == retType && variabile[i].numar_parametri == p->numar_parametri)
+            {
+                printf("Numele functiei %s a mai fost utilizat.\n", id);
+                exit(0);
+            }
+        }
     }
 
     struct var *new_variable = variabile + total_variabile;

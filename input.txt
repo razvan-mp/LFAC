@@ -5,6 +5,17 @@ integru subrutina cmmdc(integru x)
     ofera 10;
 }
 
+plutitor subrutina cmmdc(integru x)
+{
+    ofera 10;
+}
+
+plutitor subrutina cmmdc(integru x, plutitor y)
+{
+    ofera 10;
+}
+
+
 integru ss[2];
 ss[0] = 2;
 ss[1] = 12;
@@ -13,13 +24,18 @@ nu_mai_declar
 
 pe_principala
 
-integru a = 3;
+integru a = 2 + 3 + 2 * 4;
 
 
 print("Ceva ", ss[0]);
 print("Altceva ", ss[1] + 5);
 print("ajkldsa ", 9);
+
+print("Evaluare ", a);
+
 print(4, "Test");
 print("Test);
+
+
 
 nu_mai_principala
