@@ -6,13 +6,21 @@ plutitor empty_var_2;
 litera lfac[4];
 lfac[0] = 'l'; lfac[1] = 'f'; lfac[2] = 'a'; lfac[3] = 'c';
 
-integru 
+integru b = vezi(24 / 8 + 3 * 12 - (40 * 6));
 
 nu_mai_declar
 
 dau_functii
 
+integru subrutina cmmdc(integru a, bul c)
+{
+      ofera 10;
+}
 
+integru subrutina cmmdc(integru a, integru b)
+{
+      ofera 2;
+}
 
 nu_mai_dau
 
