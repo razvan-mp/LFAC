@@ -1,5 +1,8 @@
 aici_declar
 
+conservator integru test_const;
+conservator integru test_const_1 = 12;
+
 integru empty_var_1;
 plutitor empty_var_2;
 
