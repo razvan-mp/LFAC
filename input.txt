@@ -2,56 +2,24 @@ aici_declar
 
 integru a = 24/8 + 3 * 12 - 25 + 46;
 
-integru num_1 = 3;
+integru num_1 = 1;
 integru num_2 = 7;
 
 conservator integru test_2 = 10;
 
 plutitor float_test = 17.234;
 
-integru empty_var_1;
-plutitor empty_var_2;
-
-litera lfac[4];
-lfac[0] = 'l'; lfac[1] = 'f'; lfac[2] = 'a'; lfac[3] = 'c';
-
-conservator fraza ss = "test string";
-
-bul test_bool = test_2 < 10;
-bul test_bool_2 = test_2 == 10;
+integru empty_var_1 = 1231.123;
+plutitor empty_var_2 = 12;
+integru empty_var_3 = 'a';
 
 nu_mai_declar
 
-dau_functii
-
-defineste_tip
-{
-    integru x;
-    integru y;
-} z;
-
-integru subrutina test_fun(integru a, integru b)
-{
-    ofera 0;
-}
-
-integru subrutina test_fun(integru a, integru b, integru c)
-{
-    ofera 0;
-}
-
-nu_mai_dau
-
 pe_principala
 
-print(" Test ", "afisare");
-print(" Float: ", float_test);
-print(" Const: ", test_2);
-print(" Char: ", lfac);
-print(" String: ", ss);
-print(" Bool 1: ", test_bool);
-print(" Bool 2: ", test_bool_2);
-print(" Functie: ", test_fun(num_1, num_2));
+print(" float_cu_int: ", empty_var_2);
+print(" int_cu_float: ", empty_var_1);
+print(" int_cu_char: ", empty_var_3);
 
 dak (test_2 == 10)
 {
@@ -62,20 +30,10 @@ altfel
     print(" Rezultat if:", 0);
 }
 
-pt (num_1 = 5 ; num_1 <= num_2 ; num_1 = num_1 + 2)
-{
-    print("For: ", ss);
-}
-
-print(" Num_1: ", num_1);
-
-rastimp (num_1 <= 10)
-{
-    num_1 = num_1 + 1;
-}
-
-print(" Num_1: ", num_1);
+print("Num_1: ", num_1);
 
 vezi(((28 / 7) * 4 + 48) / 4 + 4);
+
+print(" z: ", z);
 
 nu_mai_principala

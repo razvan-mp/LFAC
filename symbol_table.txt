@@ -1,10 +1,10 @@
-nume : a  tip = integru valoare = 0  nu e constanta 
-nume : num_1  tip = integru valoare = 4  nu e constanta 
+nume : a  tip = integru valoare = 60  nu e constanta 
+nume : num_1  tip = integru valoare = 2  nu e constanta 
 nume : num_2  tip = integru valoare = 7  nu e constanta 
 nume : test_2  tip = integru valoare = 10  constanta 
 nume : float_test  tip = plutitor valoare = 17.233999 nu e constanta 
 nume : empty_var_1  tip = integru valoare = 0  nu e constanta 
-nume : empty_var_2  tip = plutitor valoare = 0.000000 nu e constanta 
+nume : empty_var_2  tip = plutitor valoare = 12.000000 nu e constanta 
 nume : lfac  tip = array de literalfac[0] = l  lfac[1] = f  lfac[2] = a  lfac[3] = c  
 nume : ss  tip = fraza valoare = "test string" constanta 
 nume : test_bool  tip = bul valoare = 0 nu e constanta 
