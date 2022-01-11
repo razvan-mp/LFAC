@@ -1,8 +1,15 @@
-nume : a  tip = integru valoare = 3  nu e constanta 
-nume : b  tip = plutitor valoare = 1.213100 nu e constanta 
-nume : ss  tip = array de integruss[0] = 2  ss[1] = 12  
-nume : i  tip = integru valoare = 0  nu e constanta 
+nume : a  tip = integru valoare = 0  nu e constanta 
+nume : num_1  tip = integru valoare = 4  nu e constanta 
+nume : num_2  tip = integru valoare = 7  nu e constanta 
+nume : test_2  tip = integru valoare = 10  constanta 
+nume : float_test  tip = plutitor valoare = 17.233999 nu e constanta 
+nume : empty_var_1  tip = integru valoare = 0  nu e constanta 
+nume : empty_var_2  tip = plutitor valoare = 0.000000 nu e constanta 
+nume : lfac  tip = array de literalfac[0] = l  lfac[1] = f  lfac[2] = a  lfac[3] = c  
+nume : ss  tip = fraza valoare = "test string" constanta 
+nume : test_bool  tip = bul valoare = 0 nu e constanta 
+nume : test_bool_2  tip = bul valoare = 1 nu e constanta 
 nume : z  tip = definit de utilizator
 
-Functia : integru cmmdc (integru, plutitor) 
-Functia : integru cmmdc (integru, plutitor, bul) 
+Functia : integru test_fun (integru, integru) 
+Functia : integru test_fun (integru, integru, integru) 

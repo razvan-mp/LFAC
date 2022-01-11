@@ -168,8 +168,8 @@ linie_principala    : culcat ';'                        {exit(EXIT_SUCCESS);}
                     | WHILE_ST                          {;}
                     | vezi '(' exp ')' ';'              {functie_evaluare($3);}
                     ;
-linie_decl : asignare ';'                               {;}
-           ;
+linie_decl  : asignare ';'                               {;}
+            ;
 
 ELEMENTE : TIP_DATA AIDI ';' ELEMENTE	        {;}
 		 |										{;}
@@ -183,7 +183,6 @@ TIP_DATA   : integru   	            {$$ = $1;}
 			;
 asignare    : TIP_DATA AIDI	 					    {impinge_variabila_goala($2, $1);}
 			| TIP_DATA AIDI EQUAL exp  			    {impinge_variabila($2, $1, $4);}
-
 			| conservator TIP_DATA AIDI EQUAL exp  	{impinge_variabila_conservatoare($3, $2, $5);}
 
 			| TIP_DATA AIDI '[' exp ']' 			{impinge_in_array($2, $1, $4);}
@@ -192,20 +191,20 @@ asignare    : TIP_DATA AIDI	 					    {impinge_variabila_goala($2, $1);}
 			| AIDI '[' exp ']' EQUAL exp			{actualizeaza_in_array($1, $3, $6);}
 			;
 
-exp    	: term                     	{$$ = $1;}
-     	| '(' exp ')'			   	{$$ = $2;}
-       	| exp PLUS exp              {$$ = compara_variabile($1, $3, PLUS);}
-       	| exp MINUS exp             {$$ = compara_variabile($1, $3, MINUS);}
-       	| exp PROD exp              {$$ = compara_variabile($1, $3, PROD);}
-        | exp DIV exp          	   	{$$ = compara_variabile($1, $3, DIV);}
+exp    	: term                     	                {$$ = $1;}
+     	| '(' exp ')'			   	                {$$ = $2;}
+       	| exp PLUS exp                              {$$ = compara_variabile($1, $3, PLUS);}
+       	| exp MINUS exp                             {$$ = compara_variabile($1, $3, MINUS);}
+       	| exp PROD exp                              {$$ = compara_variabile($1, $3, PROD);}
+        | exp DIV exp          	   	                {$$ = compara_variabile($1, $3, DIV);}
         | print '(' exp ',' exp ')' ';'				{printeaza_variabile($3, $5);}
-		| exp AND exp              	{$$ = compara_variabile($1, $3, AND);}
-		| exp OR exp               	{$$ = compara_variabile($1, $3, OR);}
-		| exp LS exp 				{$$ = compara_variabile($1, $3, LS) ;}
-		| exp GE exp 				{$$ = compara_variabile($1, $3, GE);}
-		| exp LEQ exp 				{$$ = compara_variabile($1, $3, LEQ);}
-		| exp GEQ exp 				{$$ = compara_variabile($1, $3, GEQ);}
-		| exp EQEQ exp 				{$$ = compara_variabile($1, $3, EQEQ);}
+		| exp AND exp              	                {$$ = compara_variabile($1, $3, AND);}
+		| exp OR exp               	                {$$ = compara_variabile($1, $3, OR);}
+		| exp LS exp 				                {$$ = compara_variabile($1, $3, LS) ;}
+		| exp GE exp 				                {$$ = compara_variabile($1, $3, GE);}
+		| exp LEQ exp 				                {$$ = compara_variabile($1, $3, LEQ);}
+		| exp GEQ exp 				                {$$ = compara_variabile($1, $3, GEQ);}
+		| exp EQEQ exp 				                {$$ = compara_variabile($1, $3, EQEQ);}
 		;
 
 
@@ -226,22 +225,8 @@ parametri_apelare   : exp						        {$$ = initializeaza_parametru($1->type);}
 				    | parametri_apelare ',' exp	        {impinge_parametru($$, $3->type);}
 				    ;
 
-IF_ST   : dak '(' exp_2 ')' ST1 ';' altfel ST1 ';'
-        | dak '(' exp_2 ')' ST1 ';'
-        ;
-
-ST1     : IF_ST
-        | exp
-        ;
-
-exp_2   : exp LS exp
-        | exp GE exp
-        | exp LEQ exp
-        | exp GEQ exp
-        | exp EQEQ exp
-        | exp OR exp
-        | exp AND exp
-        | term
+IF_ST   : dak '(' exp ')' '{' tipuri_bloc '}'
+        | dak '(' exp ')' '{' tipuri_bloc '}' altfel '{' tipuri_bloc '}'
         ;
 
 FOR_ST  : pt '(' AIDI EQUAL exp ';' exp ';' AIDI EQUAL exp ')' '{' tipuri_bloc '}'
@@ -659,6 +644,13 @@ void printeaza_variabile(struct var *node, struct var *node2)
             break;
     }
 
+    if (strcmp(node->array_fraze[0], " Rezultat if:") == 0)
+    {
+        printf("​");
+    }
+    else
+    {
+
     printf("%s", msg);
     type = node2->type;
 
@@ -769,6 +761,7 @@ void printeaza_variabile(struct var *node, struct var *node2)
         }
 
         printf("\n");
+    }
     }
 }
 
